@@ -534,12 +534,14 @@ public class TileManager : MonoBehaviour
 
 	public void BuildScenario()
 	{
+		Debug.Log("BuildScenario()");
 		ChapterManager cm = FindObjectOfType<ChapterManager>();
 		List<TileGroup> TGList = new List<TileGroup>();
 
 		//build ALL chapter tilegroups
 		foreach ( Chapter c in cm.chapterList )
 		{
+			Debug.Log("Building Tile Group " + TGList.Count + " of " + cm.chapterList.Count + "...");
 			//build the tiles in the tg
 			TileGroup tg = c.tileGroup = CreateGroupFromChapter( c );
 			if ( tg == null )
@@ -549,14 +551,21 @@ public class TileManager : MonoBehaviour
 			}
 
 			TGList.Add( tg );
+			Debug.Log("Built");
 		}
 
 		//all non-dynamic tiles excluding start
+		int nonDynamicNonStart = TGList.Where(x => !x.GetChapter().isDynamic && x.GetChapter().dataName != "Start").Count();
+		int outerCount = 1;
 		foreach ( TileGroup tg in TGList.Where( x => !x.GetChapter().isDynamic && x.GetChapter().dataName != "Start" ) )
 		{
 			//try attaching tg to oldest tg already on board
+			int nonDynamic = TGList.Where(x => !x.GetChapter().isDynamic && x.GUID != tg.GUID).Count();
+			int innerCount = 1;
 			foreach ( TileGroup tilegroup in TGList.Where( x => !x.GetChapter().isDynamic && x.GUID != tg.GUID ) )//every non-dynamic
 			{
+				Debug.Log("Attach TileGroups " + tg.ToString() + " to " + tilegroup.ToString());
+				Debug.Log("Attach TileGroups outerLoop " + outerCount + " of " + nonDynamicNonStart + ", innerLoop " + innerCount + " of " + nonDynamic);
 				bool success = tg.AttachTo( tilegroup );
 				if ( success )
 				{
@@ -565,10 +574,14 @@ public class TileManager : MonoBehaviour
 					FogData fg = fog.GetComponent<FogData>();
 					fg.chapterName = tg.GetChapter().dataName;
 					fog.transform.position = tg.groupCenter.Y( .5f );
+					Debug.Log("Attached");
 					break;
 				}
+				innerCount++;
 			}
+			outerCount++;
 		}
+		Debug.Log("BuildScenario Complete");
 	}
 
 	public TileState GetState()

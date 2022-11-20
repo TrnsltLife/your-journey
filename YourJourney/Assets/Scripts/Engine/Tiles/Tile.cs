@@ -444,6 +444,7 @@ public class Tile : MonoBehaviour
 
 	public void RevealAllAnchorConnectorTokens()
     {
+		Debug.Log("RevealAllAnchorConnectorTokens for tile " + this.ToString());
 		for (int i = 0; i < transform.childCount; i++)
 		{
 			Transform child = transform.GetChild(i);
@@ -462,7 +463,7 @@ public class Tile : MonoBehaviour
 	/// <summary>
 	/// reveal anchor/connector/special placeholder token for debug purposes
 	/// </summary>
-	void RevealAnchorConnectorToken(Transform t, string tokenName)
+	public void RevealAnchorConnectorToken(Transform t, string tokenName)
 	{
 		var center = tilemesh.GetComponent<MeshRenderer>().bounds.center;
 
@@ -927,4 +928,9 @@ public class Tile : MonoBehaviour
 			}
 		}*/
 	}
+
+	override public  string ToString()
+    {
+		return baseTile.ToShortString();
+    }
 }

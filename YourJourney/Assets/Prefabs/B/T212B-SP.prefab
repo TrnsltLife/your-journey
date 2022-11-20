@@ -164,9 +164,12 @@ MonoBehaviour:
   rootPosition: {fileID: 15366712662536101}
   tilemesh: {fileID: 0}
   tokenTriggerList: []
-  anchorSphere: {fileID: 0}
-  connectorSphere: {fileID: 0}
-  specialSphere: {fileID: 0}
+  anchorSphere: {fileID: 988778545020331381, guid: 32a38b7cb56096c43b720de5a41dccdc,
+    type: 3}
+  connectorSphere: {fileID: 988778545020331381, guid: 9d158379d94005349be9dcfb1701c6ba,
+    type: 3}
+  specialSphere: {fileID: 988778545020331381, guid: 4e881fc72ce888a47ad6b96567ac6ebd,
+    type: 3}
 --- !u!1 &15366712662536100
 GameObject:
   m_ObjectHideFlags: 0

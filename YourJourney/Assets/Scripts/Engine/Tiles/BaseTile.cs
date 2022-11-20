@@ -65,4 +65,9 @@ public class BaseTile : ITile
     {
 		return idNumber + tileSide + " [" + position + "] " + angle + "*, " + tokenCount + " tokens" + (isStartTile ? "[start]" : "");
     }
+
+	public string ToShortString()
+    {
+		return idNumber + tileSide;
+    }
 }
