@@ -274,6 +274,7 @@ public class TileGroup
 		//get array of interactions that are in the interaction group
 		IInteraction[] interactionGroupArray = im.randomTokenInteractions
 			.Where( x => x.dataName.EndsWith( chapter.randomInteractionGroup ) ).ToArray();
+		interactionGroupArray = GlowEngine.ShuffleArray(interactionGroupArray); //randomize the order so every time we play it's different
 		//Debug.Log( "EVENTS IN GROUP [" + chapter.randomInteractionGroup + "]: " + interactionGroupArray.Length );
 
 		//get all the possible token spawn locations that are NOT near FIXED tokens already placed
@@ -306,7 +307,7 @@ public class TileGroup
 
 		//recreate opentfs as hash with UNIQUE items, no dupes
 		var openhash = new HashSet<Transform>( finalOpenTFS );
-		finalOpenTFS = openhash.Select( x => x ).ToList();
+		finalOpenTFS = GlowEngine.ShuffleArray(openhash.Select( x => x ).ToArray()).ToList(); //grab the array and then shuffle it so it's different every time
 		//Debug.Log( "REQUESTED EVENTS: " + chapter.randomInteractionGroupCount );
 		//Debug.Log( "USED POSITIONS: " + usedPositions.Length );
 		//Debug.Log( "FOUND POSSIBLE POSITIONS: " + attachtfs.Count );
