@@ -140,7 +140,7 @@ public class TileGroup
 
 		for ( int i = 0; i < c.tileObserver.Count; i++ )
 		{
-			//Debug.Log( chapter.tileObserver[i].idNumber );
+			//Debug.Log( ((BaseTile)chapter.tileObserver[i]).idNumber );
 
 			BaseTile bt = chapter.tileObserver[i] as BaseTile;
 			containerObject.name += " " + bt.idNumber.ToString();
@@ -160,6 +160,8 @@ public class TileGroup
 //Show ball/sphere/marker for anchor and connection points for debugging
 //tile.gameObject.SetActive(true);
 //tile.RevealAllAnchorConnectorTokens();
+
+			//Set the tile position/coordinates
 			if ( i > 0 )
 			{
 				Vector3 convertedSpace = Vector3.zero;
@@ -189,7 +191,7 @@ public class TileGroup
 			if ( tile.baseTile.tokenList.Count > 0 )
 				usedPositions.AddRange( AddFixedToken( tile ) );
 
-			//find starting position if applicable
+			//find starting position if applicable and add the player spawn marker
 			if ( bt.isStartTile )
 			{
 				tile.isExplored = true;
@@ -198,7 +200,8 @@ public class TileGroup
 		}
 
 		//add random tokens
-		if ( c.usesRandomGroups && usedPositions.Count > 0 )
+		//if ( c.usesRandomGroups && usedPositions.Count > 0 ) // <-- This code was blocking random events from occurring *unless* there was at least one fixed token
+		if ( c.usesRandomGroups )
 			AddRandomTokens( usedPositions.ToArray() );
 
 		GenerateGroupCenter();
@@ -249,7 +252,7 @@ public class TileGroup
 		Vector3 tilefix = Vector3.zero;
 		//convert the string to vector2
 		string[] s = tile.baseTile.hexRoot.Split(',');
-		Debug.Log("pathRoot::" + tile.baseTile.idNumber + "::" + tile.baseTile.pathRoot);
+		//Debug.Log("pathRoot::" + tile.baseTile.idNumber + "::" + tile.baseTile.pathRoot);
 		Vector2 p = new Vector2(float.Parse(s[0]), float.Parse(s[1]));
 		if (p.y != 1)
 		{
@@ -269,11 +272,12 @@ public class TileGroup
 	{
 		if ( chapter.randomInteractionGroup == "None" )
 			return;
+		//Debug.Log("Add events to " + (chapter.isRandomTiles ? "random" : "fixed") + " tile group.");
 		//usedPositions = wonky user placed token position
 		InteractionManager im = GlowEngine.FindObjectOfType<InteractionManager>();
-		//get array of interactions that are in the interaction group
+		//get array of interactions that are in the interaction group; don't include interactions that have already been placed (unless isReusable is set to indicate they can be used more than once)
 		IInteraction[] interactionGroupArray = im.randomTokenInteractions
-			.Where( x => x.dataName.EndsWith( chapter.randomInteractionGroup ) ).ToArray();
+			.Where( x => x.dataName.EndsWith( chapter.randomInteractionGroup ) && (!x.isPlaced || x.isReusable)).ToArray();
 		interactionGroupArray = GlowEngine.ShuffleArray(interactionGroupArray); //randomize the order so every time we play it's different
 		//Debug.Log( "EVENTS IN GROUP [" + chapter.randomInteractionGroup + "]: " + interactionGroupArray.Length );
 
@@ -434,6 +438,11 @@ public class TileGroup
 			//go.GetComponent<MetaData>().isCreatedFromReplaced = false;
 			//go.GetComponent<MetaData>().hasBeenReplaced = false;
 
+			//Mark the event from this group as having been placed on the map; that way if the same event group is used on another TileGroup, the same event won't come out more than once.
+			igs[i].isPlaced = true;
+
+
+
 			tile.tokenStates.Add( new TokenState()
 			{
 				isActive = false,
@@ -447,6 +456,7 @@ public class TileGroup
 
 	Transform[] AddFixedToken( Tile tile )
 	{
+		//Debug.Log("AddFixedTokens(" + tile.baseTile.idNumber + ")");
 		List<Transform> usedPositions = new List<Transform>();
 		//List<Vector3> openPositions = new List<Vector3>();
 		//openPositions.AddRange( tile.GetChildren( "token attach" ).Select( x => x.position ) );
@@ -592,7 +602,7 @@ public class TileGroup
 				else if (new List<TerrainType>() { TerrainType.Fountain, TerrainType.Mist, TerrainType.Pit, TerrainType.Pond }.Contains(goMetaData.terrainType))
 				{
 					//75mm x 75mm rounded rectangle
-					Debug.Log("Large Round Terrain Type " + goMetaData.terrainType);
+					//Debug.Log("Large Round Terrain Type " + goMetaData.terrainType);
 					go.GetComponent<MetaData>().offset = t.vposition - new Vector3(256, 0, 256) + new Vector3(15, 0, 15); // + new Vector3(135, 0, 100);
 				}
 			}
@@ -631,7 +641,7 @@ public class TileGroup
 
 				rotateCenter = tokenPos + new Vector3(tokenSizeX / 2, 0, -tokenSizeZ / 2);
 				go.transform.RotateAround(rotateCenter, Vector3.up, (float)t.angle);
-				Debug.Log("rotate token with size [" + tokenSizeX + ", " + tokenSizeZ + "] " + t.angle + " degrees around " + rotateCenter + " vs tokenPos " + tokenPos);
+				//Debug.Log("rotate token with size [" + tokenSizeX + ", " + tokenSizeZ + "] " + t.angle + " degrees around " + rotateCenter + " vs tokenPos " + tokenPos);
 			}
 
 			tile.tokenStates.Add( new TokenState()
@@ -961,7 +971,7 @@ public class TileGroup
 	public Vector3[] GetOpenConnectors()
 	{
 		var bar = from tile in tileList from c in tile.GetChildren("connector") select c.name;
-		Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
+		//Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
 		var foo = from tile in tileList from c in tile.GetChildren( "connector" ) select c.position;
 		return foo.ToArray();
 	}
@@ -999,7 +1009,7 @@ public class TileGroup
 	public Vector3[] GetOpenAnchors()
 	{
 		var bar = from tile in tileList from c in tile.GetChildren("anchor") select c.name;
-		Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
+		//Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
 		var allAnchors = from tile in tileList from tf in tile.GetChildren( "anchor" ) select tf.position;
 		return allAnchors.ToArray();
 	}
@@ -1037,7 +1047,7 @@ public class TileGroup
 	/// </summary>
 	public void Colorize( bool onlyStart = false )
 	{
-		Debug.Log( "EXPLORING GROUP isExplored?::" + isExplored );
+		//Debug.Log( "EXPLORING GROUP isExplored?::" + isExplored );
 
 		if ( isExplored )
 			return;

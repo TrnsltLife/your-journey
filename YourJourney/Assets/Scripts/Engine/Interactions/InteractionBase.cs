@@ -19,4 +19,6 @@ public abstract class InteractionBase : IInteraction
 	public int xpReward { get; set; }
 	public int threatReward { get; set; }
 	public bool isPersistent { get; set; }
+	public bool isPlaced { get; set; }
+	public bool isReusable { get; set; }
 }
