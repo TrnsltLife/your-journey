@@ -27,6 +27,7 @@ public class FileManager
 	public List<Trigger> triggers { get; set; }
 	public List<Objective> objectives { get; set; }
 	public List<MonsterActivations> activations { get; set; }
+	public List<Translation> translations { get; set; }
 	public List<TextBookData> resolutions { get; set; }
 	public List<Threat> threats { get; set; }
 	public List<Chapter> chapters { get; set; }
@@ -59,6 +60,7 @@ public class FileManager
 		triggers = source.triggersObserver.ToList();
 		objectives = source.objectiveObserver.ToList();
 		activations = source.activationsObserver.ToList();
+		translations = source.translationObserver.ToList();
 		resolutions = source.resolutionObserver.ToList();
 		threats = source.threatObserver.ToList();
 		chapters = source.chapterObserver.ToList();

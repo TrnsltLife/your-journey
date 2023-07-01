@@ -432,6 +432,7 @@ public class TileGroup
 			go.GetComponent<MetaData>().triggeredByName = "None";
 			go.GetComponent<MetaData>().triggerName = "None";
 			go.GetComponent<MetaData>().tokenInteractionText = igs[i].tokenInteractionText;
+			go.GetComponent<MetaData>().tokenInteractionKey = igs[i].TranslationKey("tokenText");
 			go.GetComponent<MetaData>().interactionName = igs[i].dataName;
 			go.GetComponent<MetaData>().GUID = System.Guid.NewGuid();
 			go.GetComponent<MetaData>().isRandom = true;
@@ -563,7 +564,9 @@ public class TileGroup
 			go.GetComponent<MetaData>().interactionName = t.triggerName;
 			go.GetComponent<MetaData>().GUID = t.GUID;
 			//Get custom tokenInteractionText if there is any
-			go.GetComponent<MetaData>().tokenInteractionText = Engine.currentScenario.interactionObserver.Find(interact => t.triggerName == interact.dataName)?.tokenInteractionText;
+			IInteraction inter = Engine.currentScenario.interactionObserver.Find(interact => t.triggerName == interact.dataName);
+			go.GetComponent<MetaData>().tokenInteractionText = inter?.tokenInteractionText;
+			go.GetComponent<MetaData>().tokenInteractionKey = inter?.TranslationKey("tokenText");
 
 
 			//Offset to token in EDITOR coords. [256,256] is the center point since the editor board is 512x512.
@@ -754,6 +757,7 @@ public class TileGroup
 		newMD.triggeredByName = oldMD.triggeredByName;
 		newMD.interactionName = sourceEvent.dataName;
 		newMD.tokenInteractionText = sourceEvent.tokenInteractionText;
+		newMD.tokenInteractionKey = sourceEvent.TranslationKey("tokenText");
 		newMD.GUID = sourceEvent.GUID;//oldMD.GUID;
 		newMD.offset = oldMD.offset;
 		newMD.isRandom = false;

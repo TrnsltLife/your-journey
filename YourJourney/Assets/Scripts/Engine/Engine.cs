@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static LanguageManager;
 
 public class Engine : MonoBehaviour
 {
@@ -62,7 +63,6 @@ public class Engine : MonoBehaviour
 		else
 		{
 			scenario = Bootstrap.LoadScenario();
-			LoadDefaultMonsterActivations();
 		}
 
 		if ( scenario == null )
@@ -85,6 +85,8 @@ public class Engine : MonoBehaviour
 			return;
 		}
 
+		//Load Monster Activations
+		LoadDefaultMonsterActivations();
 
 		//Load Skins
 		var skinsManager = GetComponent<SkinsManager>();
@@ -95,6 +97,7 @@ public class Engine : MonoBehaviour
 		//Load Translations
 		LanguageManager.LoadLanguage(Bootstrap.GetLanguage());
 		OnLanguageUpdate(Bootstrap.GetLanguage());
+		LanguageManager.AssignScenarioTranslations(scenario.translationObserver);
 
 
 		//first objective/interaction/trigger are DUMMIES (None), remove them
@@ -180,7 +183,7 @@ public class Engine : MonoBehaviour
 			//only show intro text if it's not empty
 			if ( !string.IsNullOrEmpty( scenario.introBookData.pages[0] ) )
 			{
-				interactionManager.GetNewTextPanel().ShowOkContinue( scenario.introBookData.pages[0], ButtonIcon.Continue, () =>
+				interactionManager.GetNewTextPanel().ShowOkContinue( Interpret("scenario.introduction", scenario.introBookData.pages[0]), ButtonIcon.Continue, () =>
 					{
 						uiControl.interactable = true;
 

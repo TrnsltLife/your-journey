@@ -190,7 +190,7 @@ public class InteractionManager : MonoBehaviour
 				//special case for persistent events
 				if ( it.interactionType == InteractionType.Persistent && FindObjectOfType<TriggerManager>().IsTriggered( ( (PersistentInteraction)it ).alternativeTextTrigger ) )
 				{
-					GetNewTextPanel().ShowOkContinue( ( (PersistentInteraction)it ).alternativeBookData.pages[0], ButtonIcon.Continue );
+					GetNewTextPanel().ShowOkContinue( Interpret(it.TranslationKey("altText"), ((PersistentInteraction)it).alternativeBookData.pages[0]), ButtonIcon.Continue );
 				}
 				else if ( it.interactionType == InteractionType.Dialog )
 				{

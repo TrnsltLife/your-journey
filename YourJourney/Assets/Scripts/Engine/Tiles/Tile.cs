@@ -645,7 +645,7 @@ public class Tile : MonoBehaviour
 
 	void ShowExplorationText( Tile tile, System.Action action )
 	{
-		string flavor = tile.baseTile.flavorBookData.pages.Count > 0 ? tile.baseTile.flavorBookData.pages[0] : "";
+		string flavor = tile.baseTile.flavorBookData.pages.Count > 0 ? Interpret("tile." + tile.baseTile.idNumber + ".exploredText", tile.baseTile.flavorBookData.pages[0]) : "";
 		string instructions = Translate("dialog.text.DiscardExploration", "Discard the exploration token.");
 		if ( Bootstrap.gameStarter.difficulty != Difficulty.Hard )
 			instructions += " " + Translate("dialog.text.GainInspiration", "Gain 1 inspiration.");
@@ -679,7 +679,7 @@ public class Tile : MonoBehaviour
         }
 		if(!String.IsNullOrWhiteSpace(metaData.tokenInteractionText))
         {
-			objectEventToken = metaData.tokenInteractionText;
+			objectEventToken = Interpret(metaData.tokenInteractionKey, metaData.tokenInteractionText);
         }
 
 		Tile tile = objectHit.parent.GetComponent<Tile>();
@@ -710,7 +710,7 @@ public class Tile : MonoBehaviour
 				}
 				if (!String.IsNullOrWhiteSpace(metaData.tokenInteractionText))
 				{
-					objectEventToken = metaData.tokenInteractionText;
+					objectEventToken = Interpret(metaData.tokenInteractionKey, metaData.tokenInteractionText);
 				}
 
 				//make it persistent
@@ -830,6 +830,7 @@ public class Tile : MonoBehaviour
 		newMD.interactionName = tokenState.metaData.interactionName;
 		newMD.triggeredByName = tokenState.metaData.triggeredByName;
 		newMD.tokenInteractionText = tokenState.metaData.tokenInteractionText;
+		newMD.tokenInteractionKey = tokenState.metaData.tokenInteractionKey;
 		newMD.tokenType = tokenState.metaData.tokenType;
 		newMD.personType = tokenState.metaData.personType;
 		newMD.terrainType = tokenState.metaData.terrainType;

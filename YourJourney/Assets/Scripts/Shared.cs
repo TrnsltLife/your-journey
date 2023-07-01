@@ -100,6 +100,7 @@ public interface IInteraction
 	bool isPersistent { get; set; }
 	bool isPlaced { get; set; } //whether a grouped event has already had its token place on a tile group
 	bool isReusable { get; set; } //whether a grouped event can be used on more than one tile group
+	string TranslationKey(string suffix);
 }
 
 public interface ICommonData

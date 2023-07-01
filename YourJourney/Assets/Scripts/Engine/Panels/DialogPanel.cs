@@ -3,6 +3,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static LanguageManager;
 
 public class DialogPanel : MonoBehaviour
 {
@@ -64,15 +65,15 @@ public class DialogPanel : MonoBehaviour
 		overlay.DOFade( 1, .5f );
 
 		group.alpha = 0;
-		btn1Text.text = di.choice1;
-		btn2Text.text = di.choice2;
-		btn3Text.text = di.choice3;
+		btn1Text.text = Interpret(di.TranslationKey("choice1"), di.choice1);
+		btn2Text.text = Interpret(di.TranslationKey("choice2"), di.choice2);
+		btn3Text.text = Interpret(di.TranslationKey("choice3"), di.choice3);
 		buttonActions = actions;
 
 		if ( !di.isDone )
-			SetText( di.eventBookData.pages[0] );
+			SetText( Interpret(di.TranslationKey("eventText"), di.eventBookData.pages[0]) );
 		else
-			SetText( di.persistentText );
+			SetText( Interpret(di.TranslationKey("persistentText"), di.persistentText) );
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );

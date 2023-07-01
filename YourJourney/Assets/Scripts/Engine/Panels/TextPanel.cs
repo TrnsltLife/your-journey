@@ -113,7 +113,7 @@ public class TextPanel : MonoBehaviour
 	/// </summary>
 	public void ShowQueryInteraction( IInteraction it, string btnName, Action<InteractionResult> actions )
 	{
-		Show( it.textBookData.pages[0], Translate("dialog.button.Cancel"), btnName, ButtonIcon.Action, actions );
+		Show( Interpret(it.TranslationKey("flavorText"), it.textBookData.pages[0]), Translate("dialog.button.Cancel"), btnName, ButtonIcon.Action, actions );
 	}
 
 	/// <summary>
@@ -129,7 +129,7 @@ public class TextPanel : MonoBehaviour
 	/// </summary>
 	public void ShowTextInteraction( IInteraction it, Action actions )
 	{
-		ShowOkContinue( it.eventBookData.pages[0], ButtonIcon.Continue, actions );
+		ShowOkContinue( Interpret(it.TranslationKey("eventText"), it.eventBookData.pages[0]), ButtonIcon.Continue, actions );
 	}
 
 	public void Hide()

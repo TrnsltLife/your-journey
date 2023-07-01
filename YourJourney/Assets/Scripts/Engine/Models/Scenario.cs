@@ -35,6 +35,7 @@ public class Scenario
 	public ObservableCollection<Trigger> triggersObserver { get; set; }
 	public ObservableCollection<Objective> objectiveObserver { get; set; }
 	public ObservableCollection<MonsterActivations> activationsObserver { get; set; }
+	public ObservableCollection<Translation> translationObserver { get; set; }
 	public ObservableCollection<TextBookData> resolutionObserver { get; set; }
 	public ObservableCollection<Threat> threatObserver { get; set; }
 	public ObservableCollection<Chapter> chapterObserver { get; set; }
@@ -71,6 +72,14 @@ public class Scenario
 		else
         {
 			s.activationsObserver = new ObservableCollection<MonsterActivations>();
+        }
+		if (fm.translations != null)
+		{
+			s.translationObserver = new ObservableCollection<Translation>(fm.translations);
+		}
+		else
+        {
+			s.translationObserver = new ObservableCollection<Translation>();
         }
 		s.resolutionObserver = new ObservableCollection<TextBookData>( fm.resolutions );
 		s.threatObserver = new ObservableCollection<Threat>( fm.threats );

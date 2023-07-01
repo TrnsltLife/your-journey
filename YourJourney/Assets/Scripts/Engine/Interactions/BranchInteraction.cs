@@ -9,6 +9,8 @@
 
 	public override InteractionType interactionType { get { return InteractionType.Branch; } set { } }
 
+	public override string TranslationKey(string suffix) { return "event.story-branch." + dataName + "." + suffix; }
+
 	public void Resolve( InteractionManager im )
 	{
 		if ( branchTestEvent )//if it's an EVENT to activate

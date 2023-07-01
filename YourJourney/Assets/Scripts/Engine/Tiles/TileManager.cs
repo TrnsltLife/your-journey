@@ -519,13 +519,13 @@ public class TileManager : MonoBehaviour
 				if (t.Item1 == 998 || t.Item1 == 999) //SquareTile
 				{
 					s += "the Battle Map Tile "
-						+ (t.Item2 == "A" ? " (Grass)" : " (Dirt)")
-						+ " <font=\"Icon\">" + Collection.FromTileNumber(t.Item1).FontCharacter + "</font>"; //Add the Collection symbol.
+						+ (t.Item2 == "A" ? " (Grass)" : " (Dirt)");
+						//+ " <font=\"Icon\">" + Collection.FromTileNumber(t.Item1).FontCharacter + "</font>"; //Add the Collection symbol.
 				}
 				else //HexTile
 				{
-					s += t.Item1 + " " + t.Item2
-						+ "Tile <font=\"Icon\">" + Collection.FromTileNumber(t.Item1).FontCharacter + "</font>"; //Add the Collection symbol.
+					s += "Tile " + t.Item1 + " " + t.Item2
+						+ " <font=\"Icon\">" + Collection.FromTileNumber(t.Item1).FontCharacter + "</font>"; //Add the Collection symbol.
 
 				}
 
