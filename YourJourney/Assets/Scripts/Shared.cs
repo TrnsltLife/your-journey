@@ -120,6 +120,7 @@ public class ProjectItem
 	public string fileName { get; set; }
 	public string fileVersion { get; set; }
 	public List<int> collections { get; set; }
+	public Dictionary<string, Dictionary<string, string>> translations { get; set; }
 	public string campaignGUID { get; set; }
 	public string campaignStory { get; set; }
 	public string campaignDescription { get; set; }

@@ -186,7 +186,7 @@ public class LanguageManager : MonoBehaviour
 		}
 	}
 
-	public static void AssignScenarioTranslations(ObservableCollection<Translation> newTranslations)
+	public static void AssignScenarioTranslations(List<Translation> newTranslations)
     {
 		scenarioLanguages.Clear();
 		scenarioTranslations.Clear();

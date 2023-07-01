@@ -111,4 +111,28 @@ public class Scenario
 
 		return s;
 	}
+
+	/// <summary>
+	/// Create a stripped down copy of the scenario translation that only contains the scenario.name and scenario.instructions
+	/// </summary>
+	/// <returns></returns>
+	public Dictionary<string, Dictionary<string, string>> TranslationForTitleScreens()
+    {
+		Dictionary<string, Dictionary<string, string>> langsDict = new Dictionary<string, Dictionary<string, string>>();
+		if(translationObserver == null) { return langsDict; }
+        foreach(var translation in translationObserver)
+		{
+			string langCode = translation.dataName;
+			Dictionary<string, string> wordsDict = new Dictionary<string, string>();
+			foreach(var item in translation.translationItems)
+            {
+				if(item.key == "scenario.scenarioName" || item.key == "scenario.instructions")
+                {
+					wordsDict.Add(item.key, item.text);
+                }
+            }
+			langsDict.Add(langCode, wordsDict);
+        }
+		return langsDict;
+    }
 }

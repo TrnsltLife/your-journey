@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Newtonsoft.Json;
 using TMPro;
@@ -97,7 +98,7 @@ public class Engine : MonoBehaviour
 		//Load Translations
 		LanguageManager.LoadLanguage(Bootstrap.GetLanguage());
 		OnLanguageUpdate(Bootstrap.GetLanguage());
-		LanguageManager.AssignScenarioTranslations(scenario.translationObserver);
+		LanguageManager.AssignScenarioTranslations(scenario.translationObserver.ToList());
 
 
 		//first objective/interaction/trigger are DUMMIES (None), remove them

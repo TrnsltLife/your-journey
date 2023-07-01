@@ -56,19 +56,32 @@ public class SelectJourney : MonoBehaviour
 	{
 		var scenarios = FileManager.GetProjects().ToArray();
 		var campaigns = FileManager.GetCampaigns().ToArray();
-		projectItems = campaigns.Concat( scenarios ).ToArray();
+		projectItems = campaigns.Concat(scenarios).ToArray();
 
-		for ( int i = 0; i < projectItems.Length; i++ )
+		for (int i = 0; i < projectItems.Length; i++)
 		{
-			var go = Instantiate( fileItemPrefab, itemContainer ).GetComponent<FileItemButton>();
-			go.transform.localPosition = new Vector3( 0, ( -110 * i ) );
-			//TODO collections
-			go.Init( i, projectItems[i].Title,
+			var go = Instantiate(fileItemPrefab, itemContainer).GetComponent<FileItemButton>();
+			go.transform.localPosition = new Vector3(0, (-110 * i));
+
+			go.Init( i, TranslatedTitle(projectItems[i]),
 				string.Join(" ", projectItems[i].collections.Select(c => Collection.FromID(c).FontCharacter)), 
 				projectItems[i].projectType, ( index ) => OnSelectQuest( index ) );
 			fileItemButtons.Add( go );
 		}
 		itemContainer.sizeDelta = new Vector2( 772, fileItemButtons.Count * 110 );
+	}
+
+	private string TranslatedTitle(ProjectItem projectItem)
+    {
+		string translatedTitle = projectItem.Title;
+		if (projectItem.translations.ContainsKey(LanguageManager.currentLanguageCode))
+		{
+			if (projectItem.translations[LanguageManager.currentLanguageCode].ContainsKey("scenario.scenarioName"))
+			{
+				translatedTitle = projectItem.translations[LanguageManager.currentLanguageCode]["scenario.scenarioName"];
+			}
+		}
+		return translatedTitle;
 	}
 
 	public void OnSelectQuest( int index )
@@ -83,7 +96,7 @@ public class SelectJourney : MonoBehaviour
 		}
 
 		//fill in file info
-		nameText.text = projectItems[index].Title;
+		nameText.text = TranslatedTitle(projectItems[index]);
 		if ( projectItems[index].projectType == ProjectType.Standalone )
 			fileText.text = projectItems[index].fileName;
 		else
