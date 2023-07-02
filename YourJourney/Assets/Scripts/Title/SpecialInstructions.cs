@@ -19,6 +19,8 @@ public class SpecialInstructions : MonoBehaviour
 
 	public void ActivateScreen( TitleMetaData metaData )
 	{
+		LanguageManager.AddSubscriber(onUpdateTranslation);
+
 		titleMetaData = metaData;
 		gameObject.SetActive( true );
 		//itemContainer = instructions.rectTransform;
@@ -36,17 +38,7 @@ public class SpecialInstructions : MonoBehaviour
 			s = Bootstrap.LoadScenarioFromFilename( titleMetaData.projectItem.fileName );
 			if ( s != null )
 			{
-				if (!string.IsNullOrEmpty(s.specialInstructions))
-				{
-					instructionsTranslation.TranslationEnabled(false); //Don't let text be overwritten by translation if the language changes
-					SetText(s.specialInstructions);
-				}
-				else
-				{
-					//SetText("There are no special instructions for this Scenario.");
-					instructionsTranslation.TranslationEnabled(true);
-					instructionsTranslation.Change("story.text.NoStoryDescription");
-				}
+				UpdateInstructions();
 
 				loreText.text = s.loreStartValue.ToString();
 				xpText.text = s.xpStartValue.ToString();
@@ -72,10 +64,33 @@ public class SpecialInstructions : MonoBehaviour
 		} );
 	}
 
+	void UpdateInstructions()
+    {
+		if (s != null)
+		{
+			if (!string.IsNullOrEmpty(s.specialInstructions))
+			{
+				instructionsTranslation.TranslationEnabled(false); //Don't let text be overwritten by translation if the language changes
+				SetText(titleMetaData.projectItem.Translated("scenario.instructions", s.specialInstructions));
+			}
+			else
+			{
+				//SetText("There are no special instructions for this Scenario.");
+				instructionsTranslation.TranslationEnabled(true);
+				instructionsTranslation.Change("story.text.NoStoryDescription");
+			}
+		}
+	}
+
 	void SetText( string t )
 	{
 		instructions.text = t;
 	}
+
+	public void onUpdateTranslation()
+    {
+		UpdateInstructions();
+    }
 
 	public void OnBegin()
 	{

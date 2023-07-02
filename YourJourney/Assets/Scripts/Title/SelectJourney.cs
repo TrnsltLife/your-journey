@@ -18,12 +18,15 @@ public class SelectJourney : MonoBehaviour
 	public RectTransform itemContainer;
 	public Button nextButton, cancelButton;
 	public GameObject campaignWarning;
+	public int selectedIndex = -1;
 
 	TitleMetaData titleMetaData;
 	TitleManager tm;
 
 	public void ActivateScreen( TitleMetaData metaData )
 	{
+		LanguageManager.AddSubscriber(onUpdateTranslation);
+
 		titleMetaData = metaData;
 
 		tm = FindObjectOfType<TitleManager>();
@@ -63,7 +66,7 @@ public class SelectJourney : MonoBehaviour
 			var go = Instantiate(fileItemPrefab, itemContainer).GetComponent<FileItemButton>();
 			go.transform.localPosition = new Vector3(0, (-110 * i));
 
-			go.Init( i, TranslatedTitle(projectItems[i]),
+			go.Init( i, projectItems[i].Translated("scenario.scenarioName", projectItems[i].Title),
 				string.Join(" ", projectItems[i].collections.Select(c => Collection.FromID(c).FontCharacter)), 
 				projectItems[i].projectType, ( index ) => OnSelectQuest( index ) );
 			fileItemButtons.Add( go );
@@ -71,21 +74,30 @@ public class SelectJourney : MonoBehaviour
 		itemContainer.sizeDelta = new Vector2( 772, fileItemButtons.Count * 110 );
 	}
 
-	private string TranslatedTitle(ProjectItem projectItem)
-    {
-		string translatedTitle = projectItem.Title;
-		if (projectItem.translations.ContainsKey(LanguageManager.currentLanguageCode))
+	public void UpdateScenarioPrefabsAndSelectedQuest()
+	{
+		//Update the titles on the buttons
+		for (int i = 0; i < projectItems.Length; i++)
 		{
-			if (projectItem.translations[LanguageManager.currentLanguageCode].ContainsKey("scenario.scenarioName"))
-			{
-				translatedTitle = projectItem.translations[LanguageManager.currentLanguageCode]["scenario.scenarioName"];
-			}
+			FileItemButton go = fileItemButtons[i];
+			go.title.text = projectItems[i].Translated("scenario.scenarioName", projectItems[i].Title);
 		}
-		return translatedTitle;
+
+		//Update the title in the panel for the selected quest
+		if(selectedIndex >= 0)
+        {
+			nameText.text = projectItems[selectedIndex].Translated("scenario.scenarioName", projectItems[selectedIndex].Title);
+		}
 	}
+
+	public void onUpdateTranslation()
+    {
+		UpdateScenarioPrefabsAndSelectedQuest();
+    }
 
 	public void OnSelectQuest( int index )
 	{
+		selectedIndex = index;
 		warningPanel.SetActive( false );
 		campaignWarning.SetActive( false );
 
@@ -96,7 +108,7 @@ public class SelectJourney : MonoBehaviour
 		}
 
 		//fill in file info
-		nameText.text = TranslatedTitle(projectItems[index]);
+		nameText.text = projectItems[index].Translated("scenario.scenarioName", projectItems[index].Title);
 		if ( projectItems[index].projectType == ProjectType.Standalone )
 			fileText.text = projectItems[index].fileName;
 		else

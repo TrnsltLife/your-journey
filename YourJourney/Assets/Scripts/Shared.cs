@@ -125,6 +125,18 @@ public class ProjectItem
 	public string campaignStory { get; set; }
 	public string campaignDescription { get; set; }
 	public string coverImage { get; set; }
+
+	public string Translated(string key, string defaultValue)
+	{
+		if (translations.ContainsKey(LanguageManager.currentLanguageCode))
+		{
+			if (translations[LanguageManager.currentLanguageCode].ContainsKey(key))
+			{
+				return translations[LanguageManager.currentLanguageCode][key];
+			}
+		}
+		return defaultValue;
+	}
 }
 
 public class CampaignItem
