@@ -284,7 +284,7 @@ public class InteractionManager : MonoBehaviour
 		if ( engine.scenario.resolutionObserver.Any( x => x.triggerName == name ) )
 		{
 			var text = engine.scenario.resolutionObserver.Where( x => x.triggerName == name ).First();
-			GetNewTextPanel().ShowOkContinue( text.pages[0], ButtonIcon.Continue );
+			GetNewTextPanel().ShowOkContinue( Interpret("resolution." + text.dataName + ".text", text.pages[0]), ButtonIcon.Continue );
 			//handle end game
 			engine.triggerManager.TriggerEndGame( text.dataName );
 			return true;

@@ -551,11 +551,11 @@ public class Tile : MonoBehaviour
 			string tokName = tfmetaData.tokenType.ToString();
 			if(tfmetaData.tokenType == TokenType.Person)
             {
-				tokName = tfmetaData.personType.ToString();
+				tokName = Translate("interaction." + tfmetaData.personType.ToString(), tfmetaData.personType.ToString());
             }
 			else if(tfmetaData.tokenType == TokenType.Terrain)
             {
-				tokName = tfmetaData.terrainType.ToString();
+				tokName = Translate("interaction." + tfmetaData.terrainType.ToString(), tfmetaData.terrainType.ToString());
             }
 			nameList.Add(tokName);
 

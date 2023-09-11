@@ -303,21 +303,27 @@ public class Engine : MonoBehaviour
 		FindObjectOfType<LorePanel>().AddReward( scenario.loreReward, scenario.xpReward );
 
 		bool success = scenario.scenarioEndStatus[resName];//default reso
-		string msg = success ? "S U C C E S S" : "F A I L U R E";
+		string msg = success ? Translate("game.text.Success", "SUCCESS") : Translate("game.text.Failure", "FAILURE");
 		string end = "\r\n\r\n";
 		if(scenario.projectType == ProjectType.Campaign)
         {
-			end += "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.";
+			end += Translate("game.text.Rewards", "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.", 
+				new List<string> { Bootstrap.loreCount.ToString(), Bootstrap.xpCount.ToString()});
         }
 		else
         {
-			end += "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.\r\n"
-				+ "With your starting values, that gives you " + (Bootstrap.gameStarter.loreStartValue + Bootstrap.loreCount) + " Lore "
-				+ "and " + (Bootstrap.gameStarter.xpStartValue + Bootstrap.xpCount) + " XP.\r\n\r\n"
-				+ "Be sure to write this down if you want to continue with another standalone scenario.";
+			int totalLore = Bootstrap.gameStarter.loreStartValue + Bootstrap.loreCount;
+			int totalXP = Bootstrap.gameStarter.xpStartValue + Bootstrap.xpCount;
+			end += Translate("game.text.Rewards", "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.",
+					new List<string> { Bootstrap.loreCount.ToString(), Bootstrap.xpCount.ToString() }) 
+				+ "\r\n"
+				+ Translate("game.text.RunningTotal", "With your starting values, that gives you " + (totalLore) + " Lore and " + (totalXP) + " XP.",
+					new List<string> { totalLore.ToString(), totalXP.ToString() }) 
+				+ "\r\n\r\n"
+				+ Translate("game.text.Reminder", "Be sure to write this down if you want to continue with another standalone scenario.");
 		}
 		var text = interactionManager.GetNewTextPanel();
-		text.ShowOkContinue( "The Scenario has ended.\r\n\r\n" + msg + end, ButtonIcon.Continue, () =>
+		text.ShowOkContinue( Translate("game.text.ScenarioEnded", "The Scenario has ended.") + "\r\n\r\n" + msg + end, ButtonIcon.Continue, () =>
 			{
 				fader.gameObject.SetActive( true );
 				fader.DOFade( 1, 2 ).OnComplete( () =>

@@ -156,9 +156,8 @@ public class ChapterManager : MonoBehaviour
 			}
 			else if (bt.tileType == TileType.Square)
             {
-				s += "Battle Map Tile"
-					+ (bt.tileSide == "A" ? " (Grass)" : " (Dirt)")
-					+ " <font=\"Icon\">" + Collection.FromTileNumber(bt.idNumber).FontCharacter + "</font>" //Add the Collection symbol.
+				s += Translate(bt.tileSide == "A" ? "dialog.text.BattleTileGrass" : "BattleTileDirt",
+						"Battle Map Tile " + (bt.tileSide == "A" ? " (Grass)" : " (Dirt)"))
 					+ ", ";
 			}
 		}
