@@ -95,10 +95,16 @@ public class StatTestPanel : MonoBehaviour
 
 
 		//if it's cumulative (and not simple pass/fail) and already started, show progress text
-		if ( ( testInteraction.isCumulative && !testInteraction.passFail ) && testInteraction.accumulatedValue >= 0 )
-			SetText( testInteraction.progressBookData.pages[0] );
+		if ((testInteraction.isCumulative && !testInteraction.passFail) && testInteraction.accumulatedValue >= 0)
+		{
+			string progressText = Interpret(testInteraction.TranslationKey("progressText"), testInteraction.progressBookData.pages[0]);
+			SetText(progressText);
+		}
 		else//otherwise show normal event text
-			SetText( testInteraction.eventBookData.pages[0] );
+		{
+			string eventText = Interpret(testInteraction.TranslationKey("eventText"), testInteraction.eventBookData.pages[0]);
+			SetText(eventText);
+		}
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
