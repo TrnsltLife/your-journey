@@ -16,11 +16,12 @@ public class ObjectiveManager : MonoBehaviour
 
 	public void Init( Scenario s )
 	{
-		LanguageManager.AddSubscriber(onUpdateTranslation);
-
 		objectiveList = new List<Objective>( s.objectiveObserver );
 		currentObjective = null;
 		//Debug.Log( $"Objective Manager: {objectiveList.Count} Objectives Found" );
+
+		LanguageManager.AddSubscriber(onUpdateTranslation);
+		onUpdateTranslation();
 	}
 
 	public void onUpdateTranslation()
