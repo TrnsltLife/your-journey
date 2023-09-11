@@ -214,7 +214,7 @@ public class LanguageManager : MonoBehaviour
 			var keyval = scenarioTranslations[currentLanguageCode];
 			if(keyval.ContainsKey(key))
             {
-				return keyval[key];
+				return keyval[key].Trim();
             }
         }
 
@@ -234,7 +234,7 @@ public class LanguageManager : MonoBehaviour
 			var keyval = translations[currentLanguageCode];
 			if(keyval.ContainsKey(key))
             {
-				return keyval[key];
+				return keyval[key].Trim();
             }
         }
 
