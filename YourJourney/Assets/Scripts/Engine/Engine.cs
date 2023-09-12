@@ -411,7 +411,7 @@ public class Engine : MonoBehaviour
 
 	public void OnShowSettings()
 	{
-		settingsDialog.Show("settings.QuitToTitle", OnLanguageUpdate, OnQuit, OnSkinpackUpdate );
+		settingsDialog.Show("settings.QuitToTitle", "Quit to Title", OnLanguageUpdate, OnQuit, OnSkinpackUpdate );
 	}
 
 	public void OnQuit()

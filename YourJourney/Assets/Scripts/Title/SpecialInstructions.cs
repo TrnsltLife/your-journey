@@ -58,7 +58,7 @@ public class SpecialInstructions : MonoBehaviour
 			{
 				//SetText( "There was a problem loading the Scenario." );
 				instructionsTranslation.TranslationEnabled(true);
-				instructionsTranslation.Change("story.text.ErrorLoading");
+				instructionsTranslation.Change("story.text.ErrorLoading", "There was a problem loading the Scenario.");
 				beginButton.interactable = false;
 			}
 		} );
@@ -77,7 +77,7 @@ public class SpecialInstructions : MonoBehaviour
 			{
 				//SetText("There are no special instructions for this Scenario.");
 				instructionsTranslation.TranslationEnabled(true);
-				instructionsTranslation.Change("story.text.NoStoryDescription");
+				instructionsTranslation.Change("story.text.NoStoryDescription", "There are no special instructions for this Scenario.");
 			}
 		}
 	}

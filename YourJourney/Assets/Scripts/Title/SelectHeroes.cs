@@ -51,7 +51,7 @@ public class SelectHeroes : MonoBehaviour
 
 		titleMetaData.difficulty = Difficulty.Normal;
 		//diffText.text = titleMetaData.difficulty.ToString();
-		diffTextTranslation.Change("heroes.button." + titleMetaData.difficulty.ToString());
+		diffTextTranslation.Change("heroes.button." + titleMetaData.difficulty.ToString(), titleMetaData.difficulty.ToString());
 
 
 		finalFader.DOFade( 0, .5f ).OnComplete( () =>
@@ -181,7 +181,7 @@ public class SelectHeroes : MonoBehaviour
 		else if ( titleMetaData.difficulty == Difficulty.Hard )
 			titleMetaData.difficulty = Difficulty.Adventure;
 		//diffText.text = titleMetaData.difficulty.ToString();
-		diffTextTranslation.Change("heroes.button." + titleMetaData.difficulty.ToString());
+		diffTextTranslation.Change("heroes.button." + titleMetaData.difficulty.ToString(), titleMetaData.difficulty.ToString());
 	}
 
 	public void OnChangeNameClick( int index )

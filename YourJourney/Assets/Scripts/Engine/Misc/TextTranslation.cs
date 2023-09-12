@@ -29,6 +29,13 @@ public class TextTranslation : MonoBehaviour
         OnUpdateTranslation();
     }
 
+    public void Change(string key, string defaultText)
+    {
+        TextKey = key;
+        DefaultText = defaultText;
+        OnUpdateTranslation();
+    }
+
     public void Change(List<string> values)
     {
         Values = values;
@@ -38,6 +45,14 @@ public class TextTranslation : MonoBehaviour
     public void Change(string key, List<string> values)
     {
         TextKey = key;
+        Values = values;
+        OnUpdateTranslation();
+    }
+
+    public void Change(string key, string defaultText, List<string> values)
+    {
+        TextKey = key;
+        DefaultText = defaultText;
         Values = values;
         OnUpdateTranslation();
     }

@@ -36,7 +36,7 @@ public class PartyPanel : MonoBehaviour
 		testColors[3] = Color.HSVToRGB( 207f / 360f, .61f, .71f );
 		testColors[4] = Color.yellow;
 		diffTextTranslation = diffText.GetComponent<TextTranslation>();
-		diffTextTranslation.Change("heroes.button." + Bootstrap.gameStarter.difficulty.ToString());
+		diffTextTranslation.Change("heroes.button." + Bootstrap.gameStarter.difficulty.ToString(), Bootstrap.gameStarter.difficulty.ToString());
 	}
 
 	public void Show()
@@ -58,8 +58,10 @@ public class PartyPanel : MonoBehaviour
 		transform.DOMoveY( sp.y, .75f );
 
 		diffText.text = Bootstrap.gameStarter.difficulty.ToString();
-		loreText.text = Translate("party.text.Lore", new List<string> { (Bootstrap.loreCount + Bootstrap.gameStarter.loreStartValue).ToString() });
-		xpText.text = Translate("party.text.XP", new List<string> { (Bootstrap.xpCount + Bootstrap.gameStarter.xpStartValue).ToString() });
+		int totalLore = Bootstrap.loreCount + Bootstrap.gameStarter.loreStartValue;
+		int totalXP = Bootstrap.xpCount + Bootstrap.gameStarter.xpStartValue;
+		loreText.text = Translate("party.text.Lore", "Lore: " + totalLore.ToString(), new List<string> { totalLore.ToString() });
+		xpText.text = Translate("party.text.XP", "XP: " + totalXP.ToString(), new List<string> { totalXP.ToString() });
 
 		foreach ( HeroItem go in heroItems )
 		{
@@ -105,7 +107,7 @@ public class PartyPanel : MonoBehaviour
 		else if ( Bootstrap.gameStarter.difficulty == Difficulty.Hard )
 			Bootstrap.gameStarter.difficulty = Difficulty.Adventure;
 		//diffText.text = Bootstrap.gameStarter.difficulty.ToString();
-		diffTextTranslation.Change("heroes.button." + Bootstrap.gameStarter.difficulty.ToString());
+		diffTextTranslation.Change("heroes.button." + Bootstrap.gameStarter.difficulty.ToString(), Bootstrap.gameStarter.difficulty.ToString());
 
 		//set campaign state difficulty, if it exists
 		if ( Bootstrap.campaignState != null )

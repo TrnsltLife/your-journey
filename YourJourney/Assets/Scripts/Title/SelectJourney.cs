@@ -40,9 +40,9 @@ public class SelectJourney : MonoBehaviour
 			fileItemButtons[i].ResetColor();
 
 		appVersionTranslation = appVersion.gameObject.GetComponent<TextTranslation>();
-		appVersionTranslation.Change("journey.text.AppVersion", new List<string>{ Bootstrap.AppVersion });
+		appVersionTranslation.Change("journey.text.AppVersion", "App Version: " + Bootstrap.AppVersion, new List<string>{ Bootstrap.AppVersion });
 		engineVersionTranslation = engineVersion.gameObject.GetComponent<TextTranslation>();
-		engineVersionTranslation.Change("journey.text.FormatVersion", new List<string>{Bootstrap.FormatVersion});
+		engineVersionTranslation.Change("journey.text.FormatVersion", "Scenario Format Version: " + Bootstrap.FormatVersion, new List<string>{Bootstrap.FormatVersion});
 		versionTextTranslation = versionText.gameObject.GetComponent<TextTranslation>();
 
 		//appVersion.text = "App Version: " + Bootstrap.AppVersion;
@@ -116,7 +116,7 @@ public class SelectJourney : MonoBehaviour
 		collectionsText.text = string.Join(" ", projectItems[index].collections.Select(c => Collection.FromID(c).FontCharacter));
 		//projectItems[index].collections;
 		//versionText.text = "File Version: " + projectItems[index].fileVersion;
-		versionTextTranslation.Change("journey.text.FileVersion", new List<string> { projectItems[index].fileVersion });
+		versionTextTranslation.Change("journey.text.FileVersion", "File Version: " + projectItems[index].fileVersion, new List<string> { projectItems[index].fileVersion });
 
 		//check version
 		if ( projectItems[index].fileVersion != Bootstrap.FormatVersion )

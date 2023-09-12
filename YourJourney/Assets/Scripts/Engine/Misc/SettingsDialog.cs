@@ -42,7 +42,7 @@ public class SettingsDialog : MonoBehaviour
 		CalculateDialogPosition();
 	}
 
-	public void Show( string bTextKey, Action<string> languageUpdateAction, Action action = null, Action<string> skinUpdateAction = null )
+	public void Show( string bTextKey, string bDefaultText, Action<string> languageUpdateAction, Action action = null, Action<string> skinUpdateAction = null )
 	{
 		CalculateDialogPosition();
 
@@ -50,7 +50,7 @@ public class SettingsDialog : MonoBehaviour
 		this.skinUpdateAction = skinUpdateAction;
 		this.languageUpdateAction = languageUpdateAction;
 		//buttonText.text = bText;
-		buttonText.GetComponent<TextTranslation>()?.Change(bTextKey);
+		buttonText.GetComponent<TextTranslation>()?.Change(bTextKey, bDefaultText);
 		settingsCanvasGroup.alpha = 0;
 		settingsCanvasGroup.gameObject.SetActive( true );
 		settingsCanvasGroup.DOFade( 1, .5f );
