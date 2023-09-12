@@ -62,7 +62,7 @@
 	"campaign.text.ReplayInProgressFinished":"A Replay is in progress.  Continue it with the Continue Replay button.  The campaign has been finished.",
 	
 	"heroes.title.SelectHero":"Select your Heroes",
-	"heroes.text.Instructions":"Select a Hero's name. Start typing to change it.\nPress Return to confirm, Escape to cancel.",
+	"heroes.text.Instructions":"Select a Hero's name. Start typing to change it.\\nPress Return to confirm, Escape to cancel.",
 	"heroes.button.Back":"Back",
 	"heroes.button.Next":"Next",
 	"heroes.text.Difficulty":"Difficulty",
