@@ -8,4 +8,7 @@ public class MultiEventInteraction : InteractionBase
 	public bool isSilent { get; set; }
 
 	public override InteractionType interactionType { get { return InteractionType.MultiEvent; } set { } }
+
+	public override string TranslationKey(string suffix) { return "event.multi-event." + dataName + "." + suffix; }
+
 }

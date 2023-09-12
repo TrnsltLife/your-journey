@@ -20,6 +20,9 @@ public class ThreatInteraction : InteractionBase
 
 	public override InteractionType interactionType { get { return InteractionType.Threat; } set { } }
 
+	public override string TranslationKey(string suffix) { return "event.enemy." + dataName + "." + suffix; }
+
+
 	int lastEnemyIndex;
 	int numSingleGroups;
 	int modPoints;

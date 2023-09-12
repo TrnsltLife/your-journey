@@ -6098,6 +6098,34 @@ MonoBehaviour:
     languageName: "Fran\xE7ais"
     internalFile: {fileID: 4900000, guid: 199f4af8e27da3d4f9b4cecce22736db, type: 3}
     externalFile: 
+  - languageCode: cz
+    languageName: "\u010Ce\u0161tina"
+    internalFile: {fileID: 4900000, guid: 18f9d796b1acb1a4ab5b2314bf73b7b7, type: 3}
+    externalFile: 
+  - languageCode: de
+    languageName: Deutsch
+    internalFile: {fileID: 4900000, guid: 320414d83526ed64592cfed3edd917ff, type: 3}
+    externalFile: 
+  - languageCode: hu
+    languageName: Magyar
+    internalFile: {fileID: 4900000, guid: 230b0c16f4c54f049b7be963b4d14a83, type: 3}
+    externalFile: 
+  - languageCode: it
+    languageName: Italiano
+    internalFile: {fileID: 4900000, guid: 5bb7f5d64a8a0c8489579da9d16c084c, type: 3}
+    externalFile: 
+  - languageCode: pl
+    languageName: Polski
+    internalFile: {fileID: 4900000, guid: 538ece83160dfcc42956504e91bb5847, type: 3}
+    externalFile: 
+  - languageCode: pt
+    languageName: "Portugu\xEAs"
+    internalFile: {fileID: 4900000, guid: a4201513318bd6d4682b5e5e57e2d825, type: 3}
+    externalFile: 
+  - languageCode: es
+    languageName: "Espa\xF1ol"
+    internalFile: {fileID: 4900000, guid: 997c157885e0dec4b9ec8ae0d970806a, type: 3}
+    externalFile: 
 --- !u!1 &270939961
 GameObject:
   m_ObjectHideFlags: 0
@@ -11486,6 +11514,7 @@ MonoBehaviour:
   nextButton: {fileID: 567672479}
   cancelButton: {fileID: 841909157}
   campaignWarning: {fileID: 1243475242}
+  selectedIndex: -1
 --- !u!1 &514865652
 GameObject:
   m_ObjectHideFlags: 0
@@ -32398,7 +32427,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1446546303}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0275307cdfe876c438ada7aba14d357d, type: 3}
   m_Name: 
@@ -34309,6 +34338,7 @@ MonoBehaviour:
   nextButton: {fileID: 1332909573}
   cancelButton: {fileID: 1469371970}
   campaignWarning: {fileID: 270939961}
+  selectedIndex: -1
 --- !u!1 &1510131354
 GameObject:
   m_ObjectHideFlags: 0

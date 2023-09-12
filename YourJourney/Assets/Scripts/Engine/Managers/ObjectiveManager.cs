@@ -19,6 +19,21 @@ public class ObjectiveManager : MonoBehaviour
 		objectiveList = new List<Objective>( s.objectiveObserver );
 		currentObjective = null;
 		//Debug.Log( $"Objective Manager: {objectiveList.Count} Objectives Found" );
+
+		LanguageManager.AddSubscriber(onUpdateTranslation);
+		onUpdateTranslation();
+	}
+
+	public void onUpdateTranslation()
+	{
+		if (currentObjective != null)
+		{
+			objectiveText.text = Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder);
+		}
+		else
+        {
+			objectiveText.text = Translate("objective.NoObjective", "No Objective");
+		}
 	}
 
 	/// <summary>
@@ -32,11 +47,11 @@ public class ObjectiveManager : MonoBehaviour
 			currentObjective = objectiveList.Where( x => x.triggeredByName == name ).First();
 			Debug.Log( "TrySetObjective() FOUND: " + currentObjective.dataName );
 			//set reminder text
-			objectiveText.text = currentObjective.objectiveReminder;
+			objectiveText.text = Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder);
 
 			//only show summary if not skipped
 			if ( !currentObjective.skipSummary )
-				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue( currentObjective.textBookData.pages[0], ButtonIcon.Continue, () =>
+				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue( Interpret(currentObjective.TranslationKey("summary"), currentObjective.textBookData.pages[0]), ButtonIcon.Continue, () =>
 				{
 					followupAction?.Invoke();
 				} );
@@ -60,11 +75,11 @@ public class ObjectiveManager : MonoBehaviour
 			Debug.Log( "Found Objective" );
 			currentObjective = objectiveList.Where( x => x.dataName == name ).First();
 			//set reminder text
-			objectiveText.text = currentObjective.objectiveReminder;
+			objectiveText.text = Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder);
 
 			//only show summary if not skipped
 			if ( !currentObjective.skipSummary )
-				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue( currentObjective.textBookData.pages[0], ButtonIcon.Continue, () =>
+				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Interpret(currentObjective.TranslationKey("summary"), currentObjective.textBookData.pages[0]), ButtonIcon.Continue, () =>
 				{
 					followupAction?.Invoke();
 				} );
@@ -85,7 +100,7 @@ public class ObjectiveManager : MonoBehaviour
 		{
 			currentObjective = objectiveList.Where( x => x.dataName == name ).First();
 			//set reminder text
-			objectiveText.text = currentObjective.objectiveReminder;
+			objectiveText.text = Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder);
 		}
 	}
 
@@ -130,7 +145,7 @@ public class ObjectiveManager : MonoBehaviour
 		if ( objectiveState.currentObjective != Guid.Empty )
 		{
 			currentObjective = objectiveList.Where( x => x.GUID == objectiveState.currentObjective ).First();
-			objectiveText.text = currentObjective.objectiveReminder;
+			objectiveText.text = Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder);
 		}
 		else
 		{

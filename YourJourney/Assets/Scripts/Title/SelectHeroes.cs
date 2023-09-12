@@ -51,7 +51,7 @@ public class SelectHeroes : MonoBehaviour
 
 		titleMetaData.difficulty = Difficulty.Normal;
 		//diffText.text = titleMetaData.difficulty.ToString();
-		diffTextTranslation.Change("heroes.button." + titleMetaData.difficulty.ToString());
+		diffTextTranslation.Change("heroes.button." + titleMetaData.difficulty.ToString(), titleMetaData.difficulty.ToString());
 
 
 		finalFader.DOFade( 0, .5f ).OnComplete( () =>
@@ -181,7 +181,7 @@ public class SelectHeroes : MonoBehaviour
 		else if ( titleMetaData.difficulty == Difficulty.Hard )
 			titleMetaData.difficulty = Difficulty.Adventure;
 		//diffText.text = titleMetaData.difficulty.ToString();
-		diffTextTranslation.Change("heroes.button." + titleMetaData.difficulty.ToString());
+		diffTextTranslation.Change("heroes.button." + titleMetaData.difficulty.ToString(), titleMetaData.difficulty.ToString());
 	}
 
 	public void OnChangeNameClick( int index )
@@ -215,12 +215,14 @@ public class SelectHeroes : MonoBehaviour
 		finalFader.DOFade( 1, .5f ).OnComplete( () =>
 		{
 			gameObject.SetActive( false );
-			if ( titleMetaData.projectItem.projectType == ProjectType.Standalone )
-				specialInstructions.ActivateScreen( titleMetaData );
+			if (titleMetaData.projectItem.projectType == ProjectType.Standalone)
+			{
+				specialInstructions.ActivateScreen(titleMetaData);
+			}
 			else
 			{
 				//create new campaign state and save it
-				CampaignState campaignState = new CampaignState( FileManager.LoadCampaign( titleMetaData.projectItem.campaignGUID ) );
+				CampaignState campaignState = new CampaignState(FileManager.LoadCampaign(titleMetaData.projectItem.campaignGUID));
 				titleMetaData.campaignState = campaignState;
 				titleMetaData.campaignState.heroes = titleMetaData.selectedHeroes;
 				titleMetaData.campaignState.heroesIndex = titleMetaData.selectedHeroesIndex;
@@ -230,9 +232,9 @@ public class SelectHeroes : MonoBehaviour
 				//titleMetaData difficulty is already set
 				titleMetaData.previousScreen = TitleScreen.SelectHeroes;
 
-				new GameState().SaveCampaignState( titleMetaData.saveStateIndex, titleMetaData.campaignState );
+				new GameState().SaveCampaignState(titleMetaData.saveStateIndex, titleMetaData.campaignState);
 
-				campaignScreen.ActivateScreen( titleMetaData );
+				campaignScreen.ActivateScreen(titleMetaData);
 			}
 		} );
 

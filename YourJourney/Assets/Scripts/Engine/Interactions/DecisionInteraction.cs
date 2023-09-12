@@ -9,4 +9,7 @@
 	public string choice3Trigger;
 
 	public override InteractionType interactionType { get { return InteractionType.Decision; } set { } }
+
+	public override string TranslationKey(string suffix) { return "event.decision." + dataName + "." + suffix; }
+
 }

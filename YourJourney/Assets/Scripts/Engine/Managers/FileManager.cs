@@ -27,6 +27,7 @@ public class FileManager
 	public List<Trigger> triggers { get; set; }
 	public List<Objective> objectives { get; set; }
 	public List<MonsterActivations> activations { get; set; }
+	public List<Translation> translations { get; set; }
 	public List<TextBookData> resolutions { get; set; }
 	public List<Threat> threats { get; set; }
 	public List<Chapter> chapters { get; set; }
@@ -59,6 +60,7 @@ public class FileManager
 		triggers = source.triggersObserver.ToList();
 		objectives = source.objectiveObserver.ToList();
 		activations = source.activationsObserver.ToList();
+		translations = source.translationObserver.ToList();
 		resolutions = source.resolutionObserver.ToList();
 		threats = source.threatObserver.ToList();
 		chapters = source.chapterObserver.ToList();
@@ -152,6 +154,7 @@ public class FileManager
 				items.Add( new ProjectItem()
 				{
 					Title = s.scenarioName,
+					translations = s.TranslationForTitleScreens(),
 					projectType = s.projectType,
 					Date = s.saveDate,
 					fileName = fi.Name,
@@ -185,6 +188,7 @@ public class FileManager
 				pi.projectType = ProjectType.Campaign;
 				pi.Date = fi.LastWriteTime.ToString( "M/d/yyyy" );
 				pi.Title = c.campaignName;
+				pi.translations = new Dictionary<string, Dictionary<string, string>>(); //TODO Load info in from the campaign once it has Campaign Translation data
 				pi.campaignDescription = c.description;
 				pi.campaignGUID = dInfo.Name;
 				pi.campaignStory = c.storyText;

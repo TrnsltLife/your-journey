@@ -83,7 +83,7 @@ public class TextPanel : MonoBehaviour
 
 	public void ShowYesNo( string s, Action<InteractionResult> actions = null )
 	{
-		Show( s, Translate("dialog.button.Yes"), Translate("dialog.button.No"), ButtonIcon.None, actions );
+		Show( s, Translate("dialog.button.Yes", "Yes"), Translate("dialog.button.No", "No"), ButtonIcon.None, actions );
 	}
 
 	public void ShowOkContinue( string s, ButtonIcon icon, Action action = null )
@@ -113,7 +113,7 @@ public class TextPanel : MonoBehaviour
 	/// </summary>
 	public void ShowQueryInteraction( IInteraction it, string btnName, Action<InteractionResult> actions )
 	{
-		Show( it.textBookData.pages[0], Translate("dialog.button.Cancel"), btnName, ButtonIcon.Action, actions );
+		Show( Interpret(it.TranslationKey("flavorText"), it.textBookData.pages[0]), Translate("dialog.button.Cancel", "Cancel"), btnName, ButtonIcon.Action, actions );
 	}
 
 	/// <summary>
@@ -121,7 +121,7 @@ public class TextPanel : MonoBehaviour
 	/// </summary>
 	public void ShowQueryExploration( Action<InteractionResult> actions )
 	{
-		Show( Translate("dialog.text.ExploreTile"), Translate("dialog.button.Yes"), Translate("dialog.button.No"), ButtonIcon.None, actions );
+		Show( Translate("dialog.text.ExploreTile", "Explore this tile?"), Translate("dialog.button.Yes", "Yes"), Translate("dialog.button.No", "No"), ButtonIcon.None, actions );
 	}
 
 	/// <summary>
@@ -129,7 +129,7 @@ public class TextPanel : MonoBehaviour
 	/// </summary>
 	public void ShowTextInteraction( IInteraction it, Action actions )
 	{
-		ShowOkContinue( it.eventBookData.pages[0], ButtonIcon.Continue, actions );
+		ShowOkContinue( Interpret(it.TranslationKey("eventText"), it.eventBookData.pages[0]), ButtonIcon.Continue, actions );
 	}
 
 	public void Hide()

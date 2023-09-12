@@ -13,6 +13,7 @@ public class Monster
 {
 	public Guid GUID;
 	public int id;
+	public int index;
 	public int activationsId;
 	public string dataName;
 	public string enumName;
@@ -186,22 +187,30 @@ public class Monster
 
 	public static string MonsterNameAttacker(Monster m, int count)
 	{
+		//Get the custom name from the in-scenario translation for scripted enemies
+		string customName = Interpret("event.enemy." + m.interaction.dataName + ".monster." + m.index + ".name", "");
+		if (!String.IsNullOrEmpty(customName)) { return customName; }
+
+		//Otherwise get the translation for the standard monster name
 		string monsterKey = m.enumName;
 		if (String.IsNullOrWhiteSpace(monsterKey)) { monsterKey = m.dataName; }
 		if (count == 1)
 		{
-			Debug.Log("MonsterNameAttacker: monster.single.attacker." + monsterKey);
 			return Translate("monster.single.attacker." + monsterKey, "A(n) " + m.dataName);
 		}
 		else
 		{
-			Debug.Log("MonsterNameAttacker: monster.plural.attacker." + m.enumName);
 			return Translate("monster.plural.attacker." + monsterKey, "The " + m.dataName + "(s)");
 		}
 	}
 
 	public static string MonsterNameObject(Monster m, int count)
 	{
+		//Get the custom name from the in-scenario translation for scripted enemies
+		string customName = Interpret("event.enemy." + m.interaction.dataName + ".monster." + m.index + ".name", "");
+		if (!String.IsNullOrEmpty(customName)) { return customName; }
+
+		//Otherwise get the translation for the standard monster name
 		string monsterKey = m.enumName;
 		if (String.IsNullOrWhiteSpace(monsterKey)) { monsterKey = m.dataName; }
 		if (count == 1)

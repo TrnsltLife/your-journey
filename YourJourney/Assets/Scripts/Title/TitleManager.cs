@@ -192,7 +192,7 @@ public class TitleManager : MonoBehaviour
 
 	public void OnSettings()
 	{
-		settings.Show( "settings.QuitApp", OnLanguageUpdate );
+		settings.Show( "settings.QuitApp", "Quit App", OnLanguageUpdate );
 	}
 
 	public void OnLanguageUpdate(string languageName)

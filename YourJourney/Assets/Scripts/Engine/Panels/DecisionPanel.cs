@@ -2,6 +2,7 @@
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using static LanguageManager;
 
 public class DecisionPanel : MonoBehaviour
 {
@@ -49,12 +50,12 @@ public class DecisionPanel : MonoBehaviour
 		overlay.DOFade( 1, .5f );
 
 		gameObject.SetActive( true );
-		btn1Text.text = branchInteraction.choice1;
-		btn2Text.text = branchInteraction.choice2;
-		btn3Text.text = branchInteraction.choice3;
+		btn1Text.text = Interpret(branchInteraction.TranslationKey("choice1"), branchInteraction.choice1);
+		btn2Text.text = Interpret(branchInteraction.TranslationKey("choice2"), branchInteraction.choice2);
+		btn3Text.text = Interpret(branchInteraction.TranslationKey("choice3"), branchInteraction.choice3);
 		buttonActions = actions;
 
-		SetText( branchInteraction.eventBookData.pages[0] );
+		SetText( Interpret(branchInteraction.TranslationKey("eventText"), branchInteraction.eventBookData.pages[0]) );
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
 

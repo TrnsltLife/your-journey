@@ -21,4 +21,6 @@ public abstract class InteractionBase : IInteraction
 	public bool isPersistent { get; set; }
 	public bool isPlaced { get; set; }
 	public bool isReusable { get; set; }
+
+	abstract public string TranslationKey(string suffix);
 }

@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using System.Collections.Generic;
+using static LanguageManager;
 
 public class LorePanel : MonoBehaviour
 {
@@ -28,7 +30,8 @@ public class LorePanel : MonoBehaviour
 		else
 			threatacc = threatamount;
 
-		threatText.text = "Threat Increased By\r\n" + threatacc;
+		threatText.text = Translate("reward.text.ThreatIncreased", "Threat Increased By\r\n" + threatacc,
+			new List<string> { threatacc.ToString() });
 
 		if ( !busy )
 		{
@@ -66,9 +69,12 @@ public class LorePanel : MonoBehaviour
 			xpacc = xpamount;
 			threatacc = threatamount;
 		}
-		loreText.text = "You Have Earned\r\n" + loreacc + " Lore.";
-		xpText.text = "You Have Earned\r\n" + xpacc + " XP.";
-		threatText.text = "Threat Decreased By\r\n" + threatacc;
+		loreText.text = Translate("reward.text.LoreEarned", "You Have Earned\r\n" + loreacc + " Lore.",
+			new List<string> { loreacc.ToString() });
+		xpText.text = Translate("reward.text.XPEarned", "You Have Earned\r\n" + xpacc + " XP.",
+			new List<string> { xpacc.ToString() });
+		threatText.text = Translate("reward.text.ThreatReduced", "Threat Reduced By\r\n" + threatacc,
+			new List<string> { threatacc.ToString() });
 
 		if ( !busy )
 		{

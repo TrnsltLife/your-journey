@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static LanguageManager;
 
 public class TileManager : MonoBehaviour
 {
@@ -511,25 +512,25 @@ public class TileManager : MonoBehaviour
 			for(int i=0; i<t.Item3.Length; i++)
 			{
 				Vector3 v = t.Item3[i];
-				string tokenName = t.Item4[i];
+				string tokenName = Translate("interaction." + t.Item4[i], t.Item4[i]);
 				FindObjectOfType<CamControl>().MoveTo( v );
 				TextPanel p = FindObjectOfType<InteractionManager>().GetNewTextPanel();
 
 				string s = "";
 				if (t.Item1 == 998 || t.Item1 == 999) //SquareTile
 				{
-					s += "the Battle Map Tile "
-						+ (t.Item2 == "A" ? " (Grass)" : " (Dirt)")
-						+ " <font=\"Icon\">" + Collection.FromTileNumber(t.Item1).FontCharacter + "</font>"; //Add the Collection symbol.
+					s += Translate(t.Item2 == "A" ? "dialog.text.TheBattleTileGrass" : "TheBattleTileDirt", 
+						"the Battle Map Tile " + (t.Item2 == "A" ? " (Grass)" : " (Dirt)"));
 				}
 				else //HexTile
 				{
-					s += t.Item1 + " " + t.Item2
-						+ "Tile <font=\"Icon\">" + Collection.FromTileNumber(t.Item1).FontCharacter + "</font>"; //Add the Collection symbol.
-
+					s += Translate("dialog.text.Tile", "Tile") + " " + t.Item1 + " " + t.Item2
+						+ " <font=\"Icon\">" + Collection.FromTileNumber(t.Item1).FontCharacter + "</font>"; //Add the Collection symbol.
 				}
 
-				p.ShowOkContinue( "Place the indicated " + tokenName + " Token on " + s + ".", ButtonIcon.Continue, () => waiting = false );
+				p.ShowOkContinue( Translate("dialog.text.PlaceToken", "Place the indicated " + tokenName + " Token on " + s + ".",
+					new List<string> {tokenName, s}), 
+					ButtonIcon.Continue, () => waiting = false );
 				while ( waiting )
 					yield return null;
 			}

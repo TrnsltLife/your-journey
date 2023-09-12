@@ -62,12 +62,12 @@ public class StatTestPanel : MonoBehaviour
 
 		if (testInteraction.isCumulative && !testInteraction.passFail)
 		{
-			abilityText.text = "Test " + AbilityUtility.ColoredText(testInteraction.testAttribute, 42) + " " + testInteraction.testAttribute.ToString();
-			string ability1 = AbilityUtility.ColoredText(testInteraction.testAttribute, 42) + " " + testInteraction.testAttribute.ToString();
+			abilityText.text = "Test " + AbilityUtility.ColoredText(testInteraction.testAttribute, 42) + " " + Translate("stat." + testInteraction.testAttribute.ToString(), testInteraction.testAttribute.ToString());
+			string ability1 = AbilityUtility.ColoredText(testInteraction.testAttribute, 42) + " " + Translate("stat." + testInteraction.testAttribute.ToString(), testInteraction.testAttribute.ToString());
 			if (!testInteraction.noAlternate)//use alternate test
 			{
 				//abilityText.text += " or " + AbilityUtility.ColoredText(testInteraction.altTestAttribute, 42) + " " + testInteraction.altTestAttribute.ToString();
-				string ability2 = AbilityUtility.ColoredText(testInteraction.altTestAttribute, 42) + " " + testInteraction.altTestAttribute.ToString();
+				string ability2 = AbilityUtility.ColoredText(testInteraction.altTestAttribute, 42) + " " + Translate("stat." + testInteraction.altTestAttribute.ToString(), testInteraction.altTestAttribute.ToString());
 				abilityText.text = Translate("test.text.TestStatOrStat", "Test {0} or {1}; {2}.", new List<string> { ability1, ability2 });
 			}
 			else
@@ -79,11 +79,11 @@ public class StatTestPanel : MonoBehaviour
 		else
 		{
 			//abilityText.text = "Test " + AbilityUtility.ColoredText(testInteraction.testAttribute, 42) + " " + testInteraction.testAttribute.ToString();
-			string ability1 = AbilityUtility.ColoredText(testInteraction.testAttribute, 42) + " " + testInteraction.testAttribute.ToString();
+			string ability1 = AbilityUtility.ColoredText(testInteraction.testAttribute, 42) + " " + Translate("stat." + testInteraction.testAttribute.ToString(), testInteraction.testAttribute.ToString());
 			if (!testInteraction.noAlternate)
 			{
 				//abilityText.text += " or " + AbilityUtility.ColoredText(testInteraction.altTestAttribute, 42) + " " + testInteraction.altTestAttribute.ToString();
-				string ability2 = AbilityUtility.ColoredText(testInteraction.altTestAttribute, 42) + " " + testInteraction.altTestAttribute.ToString();
+				string ability2 = AbilityUtility.ColoredText(testInteraction.altTestAttribute, 42) + " " + Translate("stat." + testInteraction.altTestAttribute.ToString(), testInteraction.altTestAttribute.ToString());
 				abilityText.text = Translate("test.text.TestStatOrStatValue", "Test {0} or {1}; {2}.", new List<string> { ability1, ability2, testInteraction.successValue.ToString() });
 			}
 			else
@@ -95,10 +95,16 @@ public class StatTestPanel : MonoBehaviour
 
 
 		//if it's cumulative (and not simple pass/fail) and already started, show progress text
-		if ( ( testInteraction.isCumulative && !testInteraction.passFail ) && testInteraction.accumulatedValue >= 0 )
-			SetText( testInteraction.progressBookData.pages[0] );
+		if ((testInteraction.isCumulative && !testInteraction.passFail) && testInteraction.accumulatedValue >= 0)
+		{
+			string progressText = Interpret(testInteraction.TranslationKey("progressText"), testInteraction.progressBookData.pages[0]);
+			SetText(progressText);
+		}
 		else//otherwise show normal event text
-			SetText( testInteraction.eventBookData.pages[0] );
+		{
+			string eventText = Interpret(testInteraction.TranslationKey("eventText"), testInteraction.eventBookData.pages[0]);
+			SetText(eventText);
+		}
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );

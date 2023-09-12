@@ -103,7 +103,8 @@ public class CombatPanel : MonoBehaviour
 			m.Hide();
 		for ( int i = 0; i < monster.count; i++ )
 			monsterItems[i].Show( monster, i );
-		monsterName.text = monster.dataName;
+		//monsterName.text = monster.dataName;
+		monsterName.text = Monster.MonsterNameObject(monster, monster.count);
 		large.SetActive( monster.isLarge );
 		armored.SetActive( monster.isArmored );
 		bloodthirsty.SetActive( monster.isBloodThirsty );
@@ -228,7 +229,7 @@ public class CombatPanel : MonoBehaviour
 			else if ( sp.doingShadowPhase )//otherwise at least 1 killed, remove
 			{
 				string monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
-				string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monster.dataName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
+				string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monsterName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
 
 				im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, null
 					);

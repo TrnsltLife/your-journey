@@ -100,6 +100,7 @@ public interface IInteraction
 	bool isPersistent { get; set; }
 	bool isPlaced { get; set; } //whether a grouped event has already had its token place on a tile group
 	bool isReusable { get; set; } //whether a grouped event can be used on more than one tile group
+	string TranslationKey(string suffix);
 }
 
 public interface ICommonData
@@ -119,10 +120,23 @@ public class ProjectItem
 	public string fileName { get; set; }
 	public string fileVersion { get; set; }
 	public List<int> collections { get; set; }
+	public Dictionary<string, Dictionary<string, string>> translations { get; set; }
 	public string campaignGUID { get; set; }
 	public string campaignStory { get; set; }
 	public string campaignDescription { get; set; }
 	public string coverImage { get; set; }
+
+	public string Translated(string key, string defaultValue)
+	{
+		if (translations.ContainsKey(LanguageManager.currentLanguageCode))
+		{
+			if (translations[LanguageManager.currentLanguageCode].ContainsKey(key))
+			{
+				return translations[LanguageManager.currentLanguageCode][key];
+			}
+		}
+		return defaultValue;
+	}
 }
 
 public class CampaignItem

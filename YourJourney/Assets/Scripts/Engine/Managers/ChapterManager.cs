@@ -144,7 +144,7 @@ public class ChapterManager : MonoBehaviour
 	void FinishChapterTrigger( Chapter c, bool firstChapter )
 	{
 		Debug.Log("FinishChapterTrigger chapter " + c.dataName + " firstChapter? " + firstChapter);
-		string s = Translate("dialog.text.PrepareTiles") + "\r\n\r\n";
+		string s = Translate("dialog.text.PrepareTiles", "Prepare the following tiles:") + "\r\n\r\n";
 		foreach (BaseTile bt in c.tileObserver)
 		{
 			Debug.Log(bt.ToString());
@@ -156,9 +156,8 @@ public class ChapterManager : MonoBehaviour
 			}
 			else if (bt.tileType == TileType.Square)
             {
-				s += "Battle Map Tile"
-					+ (bt.tileSide == "A" ? " (Grass)" : " (Dirt)")
-					+ " <font=\"Icon\">" + Collection.FromTileNumber(bt.idNumber).FontCharacter + "</font>" //Add the Collection symbol.
+				s += Translate(bt.tileSide == "A" ? "dialog.text.BattleTileGrass" : "BattleTileDirt",
+						"Battle Map Tile " + (bt.tileSide == "A" ? " (Grass)" : " (Dirt)"))
 					+ ", ";
 			}
 		}
@@ -251,7 +250,7 @@ public class ChapterManager : MonoBehaviour
 						tg.isExplored = true;
 					}
 				} );
-				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("dialog.text.PlaceHeroes"), ButtonIcon.Continue );
+				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("dialog.text.PlaceHeroes", "Place your Heroes in the indicated position."), ButtonIcon.Continue );
 			}
 		} );
 	}

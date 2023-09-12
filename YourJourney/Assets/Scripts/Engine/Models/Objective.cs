@@ -14,4 +14,6 @@ public class Objective
 	public string nextTrigger;
 	public TextBookData textBookData;
 	public int loreReward, xpReward, threatReward;
+
+	public string TranslationKey(string suffix) { return "objective." + dataName + "." + suffix; }
 }

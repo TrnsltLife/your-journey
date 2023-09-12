@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Newtonsoft.Json;
 using TMPro;
@@ -8,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static LanguageManager;
 
 public class Engine : MonoBehaviour
 {
@@ -62,7 +64,6 @@ public class Engine : MonoBehaviour
 		else
 		{
 			scenario = Bootstrap.LoadScenario();
-			LoadDefaultMonsterActivations();
 		}
 
 		if ( scenario == null )
@@ -85,6 +86,8 @@ public class Engine : MonoBehaviour
 			return;
 		}
 
+		//Load Monster Activations
+		LoadDefaultMonsterActivations();
 
 		//Load Skins
 		var skinsManager = GetComponent<SkinsManager>();
@@ -95,6 +98,7 @@ public class Engine : MonoBehaviour
 		//Load Translations
 		LanguageManager.LoadLanguage(Bootstrap.GetLanguage());
 		OnLanguageUpdate(Bootstrap.GetLanguage());
+		LanguageManager.AssignScenarioTranslations(scenario.translationObserver.ToList());
 
 
 		//first objective/interaction/trigger are DUMMIES (None), remove them
@@ -180,7 +184,7 @@ public class Engine : MonoBehaviour
 			//only show intro text if it's not empty
 			if ( !string.IsNullOrEmpty( scenario.introBookData.pages[0] ) )
 			{
-				interactionManager.GetNewTextPanel().ShowOkContinue( scenario.introBookData.pages[0], ButtonIcon.Continue, () =>
+				interactionManager.GetNewTextPanel().ShowOkContinue( Interpret("scenario.introduction", scenario.introBookData.pages[0]), ButtonIcon.Continue, () =>
 					{
 						uiControl.interactable = true;
 
@@ -299,21 +303,27 @@ public class Engine : MonoBehaviour
 		FindObjectOfType<LorePanel>().AddReward( scenario.loreReward, scenario.xpReward );
 
 		bool success = scenario.scenarioEndStatus[resName];//default reso
-		string msg = success ? "S U C C E S S" : "F A I L U R E";
+		string msg = success ? Translate("game.text.Success", "SUCCESS") : Translate("game.text.Failure", "FAILURE");
 		string end = "\r\n\r\n";
 		if(scenario.projectType == ProjectType.Campaign)
         {
-			end += "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.";
+			end += Translate("game.text.Rewards", "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.", 
+				new List<string> { Bootstrap.loreCount.ToString(), Bootstrap.xpCount.ToString()});
         }
 		else
         {
-			end += "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.\r\n"
-				+ "With your starting values, that gives you " + (Bootstrap.gameStarter.loreStartValue + Bootstrap.loreCount) + " Lore "
-				+ "and " + (Bootstrap.gameStarter.xpStartValue + Bootstrap.xpCount) + " XP.\r\n\r\n"
-				+ "Be sure to write this down if you want to continue with another standalone scenario.";
+			int totalLore = Bootstrap.gameStarter.loreStartValue + Bootstrap.loreCount;
+			int totalXP = Bootstrap.gameStarter.xpStartValue + Bootstrap.xpCount;
+			end += Translate("game.text.Rewards", "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.",
+					new List<string> { Bootstrap.loreCount.ToString(), Bootstrap.xpCount.ToString() }) 
+				+ "\r\n"
+				+ Translate("game.text.RunningTotal", "With your starting values, that gives you " + (totalLore) + " Lore and " + (totalXP) + " XP.",
+					new List<string> { totalLore.ToString(), totalXP.ToString() }) 
+				+ "\r\n\r\n"
+				+ Translate("game.text.Reminder", "Be sure to write this down if you want to continue with another standalone scenario.");
 		}
 		var text = interactionManager.GetNewTextPanel();
-		text.ShowOkContinue( "The Scenario has ended.\r\n\r\n" + msg + end, ButtonIcon.Continue, () =>
+		text.ShowOkContinue( Translate("game.text.ScenarioEnded", "The Scenario has ended.") + "\r\n\r\n" + msg + end, ButtonIcon.Continue, () =>
 			{
 				fader.gameObject.SetActive( true );
 				fader.DOFade( 1, 2 ).OnComplete( () =>
@@ -401,7 +411,7 @@ public class Engine : MonoBehaviour
 
 	public void OnShowSettings()
 	{
-		settingsDialog.Show("settings.QuitToTitle", OnLanguageUpdate, OnQuit, OnSkinpackUpdate );
+		settingsDialog.Show("settings.QuitToTitle", "Quit to Title", OnLanguageUpdate, OnQuit, OnSkinpackUpdate );
 	}
 
 	public void OnQuit()

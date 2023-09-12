@@ -35,6 +35,7 @@ public class Scenario
 	public ObservableCollection<Trigger> triggersObserver { get; set; }
 	public ObservableCollection<Objective> objectiveObserver { get; set; }
 	public ObservableCollection<MonsterActivations> activationsObserver { get; set; }
+	public ObservableCollection<Translation> translationObserver { get; set; }
 	public ObservableCollection<TextBookData> resolutionObserver { get; set; }
 	public ObservableCollection<Threat> threatObserver { get; set; }
 	public ObservableCollection<Chapter> chapterObserver { get; set; }
@@ -72,6 +73,14 @@ public class Scenario
         {
 			s.activationsObserver = new ObservableCollection<MonsterActivations>();
         }
+		if (fm.translations != null)
+		{
+			s.translationObserver = new ObservableCollection<Translation>(fm.translations);
+		}
+		else
+        {
+			s.translationObserver = new ObservableCollection<Translation>();
+        }
 		s.resolutionObserver = new ObservableCollection<TextBookData>( fm.resolutions );
 		s.threatObserver = new ObservableCollection<Threat>( fm.threats );
 		s.chapterObserver = new ObservableCollection<Chapter>( fm.chapters );
@@ -102,4 +111,28 @@ public class Scenario
 
 		return s;
 	}
+
+	/// <summary>
+	/// Create a stripped down copy of the scenario translation that only contains the scenario.name and scenario.instructions
+	/// </summary>
+	/// <returns></returns>
+	public Dictionary<string, Dictionary<string, string>> TranslationForTitleScreens()
+    {
+		Dictionary<string, Dictionary<string, string>> langsDict = new Dictionary<string, Dictionary<string, string>>();
+		if(translationObserver == null) { return langsDict; }
+        foreach(var translation in translationObserver)
+		{
+			string langCode = translation.dataName;
+			Dictionary<string, string> wordsDict = new Dictionary<string, string>();
+			foreach(var item in translation.translationItems)
+            {
+				if(item.key == "scenario.scenarioName" || item.key == "scenario.instructions")
+                {
+					wordsDict.Add(item.key, item.text);
+                }
+            }
+			langsDict.Add(langCode, wordsDict);
+        }
+		return langsDict;
+    }
 }
