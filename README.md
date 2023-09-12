@@ -12,7 +12,7 @@ The companion playback app for the Journeys in Middle Earth Scenario Editor, for
 
 #### Installation instructions - Windows
 1. Unzip the YourJourney_Win_v0.27.zip file somewhere and run "Your Journey.exe".
-2. Put your .jime scenario files (like [The Watch at Weathertop](https://drive.google.com/file/d/1Rr2HZlZ-ba17b714xOql2_Dgg5pnyWIg/view?usp=sharing) by [Noldorion](https://boardgamegeek.com/user/Noldorion)) in the "Your Journey" folder in your Documents folder (Windows users).
+2. Put your .jime scenario files (like [The Watch at Weathertop](https://drive.google.com/file/d/1Rr2HZlZ-ba17b714xOql2_Dgg5pnyWIg/view?usp=sharing) by [Noldorion](https://boardgamegeek.com/user/Noldorion)) in the "Your Journey" folder in your Documents folder (Windows users). You can also grab [The Search for the Citadel](https://github.com/TrnsltLife/YourJourneyScenarios/releases/tag/v0.27-citadel) which is a test scenario that demonstrates a translated scenario in French.
 3. Hit the "New Game" button at the title.
 4. Create a save slot on the next screen (just start typing when it asks for a name, then press enter).
 5. Load your level on the next screen.
