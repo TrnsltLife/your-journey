@@ -124,6 +124,7 @@
 	"damage.button.Continue":"Continue",
 	"damage.text.Negates":"{0} negates.",
 
+	"stand.text.ConfirmStand":"{0}: Do you wish to perform a Last Stand against {1}?",
 	"stand.button.Pass":"Pass",
 	"stand.button.Fail":"Fail",
 	"stand.text.Test":"Test {0}; {1}",

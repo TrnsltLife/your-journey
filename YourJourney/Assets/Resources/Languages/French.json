@@ -126,6 +126,7 @@
 	"damage.button.Continue":"Confirmer",
 	"damage.text.Negates":"{0} annule.",
 
+	"stand.text.ConfirmStand":"{0} : Voulez-vous faire votre dernier combat contre {1}.",
 	"stand.button.Pass":"Réussi",
 	"stand.button.Fail":"Raté",
 	"stand.text.Test":"Effectuez un test {0}; {1}",
