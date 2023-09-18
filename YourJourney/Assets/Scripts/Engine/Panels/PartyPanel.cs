@@ -6,6 +6,7 @@ using static LanguageManager;
 
 public class PartyPanel : MonoBehaviour
 {
+	public ChroniclePanel chroniclePanel;
 	public CanvasGroup overlay;
 	public Text loreText, xpText, diffText;
 	TextTranslation diffTextTranslation;
@@ -97,6 +98,12 @@ public class PartyPanel : MonoBehaviour
 	{
 		Hide();
 	}
+
+	public void OnChronicle()
+    {
+		Hide();
+		chroniclePanel.Show(Engine.currentScenario.chronicle);
+    }
 
 	public void OnDifficulty()
 	{

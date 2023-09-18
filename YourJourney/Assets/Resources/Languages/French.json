@@ -186,6 +186,7 @@
 	"stand.flavor.Spirit":"Vous pouvez toujours survivre, combattez la peur!",
 	"stand.flavor.Wit":"Une réflexion rapide peut vous sauver!",
 
+	"party.button.Chronicle":"La Chronique",
 	"party.button.Close":"Fermer",
 	"party.text.XP":"XP: {0}",
 	"party.text.Lore":"<size='25'>Connaissance:</size> {0}",

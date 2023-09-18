@@ -190,7 +190,7 @@ public class InteractionManager : MonoBehaviour
 				//special case for persistent events
 				if ( it.interactionType == InteractionType.Persistent && FindObjectOfType<TriggerManager>().IsTriggered( ( (PersistentInteraction)it ).alternativeTextTrigger ) )
 				{
-					GetNewTextPanel().ShowOkContinue( Interpret(it.TranslationKey("altText"), ((PersistentInteraction)it).alternativeBookData.pages[0]), ButtonIcon.Continue );
+					GetNewTextPanel().ShowOkContinue(Scenario.Chronicle(Interpret(it.TranslationKey("altText"), ((PersistentInteraction)it).alternativeBookData.pages[0])), ButtonIcon.Continue );
 				}
 				else if ( it.interactionType == InteractionType.Dialog )
 				{
@@ -284,7 +284,7 @@ public class InteractionManager : MonoBehaviour
 		if ( engine.scenario.resolutionObserver.Any( x => x.triggerName == name ) )
 		{
 			var text = engine.scenario.resolutionObserver.Where( x => x.triggerName == name ).First();
-			GetNewTextPanel().ShowOkContinue( Interpret("resolution." + text.dataName + ".text", text.pages[0]), ButtonIcon.Continue );
+			GetNewTextPanel().ShowOkContinue( Scenario.Chronicle(Interpret("resolution." + text.dataName + ".text", text.pages[0])), ButtonIcon.Continue );
 			//handle end game
 			engine.triggerManager.TriggerEndGame( text.dataName );
 			return true;
@@ -486,7 +486,7 @@ public class InteractionManager : MonoBehaviour
 
 			if ( b.success )//show success textbox
 			{
-				GetNewTextPanel().ShowOkContinue( Interpret(sti.TranslationKey("passText"), sti.passBookData.pages[0]), ButtonIcon.Continue, () =>
+				GetNewTextPanel().ShowOkContinue( Scenario.Chronicle(Interpret(sti.TranslationKey("passText"), sti.passBookData.pages[0])), ButtonIcon.Continue, () =>
 				{
 					action?.Invoke( new InteractionResult() { removeToken = true } );
 				} );
@@ -496,7 +496,7 @@ public class InteractionManager : MonoBehaviour
 			}
 			else if ( !b.btn4 && !b.success )//show fail textbox
 			{
-				GetNewTextPanel().ShowOkContinue( Interpret(sti.TranslationKey("failText"), sti.failBookData.pages[0]), ButtonIcon.Continue, () =>
+				GetNewTextPanel().ShowOkContinue(Scenario.Chronicle(Interpret(sti.TranslationKey("failText"), sti.failBookData.pages[0])), ButtonIcon.Continue, () =>
 				{
 					action?.Invoke( new InteractionResult() { removeToken = true } );
 				} );
@@ -509,7 +509,7 @@ public class InteractionManager : MonoBehaviour
 				bool success = ( (StatTestInteraction)it ).ResolveCumulative( b.value );
 				if ( success )//success
 				{
-					GetNewTextPanel().ShowOkContinue( Interpret(sti.TranslationKey("passText"), sti.passBookData.pages[0]), ButtonIcon.Continue, () =>
+					GetNewTextPanel().ShowOkContinue(Scenario.Chronicle(Interpret(sti.TranslationKey("passText"), sti.passBookData.pages[0])), ButtonIcon.Continue, () =>
 					{
 						action?.Invoke( new InteractionResult() { removeToken = true } );
 					} );
@@ -519,7 +519,7 @@ public class InteractionManager : MonoBehaviour
 				}
 				else//progressive fail
 				{
-					GetNewTextPanel().ShowOkContinue( Interpret(sti.TranslationKey("progressText"), sti.progressBookData.pages[0]), ButtonIcon.Continue, () =>
+					GetNewTextPanel().ShowOkContinue(Scenario.Chronicle(Interpret(sti.TranslationKey("progressText"), sti.progressBookData.pages[0])), ButtonIcon.Continue, () =>
 					 {
 						 action?.Invoke( new InteractionResult() { removeToken = false } );
 					 } );
@@ -593,7 +593,7 @@ public class InteractionManager : MonoBehaviour
 
 			if ( res.btn1 )
 			{
-				GetNewTextPanel().ShowOkContinue( Interpret(di.TranslationKey("text1"), di.c1Text), ButtonIcon.Continue, () =>
+				GetNewTextPanel().ShowOkContinue(Scenario.Chronicle(Interpret(di.TranslationKey("text1"), di.c1Text)), ButtonIcon.Continue, () =>
 				{
 					engine.triggerManager.FireTrigger( di.c1Trigger );
 					action?.Invoke( new InteractionResult() { removeToken = remove } );
@@ -601,7 +601,7 @@ public class InteractionManager : MonoBehaviour
 			}
 			else if ( res.btn2 )
 			{
-				GetNewTextPanel().ShowOkContinue(Interpret(di.TranslationKey("text2"), di.c2Text), ButtonIcon.Continue, () =>
+				GetNewTextPanel().ShowOkContinue(Scenario.Chronicle(Interpret(di.TranslationKey("text2"), di.c2Text)), ButtonIcon.Continue, () =>
 				{
 					engine.triggerManager.FireTrigger( di.c2Trigger );
 					action?.Invoke( new InteractionResult() { removeToken = remove } );
@@ -609,7 +609,7 @@ public class InteractionManager : MonoBehaviour
 			}
 			else if ( res.btn3 )
 			{
-				GetNewTextPanel().ShowOkContinue(Interpret(di.TranslationKey("text3"), di.c3Text), ButtonIcon.Continue, () =>
+				GetNewTextPanel().ShowOkContinue(Scenario.Chronicle(Interpret(di.TranslationKey("text3"), di.c3Text)), ButtonIcon.Continue, () =>
 				{
 					engine.triggerManager.FireTrigger( di.c3Trigger );
 					action?.Invoke( new InteractionResult() { removeToken = remove } );

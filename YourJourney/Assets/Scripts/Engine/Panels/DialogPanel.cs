@@ -75,6 +75,9 @@ public class DialogPanel : MonoBehaviour
 		else
 			SetText( Interpret(di.TranslationKey("persistentText"), di.persistentText) );
 
+
+		Scenario.Chronicle(mainText.text + "\n[" + btn1Text.text + "] [" + btn2Text.text + "] [" + btn3Text.text + "]");
+
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
 

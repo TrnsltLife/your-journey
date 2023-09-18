@@ -34,6 +34,7 @@ public class FileManager
 	//public List<Collection> collections { get; set; }
 	public List<int> collections { get; set; }
 	public List<int> globalTiles { get; set; }
+	public List<string> chronicle { get; set; }
 	public Dictionary<string, bool> scenarioEndStatus { get; set; }
 	public TextBookData introBookData { get; set; }
 	public ProjectType projectType { get; set; }
@@ -66,6 +67,7 @@ public class FileManager
 		chapters = source.chapterObserver.ToList();
 		collections = source.collectionObserver.ToList();
 		globalTiles = source.globalTilePool.ToList();
+		chronicle = source.chronicle;
 		scenarioEndStatus = source.scenarioEndStatus;
 
 		introBookData = source.introBookData;
