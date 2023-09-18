@@ -101,7 +101,8 @@ public class PartyPanel : MonoBehaviour
 
 	public void OnChronicle()
     {
-		Hide();
+		//Hide();
+		ToggleVisible(false);
 		chroniclePanel.Show(Engine.currentScenario.chronicle);
     }
 

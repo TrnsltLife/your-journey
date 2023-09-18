@@ -28,11 +28,11 @@ public class ObjectiveManager : MonoBehaviour
 	{
 		if (currentObjective != null)
 		{
-			objectiveText.text = Scenario.Chronicle(Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder));
+			objectiveText.text = Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder);
 		}
 		else
         {
-			objectiveText.text = Scenario.Chronicle(Translate("objective.NoObjective", "No Objective"));
+			objectiveText.text = Translate("objective.NoObjective", "No Objective");
 		}
 	}
 
@@ -51,7 +51,7 @@ public class ObjectiveManager : MonoBehaviour
 
 			//only show summary if not skipped
 			if ( !currentObjective.skipSummary )
-				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Scenario.Chronicle(Interpret(currentObjective.TranslationKey("summary"), currentObjective.textBookData.pages[0])), ButtonIcon.Continue, () =>
+				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Interpret(currentObjective.TranslationKey("summary"), currentObjective.textBookData.pages[0]), ButtonIcon.Continue, () =>
 				{
 					followupAction?.Invoke();
 				} );
@@ -75,11 +75,11 @@ public class ObjectiveManager : MonoBehaviour
 			Debug.Log( "Found Objective" );
 			currentObjective = objectiveList.Where( x => x.dataName == name ).First();
 			//set reminder text
-			objectiveText.text = Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder);
+			objectiveText.text = Scenario.Chronicle(Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder));
 
 			//only show summary if not skipped
 			if ( !currentObjective.skipSummary )
-				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Scenario.Chronicle(Interpret(currentObjective.TranslationKey("summary"), currentObjective.textBookData.pages[0])), ButtonIcon.Continue, () =>
+				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Interpret(currentObjective.TranslationKey("summary"), currentObjective.textBookData.pages[0]), ButtonIcon.Continue, () =>
 				{
 					followupAction?.Invoke();
 				} );

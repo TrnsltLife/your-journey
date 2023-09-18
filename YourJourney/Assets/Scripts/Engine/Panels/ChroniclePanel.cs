@@ -43,7 +43,7 @@ public class ChroniclePanel : MonoBehaviour
 		//rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		canvasGroup.gameObject.transform.DOMoveY(sp.y, .75f);
 
-		SetText(string.Join("\n------------------------------------------------------------\n", chronicle));
+		SetText(string.Join("\n<align=center><font=\"Icon\"><b>L  L  L</b></font></align>\n", chronicle));
 	}
 
 	void SetText(string t)
@@ -61,7 +61,8 @@ public class ChroniclePanel : MonoBehaviour
 		canvasGroup.DOFade( 0, .25f );
 		overlay.DOFade( 0, .25f ).OnComplete( () =>
 		{
-			partyPanel.Show();
+			gameObject.SetActive( false );
+			partyPanel.ToggleVisible(true);
 		} );
 	}
 

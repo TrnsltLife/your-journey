@@ -70,6 +70,12 @@ public class TextPanel : MonoBehaviour
 				break;
 		}
 		SetText( t );
+
+		Scenario.Chronicle(t + "\n[" + btn1 + "] [" +
+				((ButtonIcon.Action  == icon) ? "<font=\"Icon\">I</font>" : "") +
+				btn2 + "]"
+			);
+
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
 
@@ -102,6 +108,9 @@ public class TextPanel : MonoBehaviour
 		btnSingleText.text = Translate("dialog.button." + icon.ToString(), icon.ToString());
 		btnSingleAction = action;
 		SetText( s );
+
+		Scenario.Chronicle(s + "\n[" + btnSingleText.text + "]");
+
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
 

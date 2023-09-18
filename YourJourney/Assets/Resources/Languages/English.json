@@ -104,6 +104,7 @@
 	"dialog.text.TheBattleTileDirt":"the Dirt Battle Map Tile",
 	"dialog.text.PlaceMonsters":"Place {0} {1} in the indicated position.",
 	"dialog.text.PlaceToken":"Place the indicated {0} on {1}.",
+	"dialog.text.ReplaceToken":"Replace the Token with a {0} Token.",
 	"dialog.text.RemoveMonsters":"Remove {0} {1} from the board.",
 	"dialog.text.YouNearbyInspiration":"You or a nearby Hero gain 1 inspiration.",
 	"dialog.text.DiscardExploration":"Discard the exploration token.",

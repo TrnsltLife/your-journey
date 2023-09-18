@@ -184,7 +184,7 @@ public class Engine : MonoBehaviour
 			//only show intro text if it's not empty
 			if ( !string.IsNullOrEmpty( scenario.introBookData.pages[0] ) )
 			{
-				interactionManager.GetNewTextPanel().ShowOkContinue( Scenario.Chronicle(Interpret("scenario.introduction", scenario.introBookData.pages[0])), ButtonIcon.Continue, () =>
+				interactionManager.GetNewTextPanel().ShowOkContinue(Interpret("scenario.introduction", scenario.introBookData.pages[0]), ButtonIcon.Continue, () =>
 					{
 						uiControl.interactable = true;
 
