@@ -56,7 +56,8 @@ public class DecisionPanel : MonoBehaviour
 		buttonActions = actions;
 
 		SetText( Interpret(branchInteraction.TranslationKey("eventText"), branchInteraction.eventBookData.pages[0]) );
-		Scenario.Chronicle(mainText.text + "\n[" + btn1Text.text + "] [" + btn2Text.text + "] [" + btn3Text.text + "]");
+		Scenario.Chronicle(mainText.text + "\n[" + btn1Text.text + "] [" + btn2Text.text + "]" +
+			(branchInteraction.isThreeChoices ? " [" + btn3Text.text + "]" : ""));
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
@@ -99,6 +100,7 @@ public class DecisionPanel : MonoBehaviour
 	{
 		DisableButtons();
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn1Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn1 = true } );
 		Hide();
 	}
@@ -107,6 +109,7 @@ public class DecisionPanel : MonoBehaviour
 	{
 		DisableButtons();
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn2Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn2 = true } );
 		Hide();
 	}
@@ -115,6 +118,7 @@ public class DecisionPanel : MonoBehaviour
 	{
 		DisableButtons();
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn3Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn3 = true } );
 		Hide();
 	}
@@ -123,6 +127,7 @@ public class DecisionPanel : MonoBehaviour
 	{
 		DisableButtons();
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn4Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn4 = true } );
 		Hide();
 	}

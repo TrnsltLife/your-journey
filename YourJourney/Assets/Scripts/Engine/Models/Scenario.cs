@@ -143,4 +143,10 @@ public class Scenario
 		Engine.currentScenario.chronicle.Add(entry);
 		return entry;
     }
+
+	public static string ChroniclePS(string append)
+    {
+		Engine.currentScenario.chronicle[Engine.currentScenario.chronicle.Count - 1] += append;
+		return append;
+    }
 }

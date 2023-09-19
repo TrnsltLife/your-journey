@@ -654,7 +654,6 @@ public class Tile : MonoBehaviour
 		else
 			flavor = instructions;
 
-		Scenario.Chronicle(flavor);
 		interactionManager.GetNewTextPanel().ShowOkContinue( flavor, ButtonIcon.Continue, action );
 	}
 

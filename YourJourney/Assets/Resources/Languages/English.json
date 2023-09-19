@@ -197,6 +197,7 @@
 	"test.text.TestStatValue":"Test {0}; {1}.",
 	"test.text.TestStatOrStatValue":"Test {0} or {1}; {2}.",
 
+	"combat.text.ConfirmHits":"Do you want to apply {0} hits to {1}?",
 	"combat.button.Apply":"Apply",
 	"combat.button.Pierce":"Pierce",
 	"combat.button.Lethal":"Lethal",

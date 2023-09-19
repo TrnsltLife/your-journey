@@ -10,7 +10,7 @@ public class StatTestPanel : MonoBehaviour
 {
 	public TextMeshProUGUI mainText, abilityText, dummy;
 	public Text counterText;
-	public GameObject btn1, btn2, continueBtn;
+	public GameObject btn1, btn2, continueBtn, submitBtn;
 	public CanvasGroup overlay;
 	public GameObject progressRoot;
 
@@ -97,13 +97,15 @@ public class StatTestPanel : MonoBehaviour
 		//if it's cumulative (and not simple pass/fail) and already started, show progress text
 		if ((testInteraction.isCumulative && !testInteraction.passFail) && testInteraction.accumulatedValue >= 0)
 		{
-			string progressText = Scenario.Chronicle(Interpret(testInteraction.TranslationKey("progressText"), testInteraction.progressBookData.pages[0]));
+			string progressText = Interpret(testInteraction.TranslationKey("progressText"), testInteraction.progressBookData.pages[0]);
 			SetText(progressText);
+			Scenario.Chronicle(progressText + "\n\n" + abilityText.text);
 		}
 		else//otherwise show normal event text
 		{
-			string eventText = Scenario.Chronicle(Interpret(testInteraction.TranslationKey("eventText"), testInteraction.eventBookData.pages[0]));
+			string eventText = Interpret(testInteraction.TranslationKey("eventText"), testInteraction.eventBookData.pages[0]);
 			SetText(eventText);
+			Scenario.Chronicle(eventText + "\n\n" + abilityText.text);
 		}
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
@@ -162,6 +164,8 @@ public class StatTestPanel : MonoBehaviour
 		btn2.SetActive( false );
 		continueBtn.SetActive( false );
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + submitBtn.GetComponentInChildren<TextMeshProUGUI>().text + " " + value.ToString() + "]");
+
 		//use btn4 = true to signify this as a cumulative result
 		buttonActions?.Invoke( new InteractionResult() { btn4 = statTestInteraction.isCumulative, value = value } );
 		Hide();
@@ -177,6 +181,8 @@ public class StatTestPanel : MonoBehaviour
 		if ( statTestInteraction.passFail )
 			v = 1;
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn1.GetComponentInChildren<TextMeshProUGUI>().text + "]");
+
 		buttonActions?.Invoke( new InteractionResult() { btn4 = statTestInteraction.isCumulative, success = true, value = v } );
 		Hide();
 	}
@@ -190,6 +196,8 @@ public class StatTestPanel : MonoBehaviour
 		int v = value;
 		if ( statTestInteraction.passFail )
 			v = -1;
+
+		Scenario.ChroniclePS("<font=\"Icon\">O</font>[" + btn2.GetComponentInChildren<TextMeshProUGUI>().text + "]");
 
 		buttonActions?.Invoke( new InteractionResult() { btn4 = statTestInteraction.isCumulative, success = false, value = v } );
 		Hide();
