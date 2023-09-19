@@ -830,7 +830,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3481645953143989067
 CanvasRenderer:
@@ -925,7 +925,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 108.909874, y: 34.74429, z: 109.84915, w: 32.170616}
+  m_margin: {x: 18.69242, y: 16.897058, z: 17.802181, w: 17.62813}
   m_textInfo:
     textComponent: {fileID: 2676611621119320163}
     characterCount: 8
@@ -986,7 +986,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3481645953169746378
 CanvasRenderer:
@@ -1081,7 +1081,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 110.01594, y: 33.337467, z: 111.03861, w: 37.34282}
+  m_margin: {x: 18.009218, y: 17.417433, z: 17.950325, w: 16.896166}
   m_textInfo:
     textComponent: {fileID: 6062206428806289108}
     characterCount: 8
@@ -1554,7 +1554,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5813888284351961518
 CanvasRenderer:
@@ -1649,7 +1649,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 109.40716, y: 35.777016, z: 111.452225, w: 36.799232}
+  m_margin: {x: 18.26481, y: 16.693584, z: 17.558256, w: 17.616953}
   m_textInfo:
     textComponent: {fileID: 6749429660410538502}
     characterCount: 8
@@ -1869,7 +1869,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6691929712550022683}
   m_HandleRect: {fileID: 4167174119046552228}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
