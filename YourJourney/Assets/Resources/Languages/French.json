@@ -106,6 +106,7 @@
 	"dialog.text.TheBattleTileGrass":"la Tuile de carte de bataille d'herbe",
 	"dialog.text.TheBattleTileDirt":"la Tuile de carte de bataille de terre",
 	"dialog.text.PlaceToken":"Placez le jeton {0} sur {1} comme indiqué.",
+	"dialog.text.ReplaceToken":"Remplacez le jeton par un jeton {0}.",
 	"dialog.text.RemoveMonsters":"Enlevez {0} {1} du plateau.",
 	"dialog.text.YouNearbyInspiration":"Vous ou un Héros prochain gagne(z) 1 inspiration.",
 	"dialog.text.DiscardExploration":"Défaussez ce pion Exploration.",
@@ -186,6 +187,7 @@
 	"stand.flavor.Spirit":"Vous pouvez toujours survivre, combattez la peur!",
 	"stand.flavor.Wit":"Une réflexion rapide peut vous sauver!",
 
+	"party.button.Chronicle":"La Chronique",
 	"party.button.Close":"Fermer",
 	"party.text.XP":"XP: {0}",
 	"party.text.Lore":"<size='25'>Connaissance:</size> {0}",

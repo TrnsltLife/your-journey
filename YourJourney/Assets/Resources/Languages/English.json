@@ -104,6 +104,7 @@
 	"dialog.text.TheBattleTileDirt":"the Dirt Battle Map Tile",
 	"dialog.text.PlaceMonsters":"Place {0} {1} in the indicated position.",
 	"dialog.text.PlaceToken":"Place the indicated {0} on {1}.",
+	"dialog.text.ReplaceToken":"Replace the Token with a {0} Token.",
 	"dialog.text.RemoveMonsters":"Remove {0} {1} from the board.",
 	"dialog.text.YouNearbyInspiration":"You or a nearby Hero gain 1 inspiration.",
 	"dialog.text.DiscardExploration":"Discard the exploration token.",
@@ -183,6 +184,7 @@
 	"stand.flavor.Spirit":"You can still survive, fight the fear!",
 	"stand.flavor.Wit":"Quick thinking can save you!",
 
+	"party.button.Chronicle":"Chronicle",
 	"party.button.Close":"Close",
 	"party.text.XP":"XP: {0}",
 	"party.text.Lore":"Lore: {0}",
@@ -195,6 +197,7 @@
 	"test.text.TestStatValue":"Test {0}; {1}.",
 	"test.text.TestStatOrStatValue":"Test {0} or {1}; {2}.",
 
+	"combat.text.ConfirmHits":"Do you want to apply {0} hits to {1}?",
 	"combat.button.Apply":"Apply",
 	"combat.button.Pierce":"Pierce",
 	"combat.button.Lethal":"Lethal",

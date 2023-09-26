@@ -10,7 +10,7 @@ using UnityEngine;
 /// </summary>
 public class Bootstrap
 {
-	public static readonly string AppVersion = "0.27";
+	public static readonly string AppVersion = "0.28";
 	public static readonly string FormatVersion = "1.14";
 
 	//REQUIRED for playing ANY scenario, bootstraps the scenario

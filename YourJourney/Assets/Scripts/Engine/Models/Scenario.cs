@@ -43,6 +43,7 @@ public class Scenario
 	//public ObservableCollection<Collection> collectionObserver { get; set; }
 	public ObservableCollection<int> collectionObserver { get; set; }
 	public ObservableCollection<int> globalTilePool { get; set; }
+	public List<string> chronicle { get; set; }
 
 	/// <summary>
 	/// Load in data from FileManager
@@ -96,6 +97,7 @@ public class Scenario
 			s.collectionObserver.Add(Collection.CORE_SET.ID);
         }
 		s.globalTilePool = new ObservableCollection<int>( fm.globalTiles );
+		s.chronicle = new List<string> { fm.scenarioName , fm.specialInstructions };
 		s.scenarioEndStatus = new Dictionary<string, bool>( fm.scenarioEndStatus );
 		//s.fileName = fm.fileName;
 		s.introBookData = fm.introBookData;
@@ -134,5 +136,17 @@ public class Scenario
 			langsDict.Add(langCode, wordsDict);
         }
 		return langsDict;
+    }
+
+	public static string Chronicle(string entry)
+    {
+		Engine.currentScenario.chronicle.Add(entry);
+		return entry;
+    }
+
+	public static string ChroniclePS(string append)
+    {
+		Engine.currentScenario.chronicle[Engine.currentScenario.chronicle.Count - 1] += append;
+		return append;
     }
 }

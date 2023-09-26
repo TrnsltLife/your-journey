@@ -75,6 +75,12 @@ public class DialogPanel : MonoBehaviour
 		else
 			SetText( Interpret(di.TranslationKey("persistentText"), di.persistentText) );
 
+
+		Scenario.Chronicle(mainText.text + "\n" +
+			(!String.IsNullOrEmpty(di.choice1) ? "[<font=\"Icon\">I</font>" + btn1Text.text + "]" : "") +
+			(!String.IsNullOrEmpty(di.choice2) ? " [<font=\"Icon\">I</font>" + btn2Text.text + "]" : "") +
+			(!String.IsNullOrEmpty(di.choice3) ? " [<font=\"Icon\">I</font>" + btn3Text.text + "]" : ""));
+
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
 
@@ -122,6 +128,7 @@ public class DialogPanel : MonoBehaviour
 		if ( dialogInteraction.c1Used && dialogInteraction.c2Used && dialogInteraction.c3Used )
 			dialogInteraction.isDone = true;
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[<font=\"Icon\">I</font>" + btn1Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn1 = true, removeToken = false } );
 		Hide();
 	}
@@ -134,6 +141,7 @@ public class DialogPanel : MonoBehaviour
 		if ( dialogInteraction.c1Used && dialogInteraction.c2Used && dialogInteraction.c3Used )
 			dialogInteraction.isDone = true;
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[<font=\"Icon\">I</font>" + btn2Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn2 = true, removeToken = false } );
 		Hide();
 	}
@@ -146,6 +154,7 @@ public class DialogPanel : MonoBehaviour
 		if ( dialogInteraction.c1Used && dialogInteraction.c2Used && dialogInteraction.c3Used )
 			dialogInteraction.isDone = true;
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[<font=\"Icon\">I</font>" + btn3Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn3 = true, removeToken = false } );
 		Hide();
 	}
@@ -154,6 +163,7 @@ public class DialogPanel : MonoBehaviour
 	{
 		DisableButtons();
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + cancelText.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { canceled = true, removeToken = false } );
 		Hide();
 	}

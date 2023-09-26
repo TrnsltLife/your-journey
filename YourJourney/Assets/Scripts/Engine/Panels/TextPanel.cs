@@ -70,7 +70,14 @@ public class TextPanel : MonoBehaviour
 				break;
 		}
 		SetText( t );
+
+		Scenario.Chronicle(t + "\n[" + btn1 + "] [" +
+				((ButtonIcon.Action  == icon) ? "<font=\"Icon\">I</font>" : "") +
+				btn2 + "]"
+			);
+
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
+
 		transform.DOMoveY( sp.y, .75f );
 
 		group.DOFade( 1, .5f );
@@ -102,6 +109,9 @@ public class TextPanel : MonoBehaviour
 		btnSingleText.text = Translate("dialog.button." + icon.ToString(), icon.ToString());
 		btnSingleAction = action;
 		SetText( s );
+
+		Scenario.Chronicle(s + "\n[" + btnSingleText.text + "]");
+
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
 
@@ -172,6 +182,7 @@ public class TextPanel : MonoBehaviour
 		btn2.SetActive( false );
 		buttonSingle.SetActive( false );
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn1Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn1 = true } );
 		Hide();
 	}
@@ -182,6 +193,14 @@ public class TextPanel : MonoBehaviour
 		btn2.SetActive( false );
 		buttonSingle.SetActive( false );
 
+		if(!String.IsNullOrEmpty(btn2ActionText.text))
+        {
+			Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[<font=\"Icon\">I</font>" + btn2ActionText.text + "]");
+		}
+		else
+        {
+			Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn2Text.text + "]");
+		}
 		buttonActions?.Invoke( new InteractionResult() { btn2 = true } );
 		Hide();
 	}
@@ -192,6 +211,7 @@ public class TextPanel : MonoBehaviour
 		btn2.SetActive( false );
 		buttonSingle.SetActive( false );
 
+		//Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btnSingleText.text + "]");
 		btnSingleAction?.Invoke();
 		Hide();
 	}

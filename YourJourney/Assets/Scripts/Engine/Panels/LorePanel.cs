@@ -33,6 +33,8 @@ public class LorePanel : MonoBehaviour
 		threatText.text = Translate("reward.text.ThreatIncreased", "Threat Increased By\r\n" + threatacc,
 			new List<string> { threatacc.ToString() });
 
+		Scenario.Chronicle(threatText.text);
+
 		if ( !busy )
 		{
 			busy = true;
@@ -75,6 +77,8 @@ public class LorePanel : MonoBehaviour
 			new List<string> { xpacc.ToString() });
 		threatText.text = Translate("reward.text.ThreatReduced", "Threat Reduced By\r\n" + threatacc,
 			new List<string> { threatacc.ToString() });
+
+		Scenario.Chronicle(loreText.text + "\n" + xpText.text + "\n" + threatText.text);
 
 		if ( !busy )
 		{

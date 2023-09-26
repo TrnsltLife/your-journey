@@ -200,58 +200,71 @@ public class CombatPanel : MonoBehaviour
 
 	public void OnApply()
 	{
-		var sp = FindObjectOfType<ShadowPhaseManager>();
-		var mm = FindObjectOfType<MonsterManager>();
-		var im = FindObjectOfType<InteractionManager>();
-		applyButton.interactable = false;
-		//how many died this attack
-		int deadCount = monsterItems.Where( x => x.isDead && x.activeMonster ).Count() - monster.deathTally;
-
-		monster.deadCount = deadCount;//shadow phase reads this number
-		monster.deathTally += deadCount;//how many have died total
-
-		for ( int i = 0; i < monster.count; i++ )
-			monsterItems[i].Apply( stunSelected );
-
-		//elite enemies are able to perform counterattacks even	when they are exhausted
-		//stunning exhausts a group - if the group is elite it also cannot counterattack this attack
-
-		Hide( true );
-
-		if ( deadCount > 0 )
+		string monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
+		gameObject.SetActive(false);
+		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowYesNo(Translate("combat.text.ConfirmHits", "Do you want to apply {0} hits to {1}?",
+			new List<string> { damage.ToString(), monsterName }), res =>
 		{
-			//if we're here from the shadow phase AND ALL monsters died, bug out and let shadow phase continue
-			if ( sp.doingShadowPhase && monster.deathTally == monster.count )
+			if (res.btn1)
 			{
-				mm.RemoveMonster( monster );
-				sp.NotifyInterrupt();
-			}
-			else if ( sp.doingShadowPhase )//otherwise at least 1 killed, remove
-			{
-				string monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
-				string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monsterName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
+				var sp = FindObjectOfType<ShadowPhaseManager>();
+				var mm = FindObjectOfType<MonsterManager>();
+				var im = FindObjectOfType<InteractionManager>();
+				applyButton.interactable = false;
+				//how many died this attack
+				int deadCount = monsterItems.Where(x => x.isDead && x.activeMonster).Count() - monster.deathTally;
 
-				im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, null
-					);
-			}
-			else if ( !sp.doingShadowPhase )//otherwise not in SP, continue
-			{
-				if ( monster.deathTally < monster.count )
+				monster.deadCount = deadCount;//shadow phase reads this number
+				monster.deathTally += deadCount;//how many have died total
+
+				for (int i = 0; i < monster.count; i++)
+					monsterItems[i].Apply(stunSelected);
+
+				//elite enemies are able to perform counterattacks even	when they are exhausted
+				//stunning exhausts a group - if the group is elite it also cannot counterattack this attack
+
+				Hide(true);
+
+				if (deadCount > 0)
 				{
-					string monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
-					string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monster.dataName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
-
-					im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, () =>
+					//if we're here from the shadow phase AND ALL monsters died, bug out and let shadow phase continue
+					if (sp.doingShadowPhase && monster.deathTally == monster.count)
 					{
-						QueryCounterAttack( monster );
-					} );
+						mm.RemoveMonster(monster);
+						sp.NotifyInterrupt();
+					}
+					else if (sp.doingShadowPhase)//otherwise at least 1 killed, remove
+					{
+						monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
+						string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monsterName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
+
+						im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, null
+							);
+					}
+					else if (!sp.doingShadowPhase)//otherwise not in SP, continue
+					{
+						if (monster.deathTally < monster.count)
+						{
+							monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
+							string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monster.dataName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
+
+							im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, () =>
+							{
+								QueryCounterAttack(monster);
+							});
+						}
+						else
+							mm.RemoveMonster(monster);
+					}
 				}
-				else
-					mm.RemoveMonster( monster );
+				else if (!sp.doingShadowPhase)//only counterattack if NOT in sp
+					QueryCounterAttack(monster);
 			}
-		}
-		else if ( !sp.doingShadowPhase )//only counterattack if NOT in sp
-			QueryCounterAttack( monster );
+			else
+            {
+				gameObject.SetActive(true);
+			}
+		});
 	}
 
 	void QueryCounterAttack( Monster monster )

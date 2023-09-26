@@ -148,7 +148,13 @@ public class DamagePanel : MonoBehaviour
 			}
 		);
 
-		SetText(sAttack + "\r\n\r\n" + sNegatedBy + (sEffect == "" ? "" : "\r\n\r\n" + sEffect));
+		string damageString = sAttack + "\r\n\r\n" + sNegatedBy + (sEffect == "" ? "" : "\r\n\r\n" + sEffect);
+		SetText(damageString);
+
+		Scenario.Chronicle(damageString + "\r\n\r\n" +
+			"(<font=\"Icon\">D</font>" + damageText.text + ")" +
+			"(<font=\"Icon\">F</font>" + fearText.text + ")"
+			);
 
         rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
@@ -176,7 +182,7 @@ public class DamagePanel : MonoBehaviour
 		//SetText( "A menacing Darkness spreads across the land, overwhelming the heroes.\r\n\r\nIf a Hero is on a Space with a Darkness Icon or Token, suffer Fear.\r\n\r\n" +
 		//	AbilityUtility.ColoredText(Ability.Spirit, 30) + " Spirit negates." );
 
-		SetText(
+		string darknessString =
 			Translate("darkness.text.Flavor", "A menacing Darkness spreads across the land, overwhelming the heroes.") + "\r\n\r\n" +
 			Translate("darkness.text.Fear", "If a Hero is on a Space with a Darkness Icon or Token, suffer Fear.") + "\r\n\r\n" +
 			Translate("darkness.text.Negates", AbilityUtility.ColoredText(Ability.Spirit, 30) + " Spirit negates.",
@@ -184,7 +190,10 @@ public class DamagePanel : MonoBehaviour
 					AbilityUtility.ColoredText(Ability.Spirit, 30) + " " +
 					Translate("stat." + Ability.Spirit.ToString(), Ability.Spirit.ToString())
 				}
-			)
+			);
+		SetText(darknessString);
+		Scenario.Chronicle(darknessString + "\r\n\r\n" +
+			"(<font=\"Icon\">F</font>" + fearText.text + ")"
 		);
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
@@ -235,27 +244,30 @@ public class DamagePanel : MonoBehaviour
 			);
 
 
+		string standString = "";
 		//Might, Agility, Wisdom, Spirit, Wit
 		if ( test == 0 )
 		{
-			SetText(Translate("stand.flavor.Might", ((Ability)test).ToString()) + abilityTest);
+			standString = Translate("stand.flavor.Might", ((Ability)test).ToString());
 		}
 		else if ( test == 1 )
 		{
-			SetText(Translate("stand.flavor.Agility", ((Ability)test).ToString()) + abilityTest);
+			standString = Translate("stand.flavor.Agility", ((Ability)test).ToString());
 		}
 		else if ( test == 2 )
 		{
-			SetText(Translate("stand.flavor.Wisdom", ((Ability)test).ToString()) + abilityTest);
+			standString = Translate("stand.flavor.Wisdom", ((Ability)test).ToString());
 		}
 		else if ( test == 3 )
 		{
-			SetText(Translate("stand.flavor.Spirit", ((Ability)test).ToString()) + abilityTest);
+			standString = Translate("stand.flavor.Spirit", ((Ability)test).ToString());
 		}
 		else if ( test == 4 )
 		{
-			SetText(Translate("stand.flavor.Wit", ((Ability)test).ToString()) + abilityTest);
+			standString = Translate("stand.flavor.Wit", ((Ability)test).ToString());
 		}
+		SetText(standString + abilityTest);
+		Scenario.Chronicle(standString + abilityTest);
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );

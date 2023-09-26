@@ -10,6 +10,7 @@ public class PhaseNotification : MonoBehaviour
 
 	public void Show( string msg )
 	{
+		Scenario.Chronicle(msg);
 		rootObject.gameObject.SetActive( true );
 		msgText.text = msg;
 		cg.DOFade( 1, .5f );

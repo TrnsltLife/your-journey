@@ -17,6 +17,7 @@ public class TileManager : MonoBehaviour
 	public GameObject fenceTokenPrefab, streamTokenPrefab, trenchTokenPrefab, wallTokenPrefab;
 	public GameObject fogPrefab;
 	public PartyPanel partyPanel;
+	public ChroniclePanel chroniclePanel;
 	public SettingsDialog settingsDialog;
 
 	CombatPanel combatPanel;
@@ -400,13 +401,23 @@ public class TileManager : MonoBehaviour
 
 	private void Update()
 	{
+		if (interactionManager.PanelShowing) return;
+		else if (combatPanel.gameObject.activeInHierarchy) return;
+		else if (partyPanel.gameObject.activeInHierarchy) return;
+		else if (chroniclePanel.gameObject.activeInHierarchy) return;
+		else if (settingsDialog.gameObject.activeInHierarchy) return;
+		else if (provokePanel.provokeMode) return;
+
+		/*
 		if ( interactionManager.PanelShowing
 			|| partyPanel.gameObject.activeInHierarchy
+			|| chroniclePanel.gameObject.activeInHierarchy
 			|| combatPanel.gameObject.activeInHierarchy
 			|| settingsDialog.gameObject.activeInHierarchy
 			|| provokePanel.provokeMode
 			)
 			return;
+		*/
 
 		if ( !disableInput && Input.GetMouseButtonDown( 0 ) )
 		{
