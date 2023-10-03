@@ -36,6 +36,15 @@ public class TileGroup
 		return chapter;
 	}
 
+	public bool ExploredAllTiles()
+    {
+		foreach(Tile tile in tileList)
+        {
+            if (!tile.isExplored) { return false; }
+        }
+		return true;
+    }
+
 	public static TileGroup CreateFixedGroup( Chapter c )
 	{
 		TileGroup tg = new TileGroup( c.GUID );

@@ -617,6 +617,10 @@ public class Tile : MonoBehaviour
 							 triggerManager.FireTrigger( tile.chapter.exploreTrigger );
 							 //fire trigger on tile exploration
 							 triggerManager.FireTrigger( tile.baseTile.triggerName );
+							 if(tile.tileGroup.ExploredAllTiles())
+                             {
+								 triggerManager.FireTrigger(tile.chapter.exploredAllTilesTrigger);
+                             }
 							 //objectHit.parent.GetComponent<Tile>().tileGroup.ExploreTile();
 						 } );
 					}
