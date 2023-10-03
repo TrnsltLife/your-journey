@@ -11,6 +11,7 @@ public class Chapter
 	public TextBookData flavorBookData { get; set; }
 	public string triggeredBy { get; set; }
 	public string exploreTrigger { get; set; }
+	public string exploredAllTilesTrigger { get; set; }
 	public bool isRandomTiles { get; set; }
 	public bool noFlavorText { get; set; }
 
