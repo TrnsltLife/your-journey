@@ -10,13 +10,14 @@ public class CombatPanel : MonoBehaviour
 {
 	public RectTransform healthMeter;
 	public Sprite selectedButton, unselectedButton;
-	public GameObject large, armored, bloodthirsty, eliteBG;
+	public GameObject large, armored, bloodthirsty, eliteBG, rangedIcon;
 	public Text monsterName, damageText;
 	public CanvasGroup canvasGroup;
 	public MonsterItem[] monsterItems;
 	public Button applyButton;
 	public Button[] modifierButtons;
 	public GameObject[] monsterImages;
+	public Image bannerIcon;
 
 	CombatModify modifier;
 	Monster monster = null;
@@ -53,10 +54,24 @@ public class CombatPanel : MonoBehaviour
 		monsterImages[monsterIndex].GetComponent<Image>().overrideSprite = SkinsManager.SkinVariant(monsterIndex, skinVariant); //Set monster skin override based on current value in SkinsManager.monsterSkins array
 	}
 
-	public bool Show( Monster monster, int skinVariant = 0 )
+	public void SetBanner(Sprite sprite)
+	{
+		if (sprite != null)
+		{
+			bannerIcon.sprite = sprite;
+			bannerIcon.gameObject.SetActive(true);
+		}
+		else
+        {
+			bannerIcon.gameObject.SetActive(false);
+		}
+	}
+
+	public bool Show( Monster monster, Sprite bannerSprite, int skinVariant = 0 )
 	{
 		Debug.Log("CombatPanel.Show(" + monster.dataName + ")");
 		UpdateSkin((int)monster.monsterType, skinVariant);
+		SetBanner(bannerSprite);
 
 		//remove any spawn markers, since player will have seen them by now
 		var objs = FindObjectsOfType<SpawnMarker>();
@@ -85,6 +100,9 @@ public class CombatPanel : MonoBehaviour
 			canvasGroup.alpha = 0;
 			canvasGroup.DOFade( 1, .5f );
 		}
+
+		//Ranged
+		rangedIcon.SetActive(monster.isRanged);
 
 		FindObjectOfType<TileManager>().ToggleInput( true );
 

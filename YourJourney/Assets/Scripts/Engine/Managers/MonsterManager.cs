@@ -211,14 +211,14 @@ public class MonsterManager : MonoBehaviour
 		}
 	}
 
-	public bool ShowCombatPanel( Monster m, int skinVariant = 0 )
+	public bool ShowCombatPanel( Monster m, Sprite bannerSprite, int skinVariant = 0 )
 	{
 		foreach ( Transform child in buttonAttach )
 		{
 			child.GetComponent<MonsterButton>().ToggleSelect( false );
 		}
 		//selectedMonster = m;
-		return combatPanel.Show( m, skinVariant );
+		return combatPanel.Show( m, bannerSprite, skinVariant );
 	}
 
 	public void UnselectAll()
