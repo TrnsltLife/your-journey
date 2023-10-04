@@ -96,7 +96,7 @@ public class MonsterButton : MonoBehaviour
 			return;
 		}
 
-		if ( FindObjectOfType<MonsterManager>().ShowCombatPanel( monster, skinVariant ) )
+		if ( FindObjectOfType<MonsterManager>().ShowCombatPanel( monster, bannerIcon.sprite, skinVariant) )
 			selected.SetActive( true );
 		else
 			selected.SetActive( false );
