@@ -17,6 +17,7 @@ public class CombatPanel : MonoBehaviour
 	public Button applyButton;
 	public Button[] modifierButtons;
 	public GameObject[] monsterImages;
+	public GameObject[] monsterModifierLabels;
 	public Image bannerIcon;
 
 	CombatModify modifier;
@@ -123,12 +124,33 @@ public class CombatPanel : MonoBehaviour
 			monsterItems[i].Show( monster, i );
 		//monsterName.text = monster.dataName;
 		monsterName.text = Monster.MonsterNameObject(monster, monster.count);
-		large.SetActive( monster.isLarge );
-		armored.SetActive( monster.isArmored );
-		bloodthirsty.SetActive( monster.isBloodThirsty );
+		ShowModifierLabels(monster);
+		//large.SetActive( monster.isLarge );
+		//armored.SetActive( monster.isArmored );
+		//bloodthirsty.SetActive( monster.isBloodThirsty );
 
 		return true;
 	}
+
+	public void ShowModifierLabels(Monster monster)
+    {
+		large.SetActive(false);
+		armored.SetActive(false);
+		bloodthirsty.SetActive(false);
+
+		for (int i = 0; i < Monster.MAX_MODIFIERS; i++)
+        {
+			monsterModifierLabels[i].SetActive(false);
+        }
+
+		for (int i=0; i<monster.modifierList.Count; i++)
+        {
+			Text t = monsterModifierLabels[i].GetComponent<Text>();
+			Translate("combat.bonus." + monsterModifierLabels[i].name, monsterModifierLabels[i].name);
+			t.text = monster.modifierList[i].name;
+			monsterModifierLabels[i].SetActive(true);
+        }
+    }
 
 	public void Hide( bool unselect = false )
 	{
@@ -253,16 +275,16 @@ public class CombatPanel : MonoBehaviour
 					}
 					else if (sp.doingShadowPhase)//otherwise at least 1 killed, remove
 					{
+						MonsterManager.ReturnMonsterToPool(monster.monsterType, monster.deadCount);
 						monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
 						string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monsterName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
-
-						im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, null
-							);
+						im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, null);
 					}
 					else if (!sp.doingShadowPhase)//otherwise not in SP, continue
 					{
 						if (monster.deathTally < monster.count)
 						{
+							MonsterManager.ReturnMonsterToPool(monster.monsterType, monster.deadCount);
 							monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
 							string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monster.dataName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
 

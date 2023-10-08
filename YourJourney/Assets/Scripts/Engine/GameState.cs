@@ -457,6 +457,7 @@ public class ObjectiveState
 public class MonsterState
 {
 	public List<SingleMonsterState> monsterList = new List<SingleMonsterState>();
+	public List<int> monsterPool = new List<int>();
 }
 
 public class SingleMonsterState

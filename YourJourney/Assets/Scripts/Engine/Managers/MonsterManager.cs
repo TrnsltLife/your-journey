@@ -25,12 +25,53 @@ public class MonsterManager : MonoBehaviour
 	public float scalar;
 	[HideInInspector]
 	public List<Monster> monsterList = new List<Monster>();
+	[HideInInspector]
+	public static List<int> monsterPool = new List<int>();
 
 	private void Start()
 	{
 		attachRect = buttonAttach.GetComponent<RectTransform>();
 		scalar = canvas.scaleFactor;
 		LoadBanners();
+		InitMonsterPool();
+	}
+
+	private void InitMonsterPool()
+    {
+		monsterPool.AddRange(Monster.MonsterCount.ToList());
+    }
+
+	public static int LeftInPool(MonsterType monsterType)
+    {
+		return monsterPool[(int)monsterType];
+	}
+
+	public static void RemoveMonsterFromPool(MonsterType monsterType, int amount)
+    {
+		if(amount < 0) { return; }
+		string before = monsterPool[(int)monsterType] + "/" + Monster.MonsterCount[(int)monsterType];
+		monsterPool[(int)monsterType] -= amount;
+		/*
+		if(monsterPool[(int)monsterType] < 0)
+        {
+			monsterPool[(int)monsterType] = 0;
+		}
+		*/
+		Debug.Log("RemoveMonsterFromPool(" + Monster.monsterNames[(int)monsterType] + ", " + amount + "): " + before + " => " + monsterPool[(int)monsterType] + "/" + Monster.MonsterCount[(int)monsterType]);
+	}
+
+	public static void ReturnMonsterToPool(MonsterType monsterType, int amount)
+	{
+		if (amount < 0) { return; }
+		string before = monsterPool[(int)monsterType] + "/" + Monster.MonsterCount[(int)monsterType];
+		monsterPool[(int)monsterType] += amount;
+		/*
+		if (monsterPool[(int)monsterType] > Monster.MonsterCount[(int)monsterType])
+		{
+			monsterPool[(int)monsterType] = Monster.MonsterCount[(int)monsterType];
+		}
+		*/
+		Debug.Log("ReturnMonsterToPool(" + Monster.monsterNames[(int)monsterType] + ", " + amount + "): " + before + " => " + monsterPool[(int)monsterType] + "/" + Monster.MonsterCount[(int)monsterType]);
 	}
 
 	public void UpdateSkins()
@@ -55,11 +96,40 @@ public class MonsterManager : MonoBehaviour
 
 		//apply elite modifier bonuses
 		if ( m.isArmored )
-			m.shieldValue += 1;
+		{
+			m.AddModifier(MonsterModifier.ARMORED);
+		}
 		if ( m.isLarge )
-			m.health += 2;
+        {
+			m.AddModifier(MonsterModifier.LARGE);
+
+		}
 		if ( m.isBloodThirsty )
-			m.damage += 1;
+        {
+			m.AddModifier(MonsterModifier.BLOODTHIRSTY);
+		}
+
+		foreach (var mod in m.modifierList)
+        {
+			m.health += mod.health;
+			m.shieldValue += mod.armor;
+			m.sorceryValue += mod.sorcery;
+			//TODO - fix use of damage and fear
+			m.damage += mod.damage;
+			//m.fear += mod.fear;
+			//TODO - fix use of damage and fear
+			if (mod.fear > 0)
+            {
+				m.isFearsome = true;
+				m.damage += mod.fear; //increase damage by fear since the app currently takes both fear and damage out of the "m.damage" field
+            }
+			m.immuneCleave = mod.immuneCleave;
+			m.immuneLethal = mod.immuneLethal;
+			m.immunePierce = mod.immunePierce;
+			m.immuneSmite = mod.immuneSmite;
+			m.immuneStun = mod.immuneStun;
+			m.immuneSunder = mod.immuneSunder;
+        }
 
 		m.interaction = interaction;
 		m.currentHealth = new int[3] { m.health, m.health, m.health };
@@ -194,6 +264,7 @@ public class MonsterManager : MonoBehaviour
 			ThreatInteraction ti = m.interaction;
 			int foo = monsterList.Count( x => x.interaction.GUID == m.interaction.GUID );
 
+			MonsterManager.ReturnMonsterToPool(m.monsterType, m.deadCount);
 			string monsterName = Monster.MonsterNameObject(m, m.deadCount);
 			//Debug.Log("Get name for " + m.dataName + "/" + m.enumName + "/" + m.count + "/" + m.deadCount + "/" + m.deathTally + " => " + monsterName);
 			string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {m.deadCount} {m.dataName}(s) from the board.", new List<string> { m.deadCount.ToString(), monsterName });
@@ -317,6 +388,8 @@ public class MonsterManager : MonoBehaviour
 
 		scrollOffset = -517;
 		buttonAttach.localPosition = buttonAttach.localPosition.X( -517 );
+
+		monsterPool = monsterState.monsterPool;
 	}
 
 	public void LoadBanners()
@@ -365,7 +438,8 @@ public class MonsterManager : MonoBehaviour
 			} );
 		return new MonsterState()
 		{
-			monsterList = sms
+			monsterList = sms,
+			monsterPool = monsterPool
 		};
 	}
 }

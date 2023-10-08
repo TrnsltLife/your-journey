@@ -11,6 +11,8 @@ using static LanguageManager;
 /// </summary>
 public class Monster
 {
+	public static readonly int MAX_MODIFIERS = 7;
+
 	public Guid GUID;
 	public int id;
 	public int index;
@@ -39,6 +41,7 @@ public class Monster
 	public bool isBloodThirsty;
 	public bool isArmored;
 	public bool isElite;
+	public List<MonsterModifier> modifierList = new List<MonsterModifier>();
 	public bool hasBanner = false;
 	public Ability negatedBy { get; set; }
 	public MonsterType monsterType { get; set; }
@@ -46,6 +49,12 @@ public class Monster
 	public int movementValue;
 	public int loreReward;
 	public bool defaultStats;
+	public bool immuneCleave { get; set; } = false;
+	public bool immuneLethal { get; set; } = false;
+	public bool immunePierce { get; set; } = false;
+	public bool immuneSmite { get; set; } = false;
+	public bool immuneStun { get; set; } = false;
+	public bool immuneSunder { get; set; } = false;
 
 	[DefaultValue( true )]
 	[JsonProperty( DefaultValueHandling = DefaultValueHandling.Populate )]
@@ -80,14 +89,14 @@ public class Monster
 
 	//lines up with MonsterType enum
 	public static int[] MonsterCost = new int[] { 7, 4, 10, 9, 14, 25, 17, //Core Set
-		1000, 1000, 1000, //Villains of Eriador
+		100, 100, 100, //Villains of Eriador
 		5, 4, 14, 17, 27, 20, 1000, 36, //Shadowed Paths
-		1000, 1000, 1000, //Dwellers in Darkness
+		100, 100, 100, //Dwellers in Darkness
 		24, 14, 22, 30, 8, 11, //Spreading War
-		1000, 1000, 1000 //Scourges of the Wastes
+		100, 100, 100 //Scourges of the Wastes
 	};
 
-	public static int[] MonsterCount = new int[] { 6, 6, 3, 6, 3, 1, 3, //Core Set
+	public static int[] MonsterCount = new int[] { 6, 6, 3, 3, 3, 1, 3, //Core Set
 		1, 1, 1, //Villains of Eriador
 		6, 6, 3, 3, 3, 2, 1, 1, //Shadowed Paths
 		1, 1, 1, //Dwellers in Darkness
@@ -95,7 +104,7 @@ public class Monster
 		1, 1, 1, //Scourges of the Wastes
 	};
 	//large, bloodthirsty, armored
-	public static int[] ModCost = new int[] { 3, 6, 4, 4, 7, 3, 6, 6, 10, 8, 9, 6, 10 };
+	public static int[] ModCost = new int[]          { 3,        3,             4,         4,      7,          3,            6,             6,               10,        8,      9,         6,          3       };
 	public static string[] modNames = new string[13] { "Large", "Bloodthirsty", "Armored", "Huge", "Shrouded", "Terrifying", "Spike Armor", "Well-Equipped", "Veteran", "Wary", "Guarded", "Hardened", "Alert" };
 
 	/// <summary>
@@ -119,6 +128,81 @@ public class Monster
 	public Monster()
 	{
 
+	}
+
+	public bool AddModifier(MonsterModifier mod)
+    {
+		if (modifierList.Count < MAX_MODIFIERS && !modifierList.Contains(mod))
+        {
+			modifierList.Add(mod);
+			return true;
+        }
+		return false;
+    }
+
+	public static List<MonsterType> Goblins()
+	{
+		return new List<MonsterType> { MonsterType.GoblinScout, MonsterType.GoblinScout, MonsterType.VargRider };
+	}
+
+	public static List<MonsterType> Orcs()
+	{
+		return new List<MonsterType> { MonsterType.OrcHunter, MonsterType.OrcMarauder, MonsterType.OrcTaskmaster, MonsterType.HighOrcWarrior, MonsterType.Gargletarg, MonsterType.SupplicantOfMoreGoth, MonsterType.LordJavelin };
+	}
+
+	public static List<MonsterType> Humans()
+	{
+		return new List<MonsterType> { MonsterType.Ruffian, MonsterType.Soldier, MonsterType.Atari, MonsterType.Endris };
+	}
+
+	public static List<MonsterType> Spirits()
+	{
+		return new List<MonsterType> { MonsterType.Wight, MonsterType.Shadowman, MonsterType.Ursula, MonsterType.LichKing };
+	}
+
+	public static List<MonsterType> Trolls()
+	{
+		return new List<MonsterType> { MonsterType.CaveTroll, MonsterType.HillTroll, MonsterType.Oliver };
+	}
+
+	public static List<MonsterType> Vargs()
+	{
+		return new List<MonsterType> { MonsterType.HungryVarg, MonsterType.VargRider, MonsterType.Chartooth };
+	}
+
+	public static List<MonsterType> Spiders()
+	{
+		return new List<MonsterType> { MonsterType.GiantSpider, MonsterType.SpawnOfUglygiant };
+	}
+
+	public static List<MonsterType> Flying()
+    {
+		return new List<MonsterType> { MonsterType.Balerock, MonsterType.FoulBeast, MonsterType.LichKing };
+	}
+
+	public static List<MonsterType> OtherBeasts()
+	{
+		return new List<MonsterType> { MonsterType.WarElephant, MonsterType.AnonymousThing };
+	}
+
+	public static List<MonsterType> AllBeasts()
+	{
+		List<MonsterType> monsterList = new List<MonsterType>();
+		monsterList.AddRange(Trolls());
+		monsterList.AddRange(Vargs());
+		monsterList.AddRange(Spiders());
+		monsterList.AddRange(Flying());
+		monsterList.AddRange(OtherBeasts());
+		return monsterList;
+	}
+
+	public static List<MonsterType> Humanoid()
+	{
+		List<MonsterType> monsterList = new List<MonsterType>();
+		monsterList.AddRange(Goblins());
+		monsterList.AddRange(Orcs());
+		monsterList.AddRange(Humans());
+		return monsterList;
 	}
 
 	//returns true if this monster can appear in current difficulty
@@ -149,22 +233,25 @@ public class Monster
 		int f = total - d;
 		if ( d == 0 && f == 0 )
 			d = 1;
+
+		//If isFearsome is true, the Fear should always be greater than the damage
 		if ( isFearsome )
 		{
-			int temp = d;
-			if ( f > d )
-			{
-				d = f;
-				f = temp;
-			}
-		}
-		else
-		{
 			int temp = f;
-			if ( d > f )
+			if (d > f)
 			{
 				f = d;
 				d = temp;
+			}
+		}
+		//Otherwise, make damage greater than fear
+		else
+		{
+			int temp = d;
+			if (f > d)
+			{
+				d = f;
+				f = temp;
 			}
 		}
 

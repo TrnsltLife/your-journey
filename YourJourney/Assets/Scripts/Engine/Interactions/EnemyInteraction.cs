@@ -8,7 +8,7 @@ using UnityEngine;
 public class ThreatInteraction : InteractionBase
 {
 	public string triggerDefeatedName { get; set; }
-	public bool[] includedEnemies { get; set; }
+	public bool[] includedEnemies { get; set; } //True/false items in this list will be in the same order as Shared MonsterType and Monster.monsterNames, etc.
 	[DefaultValue( 0 )]
 	[JsonProperty( DefaultValueHandling = DefaultValueHandling.Populate )]
 	public int basePoolPoints { get; set; }
@@ -16,7 +16,7 @@ public class ThreatInteraction : InteractionBase
 	[JsonProperty( DefaultValueHandling = DefaultValueHandling.Populate )]
 	public DifficultyBias difficultyBias { get; set; }
 
-	public List<Monster> monsterCollection;
+	public List<Monster> monsterCollection; //Contains scripted monsters
 
 	public override InteractionType interactionType { get { return InteractionType.Threat; } set { } }
 
@@ -26,6 +26,19 @@ public class ThreatInteraction : InteractionBase
 	int lastEnemyIndex;
 	int numSingleGroups;
 	int modPoints;
+
+	public void RemoveUnavailableScriptedMonsters()
+    {
+		foreach(Monster ms in monsterCollection)
+        {
+			ms.count = Math.Min(ms.count, MonsterManager.LeftInPool(ms.monsterType));
+			if(ms.count <= 0)
+            {
+				Debug.Log("Scripted enemy group count for " + ms.dataName + " reduced to 0.");
+			}
+			MonsterManager.RemoveMonsterFromPool(ms.monsterType, ms.count);
+		}
+    }
 
 	/// <summary>
 	/// Generates enemy groups using Pool System
@@ -87,15 +100,48 @@ public class ThreatInteraction : InteractionBase
 			foreach ( Monster sim in mList )
 			{
 				//% chance to add another
-				if ( Bootstrap.random.Next( 100 ) < 50 && sim.count < 2 && sim.singlecost <= poolCount )
+				if ( Bootstrap.random.Next( 100 ) < 50 && sim.count < 2 && MonsterManager.LeftInPool(sim.monsterType) > 0 && sim.singlecost <= poolCount )
 				{
 					poolCount = Math.Max( 0f, poolCount - sim.singlecost );
 					sim.count++;
+					MonsterManager.RemoveMonsterFromPool(sim.monsterType, 1);
 					sim.fCost += sim.singlecost;
 				}
 			}
 		}
 
+		//add modifiers with any leftover points
+		bool foundModifiers = true;
+		while (foundModifiers && poolCount > 1)
+		{
+			foundModifiers = false;
+			if (mList.Count > 0 && poolCount > 0)
+			{
+				foreach (Monster sim in mList)
+				{
+					if (sim.modifierList.Count < Monster.MAX_MODIFIERS)
+					{
+						List<MonsterModifier> modList = MonsterModifier.ListAvailableModifiersFor(sim.monsterType, sim.count, (int)poolCount);
+						int modIndex = Bootstrap.random.Next(modList.Count + 1);
+						if (modIndex != modList.Count)
+						{
+							MonsterModifier mod = modList[modIndex];
+							if (sim.AddModifier(mod))
+							{
+								int modCost = mod.CalculateCost(sim.count);
+								poolCount -= modCost;
+								modPoints += modCost;
+								sim.isElite = true;
+								foundModifiers = true;
+								Debug.Log("mod added: " + mod.name);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		/*
 		//add modifiers with any leftover points
 		if ( mList.Count > 0 && poolCount > 0 )
 		{
@@ -118,6 +164,7 @@ public class ThreatInteraction : InteractionBase
 				}
 			}
 		}
+		*/
 
 		//round it to 2 decimal places
 		float leftOvers = (float)Math.Round( poolCount * 100f ) / 100f;
@@ -135,6 +182,10 @@ public class ThreatInteraction : InteractionBase
 		{
 			//skip using enemy if it was already used last iteration
 			if ( includedEnemies.Count( x => x ) > 1 && lastEnemyIndex == i )
+				continue;
+
+			//skip enemies that have their MonsterMonager.monsterPool exhausted
+			if (MonsterManager.LeftInPool((MonsterType)i) <= 0)
 				continue;
 
 			//includedEnemies lines up with MonsterType enum and MonsterCost array
@@ -155,7 +206,8 @@ public class ThreatInteraction : InteractionBase
 			//.6 of cost per count above 1
 			float groupcost = mList[pick].Item2;
 			int upTo = groupcost <= points ? 1 : 0;
-			for ( int i = 0; i < 2; i++ )
+			int leftInPool = MonsterManager.LeftInPool(ms.monsterType);
+			for ( int i = 0; i < 2 && i < leftInPool; i++ )
 			{
 				if ( ( groupcost + .6f * mList[pick].Item2 ) <= points )
 				{
@@ -168,7 +220,7 @@ public class ThreatInteraction : InteractionBase
 			//avoid a bunch of 1 enemy groups
 			if ( count == 1 && numSingleGroups >= 1 )
 			{
-				if ( count + 1 <= upTo )//if room to add 1 more...
+				if ( count + 1 <= upTo && count + 1 <= leftInPool)//if room to add 1 more...
 				{
 					//50% chance add another or use the points for modifiers
 					if ( Bootstrap.random.Next( 100 ) > 50 || modPoints > 3 )
@@ -186,13 +238,23 @@ public class ThreatInteraction : InteractionBase
 				}
 			}
 
+			if(count > leftInPool) { count = leftInPool; } //make sure we don't exceed the available number of figures
 			groupcost = mList[pick].Item2 + ( ( count - 1 ) * ( .6f * mList[pick].Item2 ) );
 			lastEnemyIndex = (int)mList[pick].Item1;
 			ms.count = count;
+			MonsterManager.RemoveMonsterFromPool(ms.monsterType, count);
 			ms.singlecost = mList[pick].Item2;
 			ms.fCost = groupcost;
-			if ( count == 1 )
+			if (count == 1)
+			{
 				numSingleGroups++;
+			}
+			else if (count == 0)
+			{
+				Monster skip = new Monster() { dataName = "modifier", fCost = 1 };
+				return new Tuple<Monster, float>(skip, 1);
+			}
+
 			return new Tuple<Monster, float>( ms, mList[pick].Item2 * count );
 		}
 		else
