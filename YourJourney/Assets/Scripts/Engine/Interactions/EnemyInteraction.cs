@@ -73,8 +73,11 @@ public class ThreatInteraction : InteractionBase
 
 		//generate all the random monster groups possible
 		List<Monster> mList = new List<Monster>();
-		while ( poolCount >= lowestCost )//lowest enemy cost
+		float lastPoolCount = -1000f;
+		while ( poolCount >= lowestCost && poolCount != lastPoolCount )//lowest enemy cost
 		{
+			lastPoolCount = poolCount; //keep track of lastPoolCount to help avoid infinite loops when too many points are allocated that can't be used up by the available enemies
+
 			Tuple<Monster, float> generated = GenerateMonster( poolCount );
 			if ( generated.Item1.dataName != "modifier" )
 			{
@@ -100,7 +103,7 @@ public class ThreatInteraction : InteractionBase
 			foreach ( Monster sim in mList )
 			{
 				//% chance to add another
-				if ( Bootstrap.random.Next( 100 ) < 50 && sim.count < 2 && MonsterManager.LeftInPool(sim.monsterType) > 0 && sim.singlecost <= poolCount )
+				if ( Bootstrap.random.Next( 100 ) < 50 && sim.count < 2 && sim.count < sim.groupLimit && MonsterManager.LeftInPool(sim.monsterType) > 0 && sim.singlecost <= poolCount)
 				{
 					poolCount = Math.Max( 0f, poolCount - sim.singlecost );
 					sim.count++;
@@ -141,31 +144,6 @@ public class ThreatInteraction : InteractionBase
 			}
 		}
 
-		/*
-		//add modifiers with any leftover points
-		if ( mList.Count > 0 && poolCount > 0 )
-		{
-			foreach ( Monster sim in mList )
-			{
-				int mod = Bootstrap.random.Next( 4 );//3=none
-				if ( mod != 3 && Monster.ModCost[mod] <= poolCount )
-				{
-					poolCount -= Monster.ModCost[mod];
-					//sim.modList.Add( Monster.modNames[mod] );
-					if ( mod == 0 )
-						sim.isLarge = true;
-					else if ( mod == 1 )
-						sim.isBloodThirsty = true;
-					else if ( mod == 2 )
-						sim.isArmored = true;
-					sim.isElite = true;
-					modPoints += Monster.ModCost[mod];
-					Debug.Log( "mod added: " + Monster.modNames[mod] );
-				}
-			}
-		}
-		*/
-
 		//round it to 2 decimal places
 		float leftOvers = (float)Math.Round( poolCount * 100f ) / 100f;
 
@@ -189,9 +167,9 @@ public class ThreatInteraction : InteractionBase
 				continue;
 
 			//includedEnemies lines up with MonsterType enum and MonsterCost array
-			if ( includedEnemies[i] && points >= Monster.MonsterCost[i] )
+			if ( includedEnemies[i] && points >= Monsters.Cost(i) )
 			{
-				mList.Add( new Tuple<MonsterType, float>( (MonsterType)i, Monster.MonsterCost[i] ) );
+				mList.Add( new Tuple<MonsterType, float>( (MonsterType)i, Monsters.Cost(i)) );
 			}
 		}
 
@@ -239,6 +217,7 @@ public class ThreatInteraction : InteractionBase
 			}
 
 			if(count > leftInPool) { count = leftInPool; } //make sure we don't exceed the available number of figures
+			if(count > ms.groupLimit) { count = ms.groupLimit; } //make sure we don't exceed the allowed number of this kind of enemy in a group
 			groupcost = mList[pick].Item2 + ( ( count - 1 ) * ( .6f * mList[pick].Item2 ) );
 			lastEnemyIndex = (int)mList[pick].Item1;
 			ms.count = count;
@@ -310,9 +289,9 @@ public class ThreatInteraction : InteractionBase
 		{
 			if ( includedEnemies[i] )
 			{
-				if ( Monster.MonsterCost[i] < fCost )
+				if (Monsters.Cost(i) < fCost )
 				{
-					fCost = Monster.MonsterCost[i];
+					fCost = Monsters.Cost(i);
 				}
 			}
 		}

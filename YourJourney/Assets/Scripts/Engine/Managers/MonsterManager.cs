@@ -38,7 +38,7 @@ public class MonsterManager : MonoBehaviour
 
 	private void InitMonsterPool()
     {
-		monsterPool.AddRange(Monster.MonsterCount.ToList());
+		monsterPool.AddRange(Monsters.List().Select(m => m.figureLimit));
     }
 
 	public static int LeftInPool(MonsterType monsterType)
@@ -49,29 +49,13 @@ public class MonsterManager : MonoBehaviour
 	public static void RemoveMonsterFromPool(MonsterType monsterType, int amount)
     {
 		if(amount < 0) { return; }
-		string before = monsterPool[(int)monsterType] + "/" + Monster.MonsterCount[(int)monsterType];
 		monsterPool[(int)monsterType] -= amount;
-		/*
-		if(monsterPool[(int)monsterType] < 0)
-        {
-			monsterPool[(int)monsterType] = 0;
-		}
-		*/
-		Debug.Log("RemoveMonsterFromPool(" + Monster.monsterNames[(int)monsterType] + ", " + amount + "): " + before + " => " + monsterPool[(int)monsterType] + "/" + Monster.MonsterCount[(int)monsterType]);
 	}
 
 	public static void ReturnMonsterToPool(MonsterType monsterType, int amount)
 	{
 		if (amount < 0) { return; }
-		string before = monsterPool[(int)monsterType] + "/" + Monster.MonsterCount[(int)monsterType];
 		monsterPool[(int)monsterType] += amount;
-		/*
-		if (monsterPool[(int)monsterType] > Monster.MonsterCount[(int)monsterType])
-		{
-			monsterPool[(int)monsterType] = Monster.MonsterCount[(int)monsterType];
-		}
-		*/
-		Debug.Log("ReturnMonsterToPool(" + Monster.monsterNames[(int)monsterType] + ", " + amount + "): " + before + " => " + monsterPool[(int)monsterType] + "/" + Monster.MonsterCount[(int)monsterType]);
 	}
 
 	public void UpdateSkins()
@@ -114,15 +98,7 @@ public class MonsterManager : MonoBehaviour
 			m.health += mod.health;
 			m.shieldValue += mod.armor;
 			m.sorceryValue += mod.sorcery;
-			//TODO - fix use of damage and fear
-			m.damage += mod.damage;
-			//m.fear += mod.fear;
-			//TODO - fix use of damage and fear
-			if (mod.fear > 0)
-            {
-				m.isFearsome = true;
-				m.damage += mod.fear; //increase damage by fear since the app currently takes both fear and damage out of the "m.damage" field
-            }
+			//Note: extra damage and fear are added during combat in DmagePanel.ShowCombatCounter()
 			m.immuneCleave = mod.immuneCleave;
 			m.immuneLethal = mod.immuneLethal;
 			m.immunePierce = mod.immunePierce;

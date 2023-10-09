@@ -87,26 +87,6 @@ public class Monster
 	public float fCost;
 	public float singlecost;
 
-	//lines up with MonsterType enum
-	public static int[] MonsterCost = new int[] { 7, 4, 10, 9, 14, 25, 17, //Core Set
-		100, 100, 100, //Villains of Eriador
-		5, 4, 14, 17, 27, 20, 1000, 36, //Shadowed Paths
-		100, 100, 100, //Dwellers in Darkness
-		24, 14, 22, 30, 8, 11, //Spreading War
-		100, 100, 100 //Scourges of the Wastes
-	};
-
-	public static int[] MonsterCount = new int[] { 6, 6, 3, 3, 3, 1, 3, //Core Set
-		1, 1, 1, //Villains of Eriador
-		6, 6, 3, 3, 3, 2, 1, 1, //Shadowed Paths
-		1, 1, 1, //Dwellers in Darkness
-		3, 3, 2, 1, 6, 6, //Spreading War
-		1, 1, 1, //Scourges of the Wastes
-	};
-	//large, bloodthirsty, armored
-	public static int[] ModCost = new int[]          { 3,        3,             4,         4,      7,          3,            6,             6,               10,        8,      9,         6,          3       };
-	public static string[] modNames = new string[13] { "Large", "Bloodthirsty", "Armored", "Huge", "Shrouded", "Terrifying", "Spike Armor", "Well-Equipped", "Veteran", "Wary", "Guarded", "Hardened", "Alert" };
-
 	/// <summary>
 	/// returns # of monsters that are alive
 	/// </summary>
@@ -138,6 +118,26 @@ public class Monster
 			return true;
         }
 		return false;
+    }
+
+	public int CalculateExtraDamage()
+	{
+		int extra = 0;
+		foreach (var mod in modifierList)
+		{
+			extra += mod.damage;
+		}
+		return extra;
+	}
+
+	public int CalculateExtraFear()
+    {
+		int extra = 0;
+		foreach(var mod in modifierList)
+        {
+			extra += mod.fear;
+        }
+		return extra;
     }
 
 	public static List<MonsterType> Goblins()
@@ -397,7 +397,7 @@ public class Monster
 				mMoveSpecial = new string[] { };
 				mRanged = false;
 				mGroupLimit = 3;
-				mFigureLimit = 6;
+				mFigureLimit = 3;
 				mCost = new int[] { 9, 17, 25 };
 				mTag = new string[] { "Orc", "Slow" };
 				mSpeed = 1;
@@ -480,7 +480,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Powerful", "Small" };
 				mSpeed = 2;
 				mDamage = 4;
@@ -500,7 +500,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Orc", "Powerful" };
 				mSpeed = 1;
 				mDamage = 4;
@@ -520,7 +520,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Fast" };
 				mSpeed = 3;
 				mDamage = 4;
@@ -662,7 +662,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 3;
 				mFigureLimit = 3;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Powerful", "Large", "Slow" };
 				mSpeed = 1;
 				mDamage = 4;
@@ -682,7 +682,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Powerful", "Large" };
 				mSpeed = 2;
 				mDamage = 4;
@@ -704,7 +704,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Orc", "Powerful", "Slow" };
 				mSpeed = 1;
 				mDamage = 3;
@@ -744,7 +744,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Large", "Slow" };
 				mSpeed = 1;
 				mDamage = 4;
@@ -888,7 +888,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Powerful" };
 				mSpeed = 2;
 				mDamage = 3;
@@ -908,7 +908,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Beast", "Powerful", "Fast", "Flying" };
 				mSpeed = 3;
 				mDamage = 4;
@@ -928,7 +928,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Small" };
 				mSpeed = 2;
 				mDamage = 2;
@@ -980,7 +980,7 @@ public class Monster
 			special = mSpecial,
 			isFearsome = mFearsome,
 			triggerName = "None",
-			singlecost = MonsterCost[(int)mType],
+			singlecost = mCost[0],
 			isEasy = true,
 			isNormal = true,
 			isHard = true,
