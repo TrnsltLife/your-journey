@@ -5,6 +5,8 @@ using System.Linq;
 using System;
 using static LanguageManager;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
+using TMPro;
 
 public class CombatPanel : MonoBehaviour
 {
@@ -18,6 +20,7 @@ public class CombatPanel : MonoBehaviour
 	public Button[] modifierButtons;
 	public GameObject[] monsterImages;
 	public GameObject[] monsterModifierLabels;
+	public TextMeshProUGUI modifierDescriptionText;
 	public Image bannerIcon;
 
 	CombatModify modifier;
@@ -125,6 +128,7 @@ public class CombatPanel : MonoBehaviour
 		//monsterName.text = monster.dataName;
 		monsterName.text = Monster.MonsterNameObject(monster, monster.count);
 		ShowModifierLabels(monster);
+		modifierDescriptionText.text = "";
 		//large.SetActive( monster.isLarge );
 		//armored.SetActive( monster.isArmored );
 		//bloodthirsty.SetActive( monster.isBloodThirsty );
@@ -151,6 +155,44 @@ public class CombatPanel : MonoBehaviour
 			monsterModifierLabels[i].SetActive(true);
         }
     }
+
+	public void PointerEnterModifierLabel(int modifierIndex)
+    {
+		Debug.Log("PointerEnterModifierLabel(" + modifierIndex + ")");
+
+		if (modifierIndex <= monster.modifierList.Count)
+		{
+			MonsterModifier mod = monster.modifierList[modifierIndex];
+			List<string> mods = new List<string>();
+			if (mod.health != 0) { mods.Add((mod.health > 0 ? "+" : "") + mod.health + " " + Translate("combat.modifier.Health", "Health")); }
+			if (mod.armor != 0) { mods.Add((mod.armor > 0 ? "+" : "") + mod.armor + " " + Translate("combat.modifier.Armor", "Armor")); }
+			if (mod.sorcery != 0) { mods.Add((mod.sorcery > 0 ? "+" : "") + mod.sorcery + " " + Translate("combat.modifier.Sorcery", "Sorcery")); }
+			if (mod.damage != 0) { mods.Add((mod.damage > 0 ? "+" : "") + mod.damage + " " + Translate("damage.Damage", "Damage")); }
+			if (mod.fear != 0) { mods.Add((mod.fear > 0 ? "+" : "") + mod.fear + " " + Translate("damage.Fear", "Fear")); }
+
+			List<string> immunities = new List<string>();
+			if (mod.immuneCleave || mod.fakeCleave) { immunities.Add(Translate("combat.button.Cleave", "Cleave")); }
+			if (mod.immuneLethal || mod.immuneLethal) { immunities.Add(Translate("combat.button.Lethal", "Lethal")); }
+			if (mod.immunePierce || mod.immunePierce) { immunities.Add(Translate("combat.button.Pierce", "Pierce")); }
+			if (mod.immuneSmite || mod.immuneSmite) { immunities.Add(Translate("combat.button.Smite", "Smite")); }
+			if (mod.immuneStun || mod.immuneStun) { immunities.Add(Translate("combat.button.Stun", "Stun")); }
+			if (mod.immuneSunder || mod.immuneSunder) { immunities.Add(Translate("combat.button.Sunder", "Sunder")); }
+
+			if(immunities.Count > 0) { mods.Add(Translate("combat.modifier.ImmuneTo") + " " + string.Join(", ", immunities)); }
+
+			modifierDescriptionText.text = string.Join("; ", mods);
+		}
+		else
+        {
+			modifierDescriptionText.text = "";
+        }
+    }
+
+	public void PointerExitModifierLabel(int modifierIndex)
+	{
+		Debug.Log("PointerExitModifierLabel(" + modifierIndex + ")");
+		modifierDescriptionText.text = "";
+	}
 
 	public void Hide( bool unselect = false )
 	{

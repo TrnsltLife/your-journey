@@ -20,10 +20,18 @@ public class MonsterModifier
     public bool immuneSmite { get; set; } = false;
     public bool immuneStun { get; set; } = false;
     public bool immuneSunder { get; set; } = false;
+
+    public bool fakeCleave { get; set; } = false;
+    public bool fakeLethal { get; set; } = false;
+    public bool fakePierce { get; set; } = false;
+    public bool fakeSmite { get; set; } = false;
+    public bool fakeStun { get; set; } = false;
+    public bool fakeSunder { get; set; } = false;
     public List<MonsterType> applicableTo { get; set; } = new List<MonsterType>();
 
     public MonsterModifier(string name, int cost, int additionalCost, int health, int armor, int sorcery, int damage, int fear,
-        bool immuneCleave, bool immuneLethal, bool immunePierce, bool immuneSmite, bool immuneStun, bool immuneSunder)
+        bool immuneCleave, bool immuneLethal, bool immunePierce, bool immuneSmite, bool immuneStun, bool immuneSunder,
+        bool fakeCleave, bool fakeLethal, bool fakePierce, bool fakeSmite, bool fakeStun, bool fakeSunder)
     {
         this.name = name;
         this.cost = cost;
@@ -33,12 +41,12 @@ public class MonsterModifier
         this.sorcery = sorcery;
         this.damage = damage;
         this.fear = fear;
-        this.immuneCleave = immuneCleave;
-        this.immuneLethal = immuneLethal;
-        this.immunePierce = immunePierce;
-        this.immuneSmite = immuneSmite;
-        this.immuneStun = immuneStun;
-        this.immuneSunder = immuneSunder;
+        this.fakeCleave = fakeCleave;
+        this.fakeLethal = fakeLethal;
+        this.fakePierce = fakePierce;
+        this.fakeSmite = fakeSmite;
+        this.fakeStun = fakeStun;
+        this.fakeSunder = fakeSunder;
     }
 
     public MonsterModifier(string name)
@@ -187,7 +195,7 @@ public class MonsterModifier
     public static readonly MonsterModifier ORC_CAPTAIN = new MonsterModifier("Orc Captain") { armor = 1, health = 2, fear = 1, immuneStun = true }.AddOrcs();
     public static readonly MonsterModifier ORC_CHAMPION = new MonsterModifier("Orc Champion") { damage = 1, fear = 1 }.AddOrcs();
     public static readonly MonsterModifier PACKS_VENGEANCE_1 = new MonsterModifier("Pack's Vengeance") { health = 2, immuneStun = true, immuneLethal = true }.AddVargs();
-    public static readonly MonsterModifier PACKS_VENGEANCE_2 = new MonsterModifier("Pack's Vengeance") { health = 2, immuneStun = true /*, fakeLethal=true */ }.AddVargs();
+    public static readonly MonsterModifier PACKS_VENGEANCE_2 = new MonsterModifier("Pack's Vengeance") { health = 2, immuneStun = true , fakeLethal=true }.AddVargs();
     public static readonly MonsterModifier POSSESSED = new MonsterModifier("Possessed") { fear = 1, immuneSmite = true }.AddHumanoids().AddAllBeasts();
     public static readonly MonsterModifier SHADOWMAN_CAPTAIN = new MonsterModifier("Shadowman Captain") { health = 4, sorcery = 1, immuneStun = true }.Add(MonsterType.Shadowman);
     public static readonly MonsterModifier SPECTRAL = new MonsterModifier("Spectral") { sorcery = 2, immuneLethal = true }.AddSpirits();
