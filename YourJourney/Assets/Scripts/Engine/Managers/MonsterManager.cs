@@ -98,13 +98,13 @@ public class MonsterManager : MonoBehaviour
 			m.health += mod.health;
 			m.shieldValue += mod.armor;
 			m.sorceryValue += mod.sorcery;
-			//Note: extra damage and fear are added during combat in DmagePanel.ShowCombatCounter()
-			m.immuneCleave = mod.immuneCleave;
-			m.immuneLethal = mod.immuneLethal;
-			m.immunePierce = mod.immunePierce;
-			m.immuneSmite = mod.immuneSmite;
-			m.immuneStun = mod.immuneStun;
-			m.immuneSunder = mod.immuneSunder;
+			//Note: extra damage and fear are added during combat in DamagePanel.ShowCombatCounter()
+			if(mod.immuneCleave) m.immuneCleave = true;
+			if (mod.immuneLethal) m.immuneLethal = true;
+			if (mod.immunePierce) m.immunePierce = true;
+			if (mod.immuneSmite) m.immuneSmite = true;
+			if (mod.immuneStun) m.immuneStun = true;
+			if (mod.immuneSunder) m.immuneSunder = true;
         }
 
 		m.interaction = interaction;

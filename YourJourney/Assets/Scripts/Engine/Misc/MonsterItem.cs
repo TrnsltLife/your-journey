@@ -127,7 +127,7 @@ public class MonsterItem : MonoBehaviour
 	public bool Apply( bool stun )
 	{
 		Debug.Log( "STUN? " + stun );
-		if ( stun )
+		if ( stun && !monster.immuneStun )
 		{
 			monster.isStunned = true;
 			FindObjectOfType<MonsterManager>().ExhaustMonster( monster, true );

@@ -71,6 +71,7 @@ public class CombatPanel : MonoBehaviour
 	public bool Show( Monster monster, Sprite bannerSprite, int skinVariant = 0 )
 	{
 		Debug.Log("CombatPanel.Show(" + monster.dataName + ")");
+		this.monster = monster;
 		UpdateSkin((int)monster.monsterType, skinVariant);
 		SetBanner(bannerSprite);
 
@@ -117,7 +118,6 @@ public class CombatPanel : MonoBehaviour
 		applyButton.interactable = true;
 		damage = 0;
 		damageText.text = damage.ToString();
-		this.monster = monster;
 		foreach ( var m in monsterItems )
 			m.Hide();
 		for ( int i = 0; i < monster.count; i++ )
@@ -208,7 +208,12 @@ public class CombatPanel : MonoBehaviour
 
 	void DoDamage()
 	{
-		modifier = new CombatModify() { Pierce = pierceSelected, Smite = smiteSelected, Sunder = sunderSelected, Cleave = cleaveSelected, Lethal = lethalSelected, Stun = stunSelected };
+		modifier = new CombatModify() { Pierce = pierceSelected && !monster.immunePierce, 
+										Smite = smiteSelected && !monster.immuneSmite, 
+										Sunder = sunderSelected && !monster.immuneSunder, 
+										Cleave = cleaveSelected && !monster.immuneCleave, 
+										Lethal = lethalSelected && !monster.immuneLethal, 
+										Stun = stunSelected && !monster.immuneStun };
 
 		int r = monsterItems[0].Damage( damage, modifier );
 		if ( monster.count > 1 )

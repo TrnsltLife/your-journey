@@ -660,8 +660,8 @@ public class Monster
 				mMoveB = 2;
 				mMoveSpecial = new string[] { };
 				mRanged = false;
-				mGroupLimit = 3;
-				mFigureLimit = 3;
+				mGroupLimit = 1;
+				mFigureLimit = 1;
 				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Powerful", "Large", "Slow" };
 				mSpeed = 1;
