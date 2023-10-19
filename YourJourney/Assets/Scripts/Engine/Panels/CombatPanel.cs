@@ -172,13 +172,13 @@ public class CombatPanel : MonoBehaviour
 
 			List<string> immunities = new List<string>();
 			if (mod.immuneCleave || mod.fakeCleave) { immunities.Add(Translate("combat.button.Cleave", "Cleave")); }
-			if (mod.immuneLethal || mod.immuneLethal) { immunities.Add(Translate("combat.button.Lethal", "Lethal")); }
-			if (mod.immunePierce || mod.immunePierce) { immunities.Add(Translate("combat.button.Pierce", "Pierce")); }
-			if (mod.immuneSmite || mod.immuneSmite) { immunities.Add(Translate("combat.button.Smite", "Smite")); }
-			if (mod.immuneStun || mod.immuneStun) { immunities.Add(Translate("combat.button.Stun", "Stun")); }
-			if (mod.immuneSunder || mod.immuneSunder) { immunities.Add(Translate("combat.button.Sunder", "Sunder")); }
+			if (mod.immuneLethal || mod.fakeLethal) { immunities.Add(Translate("combat.button.Lethal", "Lethal")); }
+			if (mod.immunePierce || mod.fakePierce) { immunities.Add(Translate("combat.button.Pierce", "Pierce")); }
+			if (mod.immuneSmite || mod.fakeSmite) { immunities.Add(Translate("combat.button.Smite", "Smite")); }
+			if (mod.immuneStun || mod.fakeStun) { immunities.Add(Translate("combat.button.Stun", "Stun")); }
+			if (mod.immuneSunder || mod.fakeSunder) { immunities.Add(Translate("combat.button.Sunder", "Sunder")); }
 
-			if(immunities.Count > 0) { mods.Add(Translate("combat.modifier.ImmuneTo") + " " + string.Join(", ", immunities)); }
+			if(immunities.Count > 0) { mods.Add(Translate("combat.modifier.ImmuneTo", "Immune to") + " " + string.Join(", ", immunities)); }
 
 			modifierDescriptionText.text = string.Join("; ", mods);
 		}
