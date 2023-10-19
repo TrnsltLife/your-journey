@@ -238,7 +238,7 @@ public class MonsterModifier
     public static readonly MonsterModifier URSULAS_VENGEANCE = new MonsterModifier(47, "Ursula's Vengeance") { health = 4, armor = 1, sorcery = 2, immuneLethal = true, immuneStun = true }.Add(MonsterType.Oliver).AddToList();
     public static readonly MonsterModifier LICH_KING = new MonsterModifier(48, "Lich-king") { immuneStun = true }.Add(MonsterType.LichKing).AddToList();
     public static readonly MonsterModifier CHIEF_OF_THE_NINE = new MonsterModifier(49, "Chief of the Nine") { armor = 1, immuneStun = true }.Add(MonsterType.LichKing).AddToList();
-    public static readonly MonsterModifier LORD_OF_MY_HOUSE_MORE_GHOUL = new MonsterModifier(50, "Lord of My-House More-Ghoul") { health = 5, damage = 1, fear = 1, immuneLethal = true, immuneSunder = true, immuneStun = true }.Add(MonsterType.LichKing).AddToList();
+    public static readonly MonsterModifier LORD_OF_MINE_HOUSE_MORE_GHOUL = new MonsterModifier(50, "Lord of Mine-House More-Ghoul") { health = 5, damage = 1, fear = 1, immuneLethal = true, immuneSunder = true, immuneStun = true }.Add(MonsterType.LichKing).AddToList();
 
 
     /*
@@ -314,7 +314,7 @@ public class MonsterModifier
             yield return URSULAS_VENGEANCE;
             yield return LICH_KING;
             yield return CHIEF_OF_THE_NINE;
-            yield return LORD_OF_MY_HOUSE_MORE_GHOUL;
+            yield return LORD_OF_MINE_HOUSE_MORE_GHOUL;
         }
     }
 
@@ -375,7 +375,7 @@ public class MonsterModifier
             yield return URSULAS_VENGEANCE;
             yield return LICH_KING;
             yield return CHIEF_OF_THE_NINE;
-            yield return LORD_OF_MY_HOUSE_MORE_GHOUL;
+            yield return LORD_OF_MINE_HOUSE_MORE_GHOUL;
         }
     }
 }
