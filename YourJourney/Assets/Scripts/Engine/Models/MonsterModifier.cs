@@ -8,6 +8,7 @@ public class MonsterModifier
 {
     public int id { get; set; }
     public string name { get; set; } = "";
+    public MonsterModifierGroup group { get; set; } = MonsterModifierGroup.None;
     public int cost { get; set; } = 0;
     int additionalCost { get; set; } = 0;
     public int health { get; set; } = 0;
@@ -30,12 +31,15 @@ public class MonsterModifier
     public bool fakeSunder { get; set; } = false;
     public List<MonsterType> applicableTo { get; set; } = new List<MonsterType>();
 
-    public MonsterModifier(int id, string name, int cost, int additionalCost, int health, int armor, int sorcery, int damage, int fear,
+    public MonsterModifier() { }
+
+    public MonsterModifier(int id, string name, MonsterModifierGroup group, int cost, int additionalCost, int health, int armor, int sorcery, int damage, int fear,
         bool immuneCleave, bool immuneLethal, bool immunePierce, bool immuneSmite, bool immuneStun, bool immuneSunder,
         bool fakeCleave, bool fakeLethal, bool fakePierce, bool fakeSmite, bool fakeStun, bool fakeSunder)
     {
         this.id = id;
         this.name = name;
+        this.group = group;
         this.cost = cost;
         this.additionalCost = additionalCost;
         this.health = health;
@@ -51,18 +55,64 @@ public class MonsterModifier
         this.fakeSunder = fakeSunder;
     }
 
-    public MonsterModifier(int id, string name)
+    public MonsterModifier(int id, string name, MonsterModifierGroup group)
     {
         this.id = id;
         this.name = name;
+        this.group = group;
     }
 
-    public MonsterModifier(int id, string name, int cost, int additionalCost)
+    public MonsterModifier(int id, string name, MonsterModifierGroup group, int cost, int additionalCost)
     {
         this.id = id;
         this.name = name;
+        this.group = group;
         this.cost = cost;
         this.additionalCost = additionalCost;
+    }
+
+    private void AssignCostsFromBonuses()
+    {
+        /*
+        Initial Cost:
+        1 point per type:
+
+        Initial Cost and Additional Cost:
+        health: 1
+        armor: 3
+        sorcery: 6
+        damage: 2
+        fear: 2
+
+        immuneCleave: 4
+        immuneLethal: 3
+        immunePierce: 3
+        immuneSmite: 5
+        immuneStun: 5
+        immuneSunder: 3
+        */
+
+        if (cost > 0 && additionalCost > 0) { return; }
+
+        int typeCost = 0;
+        int unitCost = 0;
+        if(health != 0) { typeCost += 1; unitCost += health * 1; }
+        if(armor != 0) { typeCost += 1; unitCost += armor * 3; }
+        if(sorcery != 0) { typeCost += 1; unitCost += sorcery * 6; }
+        if(damage != 0) { typeCost += 1; unitCost += damage * 2; }
+        if(fear != 0) { typeCost += 1; unitCost += fear * 2; }
+        if(immuneCleave) { unitCost += 4; }
+        if(immuneLethal) { unitCost += 3; }
+        if(immunePierce) { unitCost += 3; }
+        if(immuneSmite) { unitCost += 5; }
+        if(immuneStun) { unitCost += 5; }
+        if(immuneSunder) { unitCost += 3; }
+
+        if(typeCost < 0) { typeCost = 0; }
+        if(unitCost < 0) { unitCost = 0; }
+
+        cost = typeCost + unitCost;
+        additionalCost = unitCost;
     }
 
     public MonsterModifier AddGoblins()
@@ -186,60 +236,59 @@ public class MonsterModifier
         return null;
     }
 
-    public static readonly MonsterModifier NONE = new MonsterModifier(0, "None", 0, 0) { }.AddToList();
-    public static readonly MonsterModifier ALERT = new MonsterModifier(1, "Alert", 10, 5) { immuneStun = true }.AddToList();
-    public static readonly MonsterModifier ARMORED = new MonsterModifier(2, "Armored", 4, 3) { armor = 1 }.AddToList();
-    public static readonly MonsterModifier BLOODTHIRSTY = new MonsterModifier(3, "Bloodthirsty", 3, 1) { damage = 1 }.AddToList();
-    public static readonly MonsterModifier GUARDED = new MonsterModifier(4, "Guarded", 9, 9) { immuneCleave = true, immuneStun = true }.AddToList();
-    public static readonly MonsterModifier HARDENED = new MonsterModifier(5, "Hardened", 6, 6) { immunePierce = true, immuneSunder = true }.AddToList();
-    public static readonly MonsterModifier HUGE = new MonsterModifier(6, "Huge", 4, 3) { health = 3 }.AddToList();
-    public static readonly MonsterModifier LARGE = new MonsterModifier(7, "Large", 3, 2) { health = 2 }.AddToList();
-    public static readonly MonsterModifier SHROUDED = new MonsterModifier(8, "Shrouded", 7, 5) { sorcery = 1 }.AddToList();
-    public static readonly MonsterModifier SPIKE_ARMOR = new MonsterModifier(9, "Spike Armor", 6, 4) { armor = 1, damage = 1 }.AddHumanoids().AddTrolls().AddSpirits().Add(MonsterType.WarElephant).AddToList();
-    public static readonly MonsterModifier TERRIFYING = new MonsterModifier(10, "Terrifying", 3, 1) { fear = 1 }.AddToList();
-    public static readonly MonsterModifier VETERAN = new MonsterModifier(11, "Veteran", 10, 7) { health = 5, damage = 1 }.AddHumanoids().AddToList();
-    public static readonly MonsterModifier WARY = new MonsterModifier(12, "Wary", 8, 8) { immuneStun = true, immuneLethal = true }.AddToList();
-    public static readonly MonsterModifier WELL_EQUIPPED = new MonsterModifier(13, "Well-Equipped", 6, 5) { health = 2, armor = 1 }.AddHumanoids().AddTrolls().AddSpirits().Add(MonsterType.WarElephant).Add(MonsterType.SiegeEngine).AddToList();
+    public static readonly MonsterModifier NONE = new MonsterModifier(0, "None", MonsterModifierGroup.None, 0, 0) { }.AddToList();
+    public static readonly MonsterModifier ALERT = new MonsterModifier(1, "Alert", MonsterModifierGroup.Basic, 10, 5) { immuneStun = true }.AddToList();
+    public static readonly MonsterModifier ARMORED = new MonsterModifier(2, "Armored", MonsterModifierGroup.Basic, 4, 3) { armor = 1 }.AddToList();
+    public static readonly MonsterModifier BLOODTHIRSTY = new MonsterModifier(3, "Bloodthirsty", MonsterModifierGroup.Basic, 3, 1) { damage = 1 }.AddToList();
+    public static readonly MonsterModifier GUARDED = new MonsterModifier(4, "Guarded", MonsterModifierGroup.Basic, 9, 9) { immuneCleave = true, immuneStun = true }.AddToList();
+    public static readonly MonsterModifier HARDENED = new MonsterModifier(5, "Hardened", MonsterModifierGroup.Basic, 6, 6) { immunePierce = true, immuneSunder = true }.AddToList();
+    public static readonly MonsterModifier HUGE = new MonsterModifier(6, "Huge", MonsterModifierGroup.Basic, 4, 3) { health = 3 }.AddToList();
+    public static readonly MonsterModifier LARGE = new MonsterModifier(7, "Large", MonsterModifierGroup.Basic, 3, 2) { health = 2 }.AddToList();
+    public static readonly MonsterModifier SHROUDED = new MonsterModifier(8, "Shrouded", MonsterModifierGroup.Basic, 7, 5) { sorcery = 1 }.AddToList();
+    public static readonly MonsterModifier SPIKE_ARMOR = new MonsterModifier(9, "Spike Armor", MonsterModifierGroup.Basic, 6, 4) { armor = 1, damage = 1 }.AddHumanoids().AddTrolls().AddSpirits().Add(MonsterType.WarElephant).AddToList();
+    public static readonly MonsterModifier TERRIFYING = new MonsterModifier(10, "Terrifying", MonsterModifierGroup.Basic, 3, 1) { fear = 1 }.AddToList();
+    public static readonly MonsterModifier VETERAN = new MonsterModifier(11, "Veteran", MonsterModifierGroup.Basic, 10, 7) { health = 5, damage = 1 }.AddHumanoids().AddToList();
+    public static readonly MonsterModifier WARY = new MonsterModifier(12, "Wary", MonsterModifierGroup.Basic, 8, 8) { immuneStun = true, immuneLethal = true }.AddToList();
+    public static readonly MonsterModifier WELL_EQUIPPED = new MonsterModifier(13, "Well-Equipped", MonsterModifierGroup.Basic, 6, 5) { health = 2, armor = 1 }.AddHumanoids().AddTrolls().AddSpirits().Add(MonsterType.WarElephant).Add(MonsterType.SiegeEngine).AddToList();
 
-    public static readonly MonsterModifier BLIND_RAGE = new MonsterModifier(14, "Blind Rage") { armor = 2, immunePierce = true, immuneSunder = true }.AddToList();
-    public static readonly MonsterModifier BURNING_HATRED = new MonsterModifier(15, "Burning Hatred") { armor = 1, health = 4 }.AddToList();
-    public static readonly MonsterModifier ELDEST_WORM_1 = new MonsterModifier(16, "Eldest Worm") { health = -4, armor = 1, immunePierce = true, immuneSunder = true }.Add(MonsterType.FoulBeast).Add(MonsterType.AnonymousThing).Add(MonsterType.LichKing).AddToList();
-    public static readonly MonsterModifier ELDEST_WORM_2 = new MonsterModifier(17, "Eldest Worm") { armor = 1, immunePierce = true, immuneSunder = true }.Add(MonsterType.FoulBeast).Add(MonsterType.AnonymousThing).Add(MonsterType.LichKing).AddToList();
-    public static readonly MonsterModifier ELDEST_WORM_3 = new MonsterModifier(18, "Eldest Worm") { health = 4, armor = 1, immunePierce = true, immuneSunder = true }.Add(MonsterType.FoulBeast).Add(MonsterType.AnonymousThing).Add(MonsterType.LichKing).AddToList();
-    public static readonly MonsterModifier ETERNAL_FLAME = new MonsterModifier(19, "Eternal Flame") { sorcery = 1, health = 15 }.AddSpirits().Add(MonsterType.Balerock).Add(MonsterType.FoulBeast).AddToList();
-    public static readonly MonsterModifier ETERNAL_LORD = new MonsterModifier(20, "Eternal Lord") { armor = 2, health = 2, fear = 1, damage = 1 }.AddSpirits().Add(MonsterType.Balerock).AddToList();
-    public static readonly MonsterModifier HATCHLING = new MonsterModifier(21, "Hatchling") { health = -5 }.Add(MonsterType.GiantSpider).Add(MonsterType.FoulBeast).Add(MonsterType.AnonymousThing).AddToList();
-    public static readonly MonsterModifier KINGS_ARMOR = new MonsterModifier(22, "King's Armor") { armor = 2, health = 5 }.AddHumanoids().AddSpirits().AddToList();
-    public static readonly MonsterModifier LAST_GASP = new MonsterModifier(23, "Last Gasp") { armor = -2, damage = 1, fear = 1 }.AddHumanoids().AddTrolls().AddAllBeasts().AddToList();
-    public static readonly MonsterModifier NUMENOREAN_BLOOD = new MonsterModifier(24, "Númenórean Blood") { health = 4 }.AddHumans().AddToList();
-    public static readonly MonsterModifier ORC_CAPTAIN = new MonsterModifier(25, "Orc Captain") { armor = 1, health = 2, fear = 1, immuneStun = true }.AddOrcs().AddToList();
-    public static readonly MonsterModifier ORC_CHAMPION = new MonsterModifier(26, "Orc Champion") { damage = 1, fear = 1 }.AddOrcs().AddToList();
-    public static readonly MonsterModifier PACKS_VENGEANCE_1 = new MonsterModifier(27, "Pack's Vengeance") { health = 2, immuneStun = true, immuneLethal = true }.AddVargs().AddToList();
-    public static readonly MonsterModifier PACKS_VENGEANCE_2 = new MonsterModifier(28, "Pack's Vengeance") { health = 2, immuneStun = true , fakeLethal=true }.AddVargs().AddToList();
-    public static readonly MonsterModifier POSSESSED = new MonsterModifier(29, "Possessed") { fear = 1, immuneSmite = true }.AddHumanoids().AddAllBeasts().AddToList();
-    public static readonly MonsterModifier SHADOWMAN_CAPTAIN = new MonsterModifier(30, "Shadowman Captain") { health = 4, sorcery = 1, immuneStun = true }.Add(MonsterType.Shadowman).AddToList();
-    public static readonly MonsterModifier SPECTRAL = new MonsterModifier(31, "Spectral") { sorcery = 2, immuneLethal = true }.AddSpirits().AddToList();
-    public static readonly MonsterModifier SPIDER_CAPTAIN = new MonsterModifier(32, "Spider Captain") { health = 7, damage = 1, immuneStun = true }.AddSpiders().AddToList();
-    public static readonly MonsterModifier SPIRIT_GUARD = new MonsterModifier(33, "Spirit Guard") { fear = 2, damage = 2, sorcery = 2 }.AddSpirits().AddToList();
-    public static readonly MonsterModifier SWIFT_DEATH = new MonsterModifier(34, "Swift Death") { damage = 1 }.AddToList();
-    public static readonly MonsterModifier TRAINED_FOR_BATTLE = new MonsterModifier(35, "Trained for Battle") { armor = 2, health = 5 }.AddHumanoids().AddTrolls().AddToList();
-    public static readonly MonsterModifier UNDYING_HATE = new MonsterModifier(36, "Undying Hate") { health = -12, fear = 1, damage = 1, immuneStun = true }.AddToList();
-    public static readonly MonsterModifier WARBAND_LEADER = new MonsterModifier(37, "Warband Leader") { armor = 2, health = 2, damage = 2 }.AddHumanoids().AddToList();
-    public static readonly MonsterModifier WISP = new MonsterModifier(38, "Wisp") { health = -1, sorcery = -1 }.AddSpirits().AddToList();
+    public static readonly MonsterModifier BLIND_RAGE = new MonsterModifier(14, "Blind Rage", MonsterModifierGroup.Extended) { armor = 2, immunePierce = true, immuneSunder = true }.AddToList();
+    public static readonly MonsterModifier BURNING_HATRED = new MonsterModifier(15, "Burning Hatred", MonsterModifierGroup.Extended) { armor = 1, health = 4 }.AddToList();
+    public static readonly MonsterModifier ELDEST_WORM_1 = new MonsterModifier(16, "Eldest Worm", MonsterModifierGroup.Extended) { health = -4, armor = 1, immunePierce = true, immuneSunder = true }.Add(MonsterType.FoulBeast).Add(MonsterType.AnonymousThing).Add(MonsterType.LichKing).AddToList();
+    public static readonly MonsterModifier ELDEST_WORM_2 = new MonsterModifier(17, "Eldest Worm", MonsterModifierGroup.Extended) { armor = 1, immunePierce = true, immuneSunder = true }.Add(MonsterType.FoulBeast).Add(MonsterType.AnonymousThing).Add(MonsterType.LichKing).AddToList();
+    public static readonly MonsterModifier ELDEST_WORM_3 = new MonsterModifier(18, "Eldest Worm", MonsterModifierGroup.Extended) { health = 4, armor = 1, immunePierce = true, immuneSunder = true }.Add(MonsterType.FoulBeast).Add(MonsterType.AnonymousThing).Add(MonsterType.LichKing).AddToList();
+    public static readonly MonsterModifier ETERNAL_FLAME = new MonsterModifier(19, "Eternal Flame", MonsterModifierGroup.Extended) { sorcery = 1, health = 15 }.AddSpirits().Add(MonsterType.Balerock).Add(MonsterType.FoulBeast).AddToList();
+    public static readonly MonsterModifier ETERNAL_LORD = new MonsterModifier(20, "Eternal Lord", MonsterModifierGroup.Extended) { armor = 2, health = 2, fear = 1, damage = 1 }.AddSpirits().Add(MonsterType.Balerock).AddToList();
+    public static readonly MonsterModifier HATCHLING = new MonsterModifier(21, "Hatchling", MonsterModifierGroup.Extended) { health = -5 }.Add(MonsterType.GiantSpider).Add(MonsterType.FoulBeast).Add(MonsterType.AnonymousThing).AddToList();
+    public static readonly MonsterModifier KINGS_ARMOR = new MonsterModifier(22, "King's Armor", MonsterModifierGroup.Extended) { armor = 2, health = 5 }.AddHumanoids().AddSpirits().AddToList();
+    public static readonly MonsterModifier LAST_GASP = new MonsterModifier(23, "Last Gasp", MonsterModifierGroup.Extended) { armor = -2, damage = 1, fear = 1 }.AddHumanoids().AddTrolls().AddAllBeasts().AddToList();
+    public static readonly MonsterModifier NUMENOREAN_BLOOD = new MonsterModifier(24, "Númenórean Blood", MonsterModifierGroup.Extended) { health = 4 }.AddHumans().AddToList();
+    public static readonly MonsterModifier ORC_CAPTAIN = new MonsterModifier(25, "Orc Captain", MonsterModifierGroup.Extended) { armor = 1, health = 2, fear = 1, immuneStun = true }.AddOrcs().AddToList();
+    public static readonly MonsterModifier ORC_CHAMPION = new MonsterModifier(26, "Orc Champion", MonsterModifierGroup.Extended) { damage = 1, fear = 1 }.AddOrcs().AddToList();
+    public static readonly MonsterModifier PACKS_VENGEANCE_1 = new MonsterModifier(27, "Pack's Vengeance", MonsterModifierGroup.Extended) { health = 2, immuneStun = true, immuneLethal = true }.AddVargs().AddToList();
+    public static readonly MonsterModifier PACKS_VENGEANCE_2 = new MonsterModifier(28, "Pack's Vengeance", MonsterModifierGroup.Extended) { health = 2, immuneStun = true, fakeLethal = true }.AddVargs().AddToList();
+    public static readonly MonsterModifier POSSESSED = new MonsterModifier(29, "Possessed", MonsterModifierGroup.Extended) { fear = 1, immuneSmite = true }.AddHumanoids().AddAllBeasts().AddToList();
+    public static readonly MonsterModifier SHADOWMAN_CAPTAIN = new MonsterModifier(30, "Shadowman Captain", MonsterModifierGroup.Extended) { health = 4, sorcery = 1, immuneStun = true }.Add(MonsterType.Shadowman).AddToList();
+    public static readonly MonsterModifier SPECTRAL = new MonsterModifier(31, "Spectral", MonsterModifierGroup.Extended) { sorcery = 2, immuneLethal = true }.AddSpirits().AddToList();
+    public static readonly MonsterModifier SPIDER_CAPTAIN = new MonsterModifier(32, "Spider Captain", MonsterModifierGroup.Extended) { health = 7, damage = 1, immuneStun = true }.AddSpiders().AddToList();
+    public static readonly MonsterModifier SPIRIT_GUARD = new MonsterModifier(33, "Spirit Guard", MonsterModifierGroup.Extended) { fear = 2, damage = 2, sorcery = 2 }.AddSpirits().AddToList();
+    public static readonly MonsterModifier SWIFT_DEATH = new MonsterModifier(34, "Swift Death", MonsterModifierGroup.Extended) { damage = 1 }.AddToList();
+    public static readonly MonsterModifier TRAINED_FOR_BATTLE = new MonsterModifier(35, "Trained for Battle", MonsterModifierGroup.Extended) { armor = 2, health = 5 }.AddHumanoids().AddTrolls().AddToList();
+    public static readonly MonsterModifier UNDYING_HATE = new MonsterModifier(36, "Undying Hate", MonsterModifierGroup.Extended) { health = -12, fear = 1, damage = 1, immuneStun = true }.AddToList();
+    public static readonly MonsterModifier WARBAND_LEADER = new MonsterModifier(37, "Warband Leader", MonsterModifierGroup.Extended) { armor = 2, health = 2, damage = 2 }.AddHumanoids().AddToList();
+    public static readonly MonsterModifier WISP = new MonsterModifier(38, "Wisp", MonsterModifierGroup.Extended) { health = -1, sorcery = -1 }.AddSpirits().AddToList();
 
-    public static readonly MonsterModifier DWARVEN_BANE_1 = new MonsterModifier(39, "Dwarven Bane") { armor = -2, fear = -1 }.Add(MonsterType.Balerock).AddToList();
-    public static readonly MonsterModifier DWARVEN_BANE_2 = new MonsterModifier(40, "Dwarven Bane") { armor = 1, immuneLethal = true, immuneStun = true }.Add(MonsterType.Balerock).AddToList();
-    public static readonly MonsterModifier DWARVEN_BANE_3 = new MonsterModifier(41, "Dwarven Bane") { armor = 1, sorcery = 1, health = 4, fear = 1, immuneLethal = true, immuneSunder = true }.Add(MonsterType.Balerock).AddToList();
-    public static readonly MonsterModifier DWARVEN_BANE_4 = new MonsterModifier(42, "Dwarven Bane") { armor = 2, sorcery = 2, health = 5, fear = 2, damage = 2, immuneLethal = true, immuneSunder = true, immuneStun = true }.Add(MonsterType.Balerock).AddToList();
-    public static readonly MonsterModifier MASTER_OF_THE_PIT_1 = new MonsterModifier(43, "Master of the Pit") {sorcery=1, immuneStun= true }.AddToList();
-    public static readonly MonsterModifier MASTER_OF_THE_PIT_2 = new MonsterModifier(44, "Master of the Pit") {sorcery=2, immuneStun= true }.AddToList();
-    public static readonly MonsterModifier MASTER_OF_THE_PIT_3 = new MonsterModifier(45, "Master of the Pit") {sorcery = 3, immuneStun = true }.AddToList();
-    public static readonly MonsterModifier HERALD_OF_THE_BALEROCK = new MonsterModifier(46, "Herald of the Balerock") { health = 2, sorcery = 3, immuneSmite = true, immuneStun = true }.AddToList();
-    public static readonly MonsterModifier URSULAS_VENGEANCE = new MonsterModifier(47, "Ursula's Vengeance") { health = 4, armor = 1, sorcery = 2, immuneLethal = true, immuneStun = true }.Add(MonsterType.Oliver).AddToList();
-    public static readonly MonsterModifier LICH_KING = new MonsterModifier(48, "Lich-king") { immuneStun = true }.Add(MonsterType.LichKing).AddToList();
-    public static readonly MonsterModifier CHIEF_OF_THE_NINE = new MonsterModifier(49, "Chief of the Nine") { armor = 1, immuneStun = true }.Add(MonsterType.LichKing).AddToList();
-    public static readonly MonsterModifier LORD_OF_MINE_HOUSE_MORE_GHOUL = new MonsterModifier(50, "Lord of Mine-House More-Ghoul") { health = 5, damage = 1, fear = 1, immuneLethal = true, immuneSunder = true, immuneStun = true }.Add(MonsterType.LichKing).AddToList();
-
+    public static readonly MonsterModifier DWARVEN_BANE_1 = new MonsterModifier(39, "Dwarven Bane", MonsterModifierGroup.Named) { armor = -2, fear = -1 }.Add(MonsterType.Balerock).AddToList();
+    public static readonly MonsterModifier DWARVEN_BANE_2 = new MonsterModifier(40, "Dwarven Bane", MonsterModifierGroup.Named) { armor = 1, immuneLethal = true, immuneStun = true }.Add(MonsterType.Balerock).AddToList();
+    public static readonly MonsterModifier DWARVEN_BANE_3 = new MonsterModifier(41, "Dwarven Bane", MonsterModifierGroup.Named) { armor = 1, sorcery = 1, health = 4, fear = 1, immuneLethal = true, immuneSunder = true }.Add(MonsterType.Balerock).AddToList();
+    public static readonly MonsterModifier DWARVEN_BANE_4 = new MonsterModifier(42, "Dwarven Bane", MonsterModifierGroup.Named) { armor = 2, sorcery = 2, health = 5, fear = 2, damage = 2, immuneLethal = true, immuneSunder = true, immuneStun = true }.Add(MonsterType.Balerock).AddToList();
+    public static readonly MonsterModifier MASTER_OF_THE_PIT_1 = new MonsterModifier(43, "Master of the Pit", MonsterModifierGroup.Named) { sorcery = 1, immuneStun = true }.AddToList();
+    public static readonly MonsterModifier MASTER_OF_THE_PIT_2 = new MonsterModifier(44, "Master of the Pit", MonsterModifierGroup.Named) { sorcery = 2, immuneStun = true }.AddToList();
+    public static readonly MonsterModifier MASTER_OF_THE_PIT_3 = new MonsterModifier(45, "Master of the Pit", MonsterModifierGroup.Named) { sorcery = 3, immuneStun = true }.AddToList();
+    public static readonly MonsterModifier HERALD_OF_THE_BALEROCK = new MonsterModifier(46, "Herald of the Balerock", MonsterModifierGroup.Named) { health = 2, sorcery = 3, immuneSmite = true, immuneStun = true }.AddToList();
+    public static readonly MonsterModifier URSULAS_VENGEANCE = new MonsterModifier(47, "Ursula's Vengeance", MonsterModifierGroup.Named) { health = 4, armor = 1, sorcery = 2, immuneLethal = true, immuneStun = true }.Add(MonsterType.Oliver).AddToList();
+    public static readonly MonsterModifier LICH_KING = new MonsterModifier(48, "Lich-king", MonsterModifierGroup.Named) { immuneStun = true }.Add(MonsterType.LichKing).AddToList();
+    public static readonly MonsterModifier CHIEF_OF_THE_NINE = new MonsterModifier(49, "Chief of the Nine", MonsterModifierGroup.Named) { armor = 1, immuneStun = true }.Add(MonsterType.LichKing).AddToList();
+    public static readonly MonsterModifier LORD_OF_CORRUPTION = new MonsterModifier(50, "Lord of Corruption", MonsterModifierGroup.Named) { health = 5, damage = 1, fear = 1, immuneLethal = true, immuneSunder = true, immuneStun = true }.Add(MonsterType.LichKing).AddToList();
 
     /*
     Golden Mask	+1 armor, +2 health, +2 sorcery, +1 fear
@@ -314,7 +363,7 @@ public class MonsterModifier
             yield return URSULAS_VENGEANCE;
             yield return LICH_KING;
             yield return CHIEF_OF_THE_NINE;
-            yield return LORD_OF_MINE_HOUSE_MORE_GHOUL;
+            yield return LORD_OF_CORRUPTION;
         }
     }
 
@@ -375,7 +424,7 @@ public class MonsterModifier
             yield return URSULAS_VENGEANCE;
             yield return LICH_KING;
             yield return CHIEF_OF_THE_NINE;
-            yield return LORD_OF_MINE_HOUSE_MORE_GHOUL;
+            yield return LORD_OF_CORRUPTION;
         }
     }
 }
