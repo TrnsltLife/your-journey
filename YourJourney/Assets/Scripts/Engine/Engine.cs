@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using DG.Tweening;
 using Newtonsoft.Json;
@@ -86,8 +87,10 @@ public class Engine : MonoBehaviour
 			return;
 		}
 
-		//Load Monster Activations
+		//Load Monster Activations, Modifiers
 		LoadDefaultMonsterActivations();
+		LoadDefaultMonsterModifiers();
+		LoadCustomMonsterModifiers();
 
 		//Load Skins
 		var skinsManager = GetComponent<SkinsManager>();
@@ -148,6 +151,30 @@ public class Engine : MonoBehaviour
 			scenario.activationsObserver.Add(activation);
 		}
     }
+
+	private void LoadDefaultMonsterModifiers()
+    {
+		Debug.Log("LoadDefaultMonsterMOdifiers()");
+		List<MonsterModifier> modifiers = MonsterModifier.Values.ToList();
+		foreach(var modifier in modifiers)
+        {
+			scenario.monsterModifiersObserver.Add(modifier);
+        }
+		Debug.Log("LoadDefaultMonsterMOdifiers() finished");
+	}
+
+	private void LoadCustomMonsterModifiers()
+    {
+		Debug.Log("LoadCustomMonsterMOdifiers()");
+		foreach (ThreatInteraction threat in scenario.interactionObserver.Where(it => it.interactionType == InteractionType.Threat))
+		{
+			foreach (Monster monster in threat.monsterCollection)
+			{
+				monster.LoadCustomModifiers(scenario.monsterModifiersObserver);
+			}
+		}
+		Debug.Log("LoadCustomMonsterMOdifiers() finished");
+	}
 
 	IEnumerator BeginGame()
 	{
@@ -261,6 +288,7 @@ public class Engine : MonoBehaviour
 		tileManager.SetState( gameState.tileState );
 		interactionManager.SetState( gameState.interactionState );
 		FindObjectOfType<MonsterManager>().SetState( gameState.monsterState );
+		//scenario.activationsObserver = new ObservableCollection<MonsterActivations>(gameState.activations);
 
 		foreach ( FogState fs in gameState.partyState.fogList )
 		{

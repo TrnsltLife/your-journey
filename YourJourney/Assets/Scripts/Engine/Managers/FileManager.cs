@@ -27,6 +27,8 @@ public class FileManager
 	public List<Trigger> triggers { get; set; }
 	public List<Objective> objectives { get; set; }
 	public List<MonsterActivations> activations { get; set; }
+	[JsonConverter(typeof(CustomMonsterModifierListConverter))]
+	public List<MonsterModifier> monsterModifiers { get; set; }
 	public List<Translation> translations { get; set; }
 	public List<TextBookData> resolutions { get; set; }
 	public List<Threat> threats { get; set; }
@@ -61,6 +63,7 @@ public class FileManager
 		triggers = source.triggersObserver.ToList();
 		objectives = source.objectiveObserver.ToList();
 		activations = source.activationsObserver.ToList();
+		monsterModifiers = source.monsterModifiersObserver.ToList();
 		translations = source.translationObserver.ToList();
 		resolutions = source.resolutionObserver.ToList();
 		threats = source.threatObserver.ToList();
@@ -123,6 +126,7 @@ public class FileManager
 				TraceWriter = traceWriter,
 				Error = (sender, error) => {
 					Debug.Log("Scenario deserialize error: " + error);
+				Debug.Log("Path: " + error.ErrorContext.Path + ", Member: " + error.ErrorContext.Member + ", Error: " + error.ErrorContext.Error.Message);
 					Debug.Log(traceWriter);
 					error.ErrorContext.Handled = true;
 				}

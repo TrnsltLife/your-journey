@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+
 
 public class MonsterModifier
 {
+    public static readonly int START_OF_CUSTOM_MODIFIERS = 1000;
+
     public int id { get; set; }
     public string name { get; set; } = "";
     public MonsterModifierGroup group { get; set; } = MonsterModifierGroup.None;
@@ -229,9 +228,16 @@ public class MonsterModifier
     }
     public static MonsterModifier FromID(int id)
     {
-        if(id < monsterModifiers.Count)
+        if (id < 0) { return null; }
+
+        if (id < monsterModifiers.Count)
         {
             return (MonsterModifier)monsterModifiers[id];
+        }
+        else if (id >= MonsterModifier.START_OF_CUSTOM_MODIFIERS)
+        {
+            //The default JSON read converter for MonsterModifier won't be able to look at the scenario's list of custom MonsterModifiers. So we need to put default values in to start out with and later hydrate it when we load the Monster in the Engine.LoadCustomMonsterModifiers.
+            return new MonsterModifier(id, "Custom " + id, MonsterModifierGroup.Custom);
         }
         return null;
     }

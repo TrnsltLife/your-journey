@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
@@ -41,6 +42,7 @@ public class Monster
 	public bool isBloodThirsty;
 	public bool isArmored;
 	public bool isElite;
+	[JsonConverter(typeof(MonsterModifierListConverter))]
 	public List<MonsterModifier> modifierList = new List<MonsterModifier>();
 	public bool hasBanner = false;
 	public Ability negatedBy { get; set; }
@@ -108,6 +110,22 @@ public class Monster
 	public Monster()
 	{
 
+	}
+
+	public void LoadCustomModifiers(ObservableCollection<MonsterModifier> customModifiers)
+	{
+		//The default JSON converter for MonsterModifier can't look at the scenario's list of custom MonsterModifiers. So we need to hydrate it when we load the Monster in the MonsterEditorWindow.
+		for (int i = 0; i < modifierList.Count; i++)
+		{
+			if (modifierList[i].id >= MonsterModifier.START_OF_CUSTOM_MODIFIERS)
+			{
+				MonsterModifier modData = customModifiers.First(it => it.id == modifierList[i].id);
+				if (modData != null)
+				{
+					modifierList[i] = modData;
+				}
+			}
+		}
 	}
 
 	public bool AddModifier(MonsterModifier mod)

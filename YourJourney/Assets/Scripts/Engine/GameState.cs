@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -17,6 +18,7 @@ public class GameState
 	public TileState tileState;
 	public InteractionState interactionState;
 	public CamState camState;
+	//public List<MonsterActivations> activations = new List<MonsterActivations>();
 
 	public void SaveState( Engine engine, int saveIndex )
 	{
@@ -47,6 +49,7 @@ public class GameState
 		tileState = engine.tileManager.GetState();
 		interactionState = engine.interactionManager.GetState();
 		camState = GlowEngine.FindObjectOfType<CamControl>().GetState();
+		//activations = engine.scenario.activationsObserver.ToList();
 
 		//string basePath = Path.Combine( Environment.ExpandEnvironmentVariables( "%userprofile%" ), "Documents", "Your Journey", "Saves" );
 		string basePath = GetFullSavePath();

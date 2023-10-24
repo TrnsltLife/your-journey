@@ -35,6 +35,7 @@ public class Scenario
 	public ObservableCollection<Trigger> triggersObserver { get; set; }
 	public ObservableCollection<Objective> objectiveObserver { get; set; }
 	public ObservableCollection<MonsterActivations> activationsObserver { get; set; }
+	public ObservableCollection<MonsterModifier> monsterModifiersObserver { get; set; }
 	public ObservableCollection<Translation> translationObserver { get; set; }
 	public ObservableCollection<TextBookData> resolutionObserver { get; set; }
 	public ObservableCollection<Threat> threatObserver { get; set; }
@@ -74,6 +75,16 @@ public class Scenario
         {
 			s.activationsObserver = new ObservableCollection<MonsterActivations>();
         }
+
+		if (fm.monsterModifiers != null)
+		{
+			s.monsterModifiersObserver = new ObservableCollection<MonsterModifier>(fm.monsterModifiers);
+		}
+		else
+		{
+			s.monsterModifiersObserver = new ObservableCollection<MonsterModifier>();
+		}
+
 		if (fm.translations != null)
 		{
 			s.translationObserver = new ObservableCollection<Translation>(fm.translations);
@@ -82,6 +93,7 @@ public class Scenario
         {
 			s.translationObserver = new ObservableCollection<Translation>();
         }
+
 		s.resolutionObserver = new ObservableCollection<TextBookData>( fm.resolutions );
 		s.threatObserver = new ObservableCollection<Threat>( fm.threats );
 		s.chapterObserver = new ObservableCollection<Chapter>( fm.chapters );
@@ -96,6 +108,7 @@ public class Scenario
 			s.collectionObserver = new ObservableCollection<int>();
 			s.collectionObserver.Add(Collection.CORE_SET.ID);
         }
+
 		s.globalTilePool = new ObservableCollection<int>( fm.globalTiles );
 		s.chronicle = new List<string> { fm.scenarioName , fm.specialInstructions };
 		s.scenarioEndStatus = new Dictionary<string, bool>( fm.scenarioEndStatus );
