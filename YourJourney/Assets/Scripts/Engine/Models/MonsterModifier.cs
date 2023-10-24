@@ -6,6 +6,7 @@ public class MonsterModifier
     public static readonly int START_OF_CUSTOM_MODIFIERS = 1000;
 
     public int id { get; set; }
+    public string dataName { get; set; }
     public string name { get; set; } = "";
     public MonsterModifierGroup group { get; set; } = MonsterModifierGroup.None;
     public int cost { get; set; } = 0;

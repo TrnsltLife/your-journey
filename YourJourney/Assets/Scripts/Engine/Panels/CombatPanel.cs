@@ -150,8 +150,14 @@ public class CombatPanel : MonoBehaviour
 		for (int i=0; i<monster.modifierList.Count; i++)
         {
 			Text t = monsterModifierLabels[i].GetComponent<Text>();
-			Translate("enemyBonus." + monsterModifierLabels[i].name + ".name", monster.modifierList[i].name);
-			t.text = monster.modifierList[i].name;
+			if (monster.modifierList[i].id >= MonsterModifier.START_OF_CUSTOM_MODIFIERS)
+			{
+				t.text = Interpret("enemyBonus." + monster.modifierList[i].dataName + ".name", monster.modifierList[i].name);
+			}
+			else
+			{
+				t.text = Translate("combat.bonus." + monster.modifierList[i].name, monster.modifierList[i].name);
+			}
 			monsterModifierLabels[i].SetActive(true);
         }
     }
