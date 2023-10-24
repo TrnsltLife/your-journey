@@ -16,42 +16,32 @@ internal class MonsterModifierListConverter : JsonConverter
 
 	public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 	{
+		//Write this out as a list of MonsterModifier because we write (and read) the full MonsterModifier objects when we save a game with GameState.
 		List<MonsterModifier> modifierList = (List<MonsterModifier>)value;
-		/*
-		List<int> idList = new List<int>();
-		foreach (MonsterModifier modifier in modifierList)
-		{
-			idList.Add(modifier.id);
-		}
-		JToken t = JToken.FromObject(idList);
-		*/
 		JToken t = JToken.FromObject(modifierList);
 		t.WriteTo(writer);
 	}
 
 	public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 	{
+		//We read in either:
+		// 1. an integer that will be converted to a MonsterModifier (from the Scenario file)
+		// 2. a full MonsterModifier object (from a saved GameState)
 		var jsonObject = JArray.Load(reader);
 		MonsterModifier modifier = null;
 		List<MonsterModifier> modifierList = new List<MonsterModifier>();
 
 		foreach (var item in jsonObject)
 		{
-			Debug.Log("Try parsing MonsterModifier");
-			Debug.Log(item);
 			try
 			{
-				//Convert from a full MonsterModifier when loading a saved game
-				//modifier = item.Value<MonsterModifier>();
+				//Convert from a full MonsterModifier when loading a saved game from GameState
 				modifier = (MonsterModifier)item.ToObject(typeof(MonsterModifier));
-				Debug.Log("Loaded MonsterModifier " + modifier.name);
 			}
 			catch (Exception e)
 			{
-				Debug.Log(e.Message);
-				//Convert from an int when loading a Scenario. Custom modifiers will be hydrated later
+				//Convert from an int when loading a new Scenario. Default modifiers will be hydrated from MonsterModifier.FromID. Custom modifiers will be hydrated later in Engine.
 				modifier = MonsterModifier.FromID(item.Value<int>());
-				Debug.Log("Loaded MonsterModifier as int " + modifier.name);
 			}
 
 			if (modifier != null)

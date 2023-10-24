@@ -288,7 +288,6 @@ public class Engine : MonoBehaviour
 		tileManager.SetState( gameState.tileState );
 		interactionManager.SetState( gameState.interactionState );
 		FindObjectOfType<MonsterManager>().SetState( gameState.monsterState );
-		//scenario.activationsObserver = new ObservableCollection<MonsterActivations>(gameState.activations);
 
 		foreach ( FogState fs in gameState.partyState.fogList )
 		{
