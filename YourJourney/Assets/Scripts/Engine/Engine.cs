@@ -206,6 +206,7 @@ public class Engine : MonoBehaviour
 
 	public void StartNewGame()
 	{
+		MonsterManager.InitMonsterPool(); //Reset monster pool very time a new game is started so last game's monster pool doesn't persist to the new game.
 		if ( !debug )
 		{
 			//only show intro text if it's not empty

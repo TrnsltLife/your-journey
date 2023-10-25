@@ -44,6 +44,7 @@ public class Monster
 	public bool isElite;
 	[JsonConverter(typeof(MonsterModifierListConverter))]
 	public List<MonsterModifier> modifierList = new List<MonsterModifier>();
+	public int randomizedModifiersCount;
 	public bool hasBanner = false;
 	public Ability negatedBy { get; set; }
 	public MonsterType monsterType { get; set; }
@@ -136,6 +137,21 @@ public class Monster
 			return true;
         }
 		return false;
+    }
+
+	public void RandomizeModifiers()
+    {
+		//If randomizedModifiersCount is set to a number greater than 0 and less than modifierList.Count, pick thta number of modifiers at random.
+
+		if(randomizedModifiersCount == 0 || randomizedModifiersCount == modifierList.Count) { return; } //use all the modifiers
+
+		MonsterModifier[] modifierArray = GlowEngine.RandomizeArray(modifierList.ToArray());
+		modifierList.Clear();
+		for(int i = 0; i < randomizedModifiersCount && i < modifierArray.Length; i++)
+        {
+			modifierList.Add(modifierArray[i]);
+        }
+		randomizedModifiersCount = 0; //Set to 0 so any future calls to this function will not change the modifierList.
     }
 
 	public int CalculateExtraDamage()

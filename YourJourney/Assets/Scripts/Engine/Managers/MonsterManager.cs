@@ -36,8 +36,9 @@ public class MonsterManager : MonoBehaviour
 		InitMonsterPool();
 	}
 
-	private void InitMonsterPool()
+	public static void InitMonsterPool()
     {
+		monsterPool.Clear();
 		monsterPool.AddRange(Monsters.List().Select(m => m.figureLimit));
     }
 

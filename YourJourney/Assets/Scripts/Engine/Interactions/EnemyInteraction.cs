@@ -162,7 +162,7 @@ public class ThreatInteraction : InteractionBase
 			if ( includedEnemies.Count( x => x ) > 1 && lastEnemyIndex == i )
 				continue;
 
-			//skip enemies that have their MonsterMonager.monsterPool exhausted
+			//skip enemies that have their MonsterManager.monsterPool exhausted
 			if (MonsterManager.LeftInPool((MonsterType)i) <= 0)
 				continue;
 

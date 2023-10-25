@@ -147,6 +147,8 @@ public class CombatPanel : MonoBehaviour
 			monsterModifierLabels[i].SetActive(false);
         }
 
+		monster.RandomizeModifiers();
+
 		for (int i=0; i<monster.modifierList.Count; i++)
         {
 			Text t = monsterModifierLabels[i].GetComponent<Text>();
