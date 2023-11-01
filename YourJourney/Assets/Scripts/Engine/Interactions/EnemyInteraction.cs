@@ -122,7 +122,7 @@ public class ThreatInteraction : InteractionBase
 			{
 				foreach (Monster sim in mList)
 				{
-					if (sim.modifierList.Count < Monster.MAX_MODIFIERS)
+					if (sim.modifierList.Count < Monster.MAX_MODIFIERS && sim.modifierList.Count < Monster.REASONABLE_MODIFIERS)
 					{
 						List<MonsterModifier> modList = MonsterModifier.ListAvailableModifiersFor(sim.monsterType, sim.count, (int)poolCount);
 						int modIndex = Bootstrap.random.Next(modList.Count + 1);

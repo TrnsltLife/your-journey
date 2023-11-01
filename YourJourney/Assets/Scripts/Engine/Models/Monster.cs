@@ -13,6 +13,7 @@ using static LanguageManager;
 public class Monster
 {
 	public static readonly int MAX_MODIFIERS = 7;
+	public static readonly int REASONABLE_MODIFIERS = 3;
 
 	public Guid GUID;
 	public int id;
