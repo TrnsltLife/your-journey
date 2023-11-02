@@ -114,6 +114,14 @@ public class Monster
 
 	}
 
+	public void UpdateModifiersAndElite()
+    {
+		if (isArmored && !modifierList.Contains(MonsterModifier.ARMORED)) { modifierList.Add(MonsterModifier.ARMORED); isArmored = false; }
+		if (isBloodThirsty && !modifierList.Contains(MonsterModifier.BLOODTHIRSTY)) { modifierList.Add(MonsterModifier.BLOODTHIRSTY); isBloodThirsty = false; }
+		if (isLarge && !modifierList.Contains(MonsterModifier.LARGE)) { modifierList.Add(MonsterModifier.LARGE); isLarge = false; }
+		if (modifierList.Count > 0) { isElite = true; }
+	}
+
 	public void LoadCustomModifiers(ObservableCollection<MonsterModifier> customModifiers)
 	{
 		//The default JSON converter for MonsterModifier can't look at the scenario's list of custom MonsterModifiers. So we need to hydrate it when we load the Monster in the MonsterEditorWindow.

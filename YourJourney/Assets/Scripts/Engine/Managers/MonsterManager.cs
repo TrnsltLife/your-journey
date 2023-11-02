@@ -79,20 +79,8 @@ public class MonsterManager : MonoBehaviour
 
 		bar.DOLocalMoveY( 50, .75f ).SetEase( Ease.InOutCubic );
 
-		//apply elite modifier bonuses
-		if ( m.isArmored )
-		{
-			m.AddModifier(MonsterModifier.ARMORED);
-		}
-		if ( m.isLarge )
-        {
-			m.AddModifier(MonsterModifier.LARGE);
-
-		}
-		if ( m.isBloodThirsty )
-        {
-			m.AddModifier(MonsterModifier.BLOODTHIRSTY);
-		}
+		//apply elite modifier bonuses from legacy isArmored, isBloodThirsty, and isLarge
+		m.UpdateModifiersAndElite();
 
 		foreach (var mod in m.modifierList)
         {
