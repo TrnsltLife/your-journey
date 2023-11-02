@@ -5,6 +5,8 @@ using System.Linq;
 using System;
 using static LanguageManager;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
+using TMPro;
 
 public class CombatPanel : MonoBehaviour
 {
@@ -17,6 +19,8 @@ public class CombatPanel : MonoBehaviour
 	public Button applyButton;
 	public Button[] modifierButtons;
 	public GameObject[] monsterImages;
+	public GameObject[] monsterModifierLabels;
+	public TextMeshProUGUI modifierDescriptionText;
 	public Image bannerIcon;
 
 	CombatModify modifier;
@@ -70,6 +74,7 @@ public class CombatPanel : MonoBehaviour
 	public bool Show( Monster monster, Sprite bannerSprite, int skinVariant = 0 )
 	{
 		Debug.Log("CombatPanel.Show(" + monster.dataName + ")");
+		this.monster = monster;
 		UpdateSkin((int)monster.monsterType, skinVariant);
 		SetBanner(bannerSprite);
 
@@ -116,18 +121,85 @@ public class CombatPanel : MonoBehaviour
 		applyButton.interactable = true;
 		damage = 0;
 		damageText.text = damage.ToString();
-		this.monster = monster;
 		foreach ( var m in monsterItems )
 			m.Hide();
 		for ( int i = 0; i < monster.count; i++ )
 			monsterItems[i].Show( monster, i );
 		//monsterName.text = monster.dataName;
 		monsterName.text = Monster.MonsterNameObject(monster, monster.count);
-		large.SetActive( monster.isLarge );
-		armored.SetActive( monster.isArmored );
-		bloodthirsty.SetActive( monster.isBloodThirsty );
+		ShowModifierLabels(monster);
+		modifierDescriptionText.text = "";
+		//large.SetActive( monster.isLarge );
+		//armored.SetActive( monster.isArmored );
+		//bloodthirsty.SetActive( monster.isBloodThirsty );
 
 		return true;
+	}
+
+	public void ShowModifierLabels(Monster monster)
+    {
+		large.SetActive(false);
+		armored.SetActive(false);
+		bloodthirsty.SetActive(false);
+
+		for (int i = 0; i < Monster.MAX_MODIFIERS; i++)
+        {
+			monsterModifierLabels[i].SetActive(false);
+        }
+
+		monster.RandomizeModifiers();
+
+		for (int i=0; i<monster.modifierList.Count; i++)
+        {
+			Text t = monsterModifierLabels[i].GetComponent<Text>();
+			if (monster.modifierList[i].id >= MonsterModifier.START_OF_CUSTOM_MODIFIERS)
+			{
+				t.text = Interpret("enemyBonus." + monster.modifierList[i].dataName + ".name", monster.modifierList[i].name);
+			}
+			else
+			{
+				t.text = Translate("combat.bonus." + monster.modifierList[i].name, monster.modifierList[i].name);
+			}
+			monsterModifierLabels[i].SetActive(true);
+        }
+    }
+
+	public void PointerEnterModifierLabel(int modifierIndex)
+    {
+		Debug.Log("PointerEnterModifierLabel(" + modifierIndex + ")");
+
+		if (modifierIndex <= monster.modifierList.Count)
+		{
+			MonsterModifier mod = monster.modifierList[modifierIndex];
+			List<string> mods = new List<string>();
+			if (mod.health != 0) { mods.Add((mod.health > 0 ? "+" : "") + mod.health + " " + Translate("combat.modifier.Health", "Health")); }
+			if (mod.armor != 0) { mods.Add((mod.armor > 0 ? "+" : "") + mod.armor + " " + Translate("combat.modifier.Armor", "Armor")); }
+			if (mod.sorcery != 0) { mods.Add((mod.sorcery > 0 ? "+" : "") + mod.sorcery + " " + Translate("combat.modifier.Sorcery", "Sorcery")); }
+			if (mod.damage != 0) { mods.Add((mod.damage > 0 ? "+" : "") + mod.damage + " " + Translate("damage.Damage", "Damage")); }
+			if (mod.fear != 0) { mods.Add((mod.fear > 0 ? "+" : "") + mod.fear + " " + Translate("damage.Fear", "Fear")); }
+
+			List<string> immunities = new List<string>();
+			if (mod.immuneCleave || mod.fakeCleave) { immunities.Add(Translate("combat.button.Cleave", "Cleave")); }
+			if (mod.immuneLethal || mod.fakeLethal) { immunities.Add(Translate("combat.button.Lethal", "Lethal")); }
+			if (mod.immunePierce || mod.fakePierce) { immunities.Add(Translate("combat.button.Pierce", "Pierce")); }
+			if (mod.immuneSmite || mod.fakeSmite) { immunities.Add(Translate("combat.button.Smite", "Smite")); }
+			if (mod.immuneStun || mod.fakeStun) { immunities.Add(Translate("combat.button.Stun", "Stun")); }
+			if (mod.immuneSunder || mod.fakeSunder) { immunities.Add(Translate("combat.button.Sunder", "Sunder")); }
+
+			if(immunities.Count > 0) { mods.Add(Translate("combat.modifier.ImmuneTo", "Immune to") + " " + string.Join(", ", immunities)); }
+
+			modifierDescriptionText.text = string.Join("; ", mods);
+		}
+		else
+        {
+			modifierDescriptionText.text = "";
+        }
+    }
+
+	public void PointerExitModifierLabel(int modifierIndex)
+	{
+		Debug.Log("PointerExitModifierLabel(" + modifierIndex + ")");
+		modifierDescriptionText.text = "";
 	}
 
 	public void Hide( bool unselect = false )
@@ -186,7 +258,12 @@ public class CombatPanel : MonoBehaviour
 
 	void DoDamage()
 	{
-		modifier = new CombatModify() { Pierce = pierceSelected, Smite = smiteSelected, Sunder = sunderSelected, Cleave = cleaveSelected, Lethal = lethalSelected, Stun = stunSelected };
+		modifier = new CombatModify() { Pierce = pierceSelected && !monster.immunePierce, 
+										Smite = smiteSelected && !monster.immuneSmite, 
+										Sunder = sunderSelected && !monster.immuneSunder, 
+										Cleave = cleaveSelected && !monster.immuneCleave, 
+										Lethal = lethalSelected && !monster.immuneLethal, 
+										Stun = stunSelected && !monster.immuneStun };
 
 		int r = monsterItems[0].Damage( damage, modifier );
 		if ( monster.count > 1 )
@@ -253,16 +330,16 @@ public class CombatPanel : MonoBehaviour
 					}
 					else if (sp.doingShadowPhase)//otherwise at least 1 killed, remove
 					{
+						MonsterManager.ReturnMonsterToPool(monster.monsterType, monster.deadCount);
 						monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
 						string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monsterName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
-
-						im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, null
-							);
+						im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, null);
 					}
 					else if (!sp.doingShadowPhase)//otherwise not in SP, continue
 					{
 						if (monster.deathTally < monster.count)
 						{
+							MonsterManager.ReturnMonsterToPool(monster.monsterType, monster.deadCount);
 							monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
 							string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monster.dataName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
 

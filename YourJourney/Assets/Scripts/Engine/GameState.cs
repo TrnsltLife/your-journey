@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -457,6 +458,7 @@ public class ObjectiveState
 public class MonsterState
 {
 	public List<SingleMonsterState> monsterList = new List<SingleMonsterState>();
+	public List<int> monsterPool = new List<int>();
 }
 
 public class SingleMonsterState

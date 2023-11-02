@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using DG.Tweening;
 using Newtonsoft.Json;
@@ -86,8 +87,10 @@ public class Engine : MonoBehaviour
 			return;
 		}
 
-		//Load Monster Activations
+		//Load Monster Activations, Modifiers
 		LoadDefaultMonsterActivations();
+		LoadDefaultMonsterModifiers();
+		LoadCustomMonsterModifiers();
 
 		//Load Skins
 		var skinsManager = GetComponent<SkinsManager>();
@@ -149,6 +152,30 @@ public class Engine : MonoBehaviour
 		}
     }
 
+	private void LoadDefaultMonsterModifiers()
+    {
+		Debug.Log("LoadDefaultMonsterMOdifiers()");
+		List<MonsterModifier> modifiers = MonsterModifier.Values.ToList();
+		foreach(var modifier in modifiers)
+        {
+			scenario.monsterModifiersObserver.Add(modifier);
+        }
+		Debug.Log("LoadDefaultMonsterMOdifiers() finished");
+	}
+
+	private void LoadCustomMonsterModifiers()
+    {
+		Debug.Log("LoadCustomMonsterMOdifiers()");
+		foreach (ThreatInteraction threat in scenario.interactionObserver.Where(it => it.interactionType == InteractionType.Threat))
+		{
+			foreach (Monster monster in threat.monsterCollection)
+			{
+				monster.LoadCustomModifiers(scenario.monsterModifiersObserver);
+			}
+		}
+		Debug.Log("LoadCustomMonsterMOdifiers() finished");
+	}
+
 	IEnumerator BeginGame()
 	{
 		while ( !doneLoading )
@@ -179,6 +206,7 @@ public class Engine : MonoBehaviour
 
 	public void StartNewGame()
 	{
+		MonsterManager.InitMonsterPool(); //Reset monster pool very time a new game is started so last game's monster pool doesn't persist to the new game.
 		if ( !debug )
 		{
 			//only show intro text if it's not empty

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
@@ -11,6 +12,9 @@ using static LanguageManager;
 /// </summary>
 public class Monster
 {
+	public static readonly int MAX_MODIFIERS = 7;
+	public static readonly int REASONABLE_MODIFIERS = 3;
+
 	public Guid GUID;
 	public int id;
 	public int index;
@@ -39,6 +43,9 @@ public class Monster
 	public bool isBloodThirsty;
 	public bool isArmored;
 	public bool isElite;
+	[JsonConverter(typeof(MonsterModifierListConverter))]
+	public List<MonsterModifier> modifierList = new List<MonsterModifier>();
+	public int randomizedModifiersCount;
 	public bool hasBanner = false;
 	public Ability negatedBy { get; set; }
 	public MonsterType monsterType { get; set; }
@@ -46,6 +53,12 @@ public class Monster
 	public int movementValue;
 	public int loreReward;
 	public bool defaultStats;
+	public bool immuneCleave { get; set; } = false;
+	public bool immuneLethal { get; set; } = false;
+	public bool immunePierce { get; set; } = false;
+	public bool immuneSmite { get; set; } = false;
+	public bool immuneStun { get; set; } = false;
+	public bool immuneSunder { get; set; } = false;
 
 	[DefaultValue( true )]
 	[JsonProperty( DefaultValueHandling = DefaultValueHandling.Populate )]
@@ -78,26 +91,6 @@ public class Monster
 	public float fCost;
 	public float singlecost;
 
-	//lines up with MonsterType enum
-	public static int[] MonsterCost = new int[] { 7, 4, 10, 9, 14, 25, 17, //Core Set
-		1000, 1000, 1000, //Villains of Eriador
-		5, 4, 14, 17, 27, 20, 1000, 36, //Shadowed Paths
-		1000, 1000, 1000, //Dwellers in Darkness
-		24, 14, 22, 30, 8, 11, //Spreading War
-		1000, 1000, 1000 //Scourges of the Wastes
-	};
-
-	public static int[] MonsterCount = new int[] { 6, 6, 3, 6, 3, 1, 3, //Core Set
-		1, 1, 1, //Villains of Eriador
-		6, 6, 3, 3, 3, 2, 1, 1, //Shadowed Paths
-		1, 1, 1, //Dwellers in Darkness
-		3, 3, 2, 1, 6, 6, //Spreading War
-		1, 1, 1, //Scourges of the Wastes
-	};
-	//large, bloodthirsty, armored
-	public static int[] ModCost = new int[] { 3, 6, 4, 4, 7, 3, 6, 6, 10, 8, 9, 6, 10 };
-	public static string[] modNames = new string[13] { "Large", "Bloodthirsty", "Armored", "Huge", "Shrouded", "Terrifying", "Spike Armor", "Well-Equipped", "Veteran", "Wary", "Guarded", "Hardened", "Alert" };
-
 	/// <summary>
 	/// returns # of monsters that are alive
 	/// </summary>
@@ -119,6 +112,140 @@ public class Monster
 	public Monster()
 	{
 
+	}
+
+	public void UpdateModifiersAndElite()
+    {
+		if (isArmored && !modifierList.Contains(MonsterModifier.ARMORED)) { modifierList.Add(MonsterModifier.ARMORED); isArmored = false; }
+		if (isBloodThirsty && !modifierList.Contains(MonsterModifier.BLOODTHIRSTY)) { modifierList.Add(MonsterModifier.BLOODTHIRSTY); isBloodThirsty = false; }
+		if (isLarge && !modifierList.Contains(MonsterModifier.LARGE)) { modifierList.Add(MonsterModifier.LARGE); isLarge = false; }
+		if (modifierList.Count > 0) { isElite = true; }
+	}
+
+	public void LoadCustomModifiers(ObservableCollection<MonsterModifier> customModifiers)
+	{
+		//The default JSON converter for MonsterModifier can't look at the scenario's list of custom MonsterModifiers. So we need to hydrate it when we load the Monster in the MonsterEditorWindow.
+		for (int i = 0; i < modifierList.Count; i++)
+		{
+			if (modifierList[i].id >= MonsterModifier.START_OF_CUSTOM_MODIFIERS)
+			{
+				MonsterModifier modData = customModifiers.First(it => it.id == modifierList[i].id);
+				if (modData != null)
+				{
+					modifierList[i] = modData;
+				}
+			}
+		}
+	}
+
+	public bool AddModifier(MonsterModifier mod)
+    {
+		if (modifierList.Count < MAX_MODIFIERS && !modifierList.Contains(mod))
+        {
+			modifierList.Add(mod);
+			return true;
+        }
+		return false;
+    }
+
+	public void RandomizeModifiers()
+    {
+		//If randomizedModifiersCount is set to a number greater than 0 and less than modifierList.Count, pick thta number of modifiers at random.
+
+		if(randomizedModifiersCount == 0 || randomizedModifiersCount == modifierList.Count) { return; } //use all the modifiers
+
+		MonsterModifier[] modifierArray = GlowEngine.RandomizeArray(modifierList.ToArray());
+		modifierList.Clear();
+		for(int i = 0; i < randomizedModifiersCount && i < modifierArray.Length; i++)
+        {
+			modifierList.Add(modifierArray[i]);
+        }
+		randomizedModifiersCount = 0; //Set to 0 so any future calls to this function will not change the modifierList.
+    }
+
+	public int CalculateExtraDamage()
+	{
+		int extra = 0;
+		foreach (var mod in modifierList)
+		{
+			extra += mod.damage;
+		}
+		return extra;
+	}
+
+	public int CalculateExtraFear()
+    {
+		int extra = 0;
+		foreach(var mod in modifierList)
+        {
+			extra += mod.fear;
+        }
+		return extra;
+    }
+
+	public static List<MonsterType> Goblins()
+	{
+		return new List<MonsterType> { MonsterType.GoblinScout, MonsterType.GoblinScout, MonsterType.VargRider };
+	}
+
+	public static List<MonsterType> Orcs()
+	{
+		return new List<MonsterType> { MonsterType.OrcHunter, MonsterType.OrcMarauder, MonsterType.OrcTaskmaster, MonsterType.HighOrcWarrior, MonsterType.Gargletarg, MonsterType.SupplicantOfMoreGoth, MonsterType.LordJavelin };
+	}
+
+	public static List<MonsterType> Humans()
+	{
+		return new List<MonsterType> { MonsterType.Ruffian, MonsterType.Soldier, MonsterType.Atari, MonsterType.Endris };
+	}
+
+	public static List<MonsterType> Spirits()
+	{
+		return new List<MonsterType> { MonsterType.Wight, MonsterType.Shadowman, MonsterType.Ursula, MonsterType.LichKing };
+	}
+
+	public static List<MonsterType> Trolls()
+	{
+		return new List<MonsterType> { MonsterType.CaveTroll, MonsterType.HillTroll, MonsterType.Oliver };
+	}
+
+	public static List<MonsterType> Vargs()
+	{
+		return new List<MonsterType> { MonsterType.HungryVarg, MonsterType.VargRider, MonsterType.Chartooth };
+	}
+
+	public static List<MonsterType> Spiders()
+	{
+		return new List<MonsterType> { MonsterType.GiantSpider, MonsterType.SpawnOfUglygiant };
+	}
+
+	public static List<MonsterType> Flying()
+    {
+		return new List<MonsterType> { MonsterType.Balerock, MonsterType.FoulBeast, MonsterType.LichKing };
+	}
+
+	public static List<MonsterType> OtherBeasts()
+	{
+		return new List<MonsterType> { MonsterType.WarElephant, MonsterType.AnonymousThing };
+	}
+
+	public static List<MonsterType> AllBeasts()
+	{
+		List<MonsterType> monsterList = new List<MonsterType>();
+		monsterList.AddRange(Trolls());
+		monsterList.AddRange(Vargs());
+		monsterList.AddRange(Spiders());
+		monsterList.AddRange(Flying());
+		monsterList.AddRange(OtherBeasts());
+		return monsterList;
+	}
+
+	public static List<MonsterType> Humanoid()
+	{
+		List<MonsterType> monsterList = new List<MonsterType>();
+		monsterList.AddRange(Goblins());
+		monsterList.AddRange(Orcs());
+		monsterList.AddRange(Humans());
+		return monsterList;
 	}
 
 	//returns true if this monster can appear in current difficulty
@@ -149,22 +276,25 @@ public class Monster
 		int f = total - d;
 		if ( d == 0 && f == 0 )
 			d = 1;
+
+		//If isFearsome is true, the Fear should always be greater than the damage
 		if ( isFearsome )
 		{
-			int temp = d;
-			if ( f > d )
-			{
-				d = f;
-				f = temp;
-			}
-		}
-		else
-		{
 			int temp = f;
-			if ( d > f )
+			if (d > f)
 			{
 				f = d;
 				d = temp;
+			}
+		}
+		//Otherwise, make damage greater than fear
+		else
+		{
+			int temp = d;
+			if (f > d)
+			{
+				d = f;
+				f = temp;
 			}
 		}
 
@@ -310,7 +440,7 @@ public class Monster
 				mMoveSpecial = new string[] { };
 				mRanged = false;
 				mGroupLimit = 3;
-				mFigureLimit = 6;
+				mFigureLimit = 3;
 				mCost = new int[] { 9, 17, 25 };
 				mTag = new string[] { "Orc", "Slow" };
 				mSpeed = 1;
@@ -393,7 +523,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Powerful", "Small" };
 				mSpeed = 2;
 				mDamage = 4;
@@ -413,7 +543,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Orc", "Powerful" };
 				mSpeed = 1;
 				mDamage = 4;
@@ -433,7 +563,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Fast" };
 				mSpeed = 3;
 				mDamage = 4;
@@ -573,9 +703,9 @@ public class Monster
 				mMoveB = 2;
 				mMoveSpecial = new string[] { };
 				mRanged = false;
-				mGroupLimit = 3;
-				mFigureLimit = 3;
-				mCost = new int[] { 1000, 0, 0 };
+				mGroupLimit = 1;
+				mFigureLimit = 1;
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Powerful", "Large", "Slow" };
 				mSpeed = 1;
 				mDamage = 4;
@@ -595,7 +725,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Powerful", "Large" };
 				mSpeed = 2;
 				mDamage = 4;
@@ -617,7 +747,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Orc", "Powerful", "Slow" };
 				mSpeed = 1;
 				mDamage = 3;
@@ -657,7 +787,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Large", "Slow" };
 				mSpeed = 1;
 				mDamage = 4;
@@ -801,7 +931,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Powerful" };
 				mSpeed = 2;
 				mDamage = 3;
@@ -821,7 +951,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Beast", "Powerful", "Fast", "Flying" };
 				mSpeed = 3;
 				mDamage = 4;
@@ -841,7 +971,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Small" };
 				mSpeed = 2;
 				mDamage = 2;
@@ -893,7 +1023,7 @@ public class Monster
 			special = mSpecial,
 			isFearsome = mFearsome,
 			triggerName = "None",
-			singlecost = MonsterCost[(int)mType],
+			singlecost = mCost[0],
 			isEasy = true,
 			isNormal = true,
 			isHard = true,

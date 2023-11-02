@@ -10,6 +10,7 @@ public enum MonsterType { Ruffian, GoblinScout, OrcHunter, OrcMarauder, HungryVa
 						SupplicantOfMoreGoth, Ursula, Oliver,
 						FoulBeast, VargRider, SiegeEngine, WarElephant, Soldier, HighOrcWarrior,
 						LordJavelin, LichKing, Endris }
+public enum MonsterModifierGroup { None, Basic, Extended, Named, Custom }
 public enum CombatModifier { None, Pierce, Smite, Sunder, Cleave, Lethal, Stun }
 public enum TileType { Hex, Battle, Square }
 public enum ProjectType { Standalone, Campaign }

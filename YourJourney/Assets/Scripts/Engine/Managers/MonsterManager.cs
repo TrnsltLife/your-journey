@@ -25,12 +25,38 @@ public class MonsterManager : MonoBehaviour
 	public float scalar;
 	[HideInInspector]
 	public List<Monster> monsterList = new List<Monster>();
+	[HideInInspector]
+	public static List<int> monsterPool = new List<int>();
 
 	private void Start()
 	{
 		attachRect = buttonAttach.GetComponent<RectTransform>();
 		scalar = canvas.scaleFactor;
 		LoadBanners();
+		InitMonsterPool();
+	}
+
+	public static void InitMonsterPool()
+    {
+		monsterPool.Clear();
+		monsterPool.AddRange(Monsters.List().Select(m => m.figureLimit));
+    }
+
+	public static int LeftInPool(MonsterType monsterType)
+    {
+		return monsterPool[(int)monsterType];
+	}
+
+	public static void RemoveMonsterFromPool(MonsterType monsterType, int amount)
+    {
+		if(amount < 0) { return; }
+		monsterPool[(int)monsterType] -= amount;
+	}
+
+	public static void ReturnMonsterToPool(MonsterType monsterType, int amount)
+	{
+		if (amount < 0) { return; }
+		monsterPool[(int)monsterType] += amount;
 	}
 
 	public void UpdateSkins()
@@ -53,13 +79,22 @@ public class MonsterManager : MonoBehaviour
 
 		bar.DOLocalMoveY( 50, .75f ).SetEase( Ease.InOutCubic );
 
-		//apply elite modifier bonuses
-		if ( m.isArmored )
-			m.shieldValue += 1;
-		if ( m.isLarge )
-			m.health += 2;
-		if ( m.isBloodThirsty )
-			m.damage += 1;
+		//apply elite modifier bonuses from legacy isArmored, isBloodThirsty, and isLarge
+		m.UpdateModifiersAndElite();
+
+		foreach (var mod in m.modifierList)
+        {
+			m.health += mod.health;
+			m.shieldValue += mod.armor;
+			m.sorceryValue += mod.sorcery;
+			//Note: extra damage and fear are added during combat in DamagePanel.ShowCombatCounter()
+			if(mod.immuneCleave) m.immuneCleave = true;
+			if (mod.immuneLethal) m.immuneLethal = true;
+			if (mod.immunePierce) m.immunePierce = true;
+			if (mod.immuneSmite) m.immuneSmite = true;
+			if (mod.immuneStun) m.immuneStun = true;
+			if (mod.immuneSunder) m.immuneSunder = true;
+        }
 
 		m.interaction = interaction;
 		m.currentHealth = new int[3] { m.health, m.health, m.health };
@@ -194,6 +229,7 @@ public class MonsterManager : MonoBehaviour
 			ThreatInteraction ti = m.interaction;
 			int foo = monsterList.Count( x => x.interaction.GUID == m.interaction.GUID );
 
+			MonsterManager.ReturnMonsterToPool(m.monsterType, m.deadCount);
 			string monsterName = Monster.MonsterNameObject(m, m.deadCount);
 			//Debug.Log("Get name for " + m.dataName + "/" + m.enumName + "/" + m.count + "/" + m.deadCount + "/" + m.deathTally + " => " + monsterName);
 			string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {m.deadCount} {m.dataName}(s) from the board.", new List<string> { m.deadCount.ToString(), monsterName });
@@ -317,6 +353,8 @@ public class MonsterManager : MonoBehaviour
 
 		scrollOffset = -517;
 		buttonAttach.localPosition = buttonAttach.localPosition.X( -517 );
+
+		monsterPool = monsterState.monsterPool;
 	}
 
 	public void LoadBanners()
@@ -365,7 +403,8 @@ public class MonsterManager : MonoBehaviour
 			} );
 		return new MonsterState()
 		{
-			monsterList = sms
+			monsterList = sms,
+			monsterPool = monsterPool
 		};
 	}
 }

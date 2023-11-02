@@ -384,11 +384,13 @@ public class InteractionManager : MonoBehaviour
 	{
 		List<Vector3> positions = new List<Vector3>();
 
+		((ThreatInteraction)it).RemoveUnavailableScriptedMonsters();
+
 		//generate the encounter using Pool System
-		List<Monster> poolList = ( (ThreatInteraction)it ).GenerateEncounter();
+		List <Monster> poolList = ( (ThreatInteraction)it ).GenerateEncounter();
 
 		//get VALID (correct difficulty) monsters, both pooled and scripted
-		var allMonsters = poolList.Concat( ( (ThreatInteraction)it ).monsterCollection.Where( m => m.IsValid() ) );
+		var allMonsters = poolList.Concat( ( (ThreatInteraction)it ).monsterCollection.Where( m => m.IsValid() && m.count > 0 ) );
 
 		//int groupCount = ( (ThreatInteraction)it ).monsterCollection.Where( m => m.IsValid() ).Count();
 		int groupCount = allMonsters.Count();

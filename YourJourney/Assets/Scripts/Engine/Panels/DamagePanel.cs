@@ -96,8 +96,8 @@ public class DamagePanel : MonoBehaviour
 		if (item != null)
 		{
 			//Debug.Log("item damage=" + item.damage.ToString() + " fear=" + item.fear.ToString() + " negate=" + ((Ability)item.negate));
-			sDamage = item.damage[groupIndex].ToString();
-			sFear = item.fear[groupIndex].ToString();
+			sDamage = (m.CalculateExtraDamage() + item.damage[groupIndex]).ToString();
+			sFear = (m.CalculateExtraFear() + item.fear[groupIndex]).ToString();
 			negatedBy = (Ability)item.negate;
 			if(negatedBy == Ability.Random) { negatedBy = (Ability)GlowEngine.GenerateRandomNumbers(6)[0]; }
 			string enemyKey = ((MonsterType)m.activationsId).ToString();
@@ -110,8 +110,8 @@ public class DamagePanel : MonoBehaviour
 		{
 			//Only apply Default damage if there are no Monster Activations
 			Tuple<int, int> damage = m.CalculateDamage();
-			sFear = damage.Item1.ToString();
-			sDamage = damage.Item2.ToString();
+			sDamage = (m.CalculateExtraDamage() + damage.Item2).ToString();
+			sFear = (m.CalculateExtraFear() + damage.Item1).ToString();
 			negatedBy = m.negatedBy;
 			negatedBy = (Ability)GlowEngine.GenerateRandomNumbers(6)[0]; //Randomize the ability instead of taking it from the monster (which is always Might right now)
 
