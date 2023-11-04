@@ -251,6 +251,7 @@ public class FileManager
 				var scenario = FileManager.LoadScenario(FileManager.GetFullPathWithCampaign(item.fileName, c.campaignGUID.ToString()));
 				item.collections = scenario.collectionObserver.ToList();
 				item.coverImage = scenario.coverImage;
+				item.specialInstructions = scenario.specialInstructions;
 				Debug.Log("setting coverImage for " + scenario.scenarioName + " " + item.coverImage);
 			}
 

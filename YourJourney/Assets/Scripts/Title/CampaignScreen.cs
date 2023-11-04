@@ -9,7 +9,8 @@ public class CampaignScreen : MonoBehaviour
 {
 	public SelectSaveSlot selectSaveSlot;
 	public SelectHeroes selectHeroes;
-	public StoryBox storyBox;
+	public StoryBox storyBox; //pop-up window, no longer used
+	public StoryBox storyBoxFormElement;
 	public Image finalFader;
 	public Button continueButton, backButton, continueReplayButton;
 	public GameObject fileItemButtonPrefab;
@@ -46,6 +47,8 @@ public class CampaignScreen : MonoBehaviour
 		tm = FindObjectOfType<TitleManager>();
 		tm.LoadScenarioImage(campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].coverImage);
 
+		OnShowStory();
+
 		bool finishedCampaign = !campaignState.scenarioStatus.Any( x => x == ScenarioStatus.NotPlayed );
 
 		for ( int i = 0; i < campaign.scenarioCollection.Count; i++ )
@@ -55,8 +58,14 @@ public class CampaignScreen : MonoBehaviour
 			go.Init( i, campaign.scenarioCollection[i].scenarioName,
 				"", //TODO collections?
 				ProjectType.Standalone, ( index ) => OnSelectScenario( index ) );
-			if ( campaignState.currentScenarioIndex != i || finishedCampaign )
+			if (campaignState.currentScenarioIndex != i || finishedCampaign)
+			{
 				go.RemoveRing();
+			}
+			if (campaignState.currentScenarioIndex == i)
+            {
+				OnShowStory(i);
+			}
 			go.SetSuccess( campaignState.scenarioStatus[i] );
 			fileItemButtons.Add( go );
 		}
@@ -175,6 +184,8 @@ public class CampaignScreen : MonoBehaviour
 			replayText.text = "";
 			//show haven't played message
 		}
+
+		OnShowStory(selectedIndex);
 	}
 
 	public void StartGame()
@@ -306,6 +317,12 @@ public class CampaignScreen : MonoBehaviour
 
 	public void OnShowStory()
 	{
-		storyBox.Show( campaignState.campaign.storyText, null );
+		storyBoxFormElement.storyText.text = campaignState.campaign.storyText;
+		//storyBox.Show( campaignState.campaign.storyText, null );
+	}
+
+	public void OnShowStory(int scenarioIndex)
+    {
+		storyBoxFormElement.storyText.text = campaign.scenarioCollection[scenarioIndex].specialInstructions;
 	}
 }

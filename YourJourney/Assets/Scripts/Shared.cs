@@ -150,6 +150,7 @@ public class CampaignItem
 	//TODO collections in CampaignScreen?
 	public List<int> collections { get; set; }
 	public string coverImage { get; set; }
+	public string specialInstructions { get; set; }
 }
 
 public class StateItem
