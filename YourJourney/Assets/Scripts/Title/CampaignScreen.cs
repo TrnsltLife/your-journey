@@ -9,6 +9,7 @@ public class CampaignScreen : MonoBehaviour
 {
 	public SelectSaveSlot selectSaveSlot;
 	public SelectHeroes selectHeroes;
+	public CampfireScreen campfireScreen;
 	public StoryBox storyBox; //pop-up window, no longer used
 	public StoryBox storyBoxFormElement;
 	public Image finalFader;
@@ -188,6 +189,12 @@ public class CampaignScreen : MonoBehaviour
 		OnShowStory(selectedIndex);
 	}
 
+	public void LoadCampfireScreen()
+    {
+		gameObject.SetActive( false );
+		campfireScreen.ActivateScreen(titleMetaData);
+    }
+
 	public void StartGame()
     {
 		gameObject.SetActive(false); //hide the SpecialInstructions form but leave scenarioOverlay with coverImage showing
@@ -220,6 +227,8 @@ public class CampaignScreen : MonoBehaviour
 		{
 			gameStarter.isNewGame = true;//start scenario fresh
 			Debug.Log( "NEW GAME" );
+			LoadCampfireScreen();
+			return;
 		}
 		else//saved state found, is it current scenario or replay?
 		{
@@ -232,6 +241,8 @@ public class CampaignScreen : MonoBehaviour
 			{
 				gameStarter.isNewGame = true;
 				Debug.Log( "NEW GAME" );
+				LoadCampfireScreen();
+				return;
 			}
 		}
 
