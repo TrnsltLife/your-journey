@@ -75,6 +75,10 @@ public class CampaignScreen : MonoBehaviour
 		replayStatusTextTranslation = replayStatusText.GetComponent<TextTranslation>();
 		CheckCampaignStatus();
 
+		//Turn gameTitle on since it may have been turned off by CampfireScreen
+		tm.gameTitle.SetActive(false);
+		tm.gameTitleFlash.SetActive(false);
+
 		gameObject.SetActive( true );
 
 		finalFader.DOFade( 0, .5f ).OnComplete( () =>

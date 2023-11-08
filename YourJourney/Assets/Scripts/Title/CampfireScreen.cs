@@ -22,6 +22,10 @@ public class CampfireScreen : MonoBehaviour
 
 		tm = FindObjectOfType<TitleManager>();
 
+		//Turn Your Journey game title off since we need the screen real estate
+		tm.gameTitle.SetActive(false);
+		tm.gameTitleFlash.SetActive(false);
+
 		gameObject.SetActive( true );
 
 		finalFader.DOFade( 0, .5f ).OnComplete( () =>
