@@ -170,6 +170,7 @@ public class TitleMetaData
 	public CampaignState campaignState;
 	public string[] selectedHeroes;
 	public int[] selectedHeroesIndex;
+	public int selectedHeroesCount;
 	public int saveStateIndex;
 	public string gameName;
 	public string coverImage;

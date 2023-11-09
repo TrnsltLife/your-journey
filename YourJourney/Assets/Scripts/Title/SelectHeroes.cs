@@ -26,7 +26,7 @@ public class SelectHeroes : MonoBehaviour
 	int lineupOffset = 0;
 	int lineupTotal = 0;
 	int lineupSize = 6;
-	int maxHeroes = 5;
+	public static readonly int maxHeroes = 5;
 	int heroCount = 0;
 
 
@@ -199,6 +199,7 @@ public class SelectHeroes : MonoBehaviour
 		string[] shn = new string[6].Fill( "" ); //names
 		int[] shi = new int[6].Fill(-1); //index, used for images
 		int shIndex = 0;
+		int shCount = 0;
 		for ( int j=0; j < lineupTotal; j++ )
 		{
 			if (selectedHeroes[j])
@@ -206,11 +207,13 @@ public class SelectHeroes : MonoBehaviour
 				shn[shIndex] = heroName[j];
 				shi[shIndex] = j; //AssetDatabase.GetAssetPath(heroImage[j]);
 				shIndex++;
+				shCount++;
 			}
 		}
-		shn = shn.Where( s => !string.IsNullOrEmpty( s ) ).ToArray();
-		titleMetaData.selectedHeroes = shn;
-		titleMetaData.selectedHeroesIndex = shi;
+		//shn = shn.Where( s => !string.IsNullOrEmpty( s ) ).ToArray();
+		titleMetaData.selectedHeroes = shn.Take(shCount).ToArray();
+		titleMetaData.selectedHeroesIndex = shi.Take(shCount).ToArray();
+		titleMetaData.selectedHeroesCount = shCount;
 
 		finalFader.DOFade( 1, .5f ).OnComplete( () =>
 		{
