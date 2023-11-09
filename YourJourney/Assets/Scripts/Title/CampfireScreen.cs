@@ -13,6 +13,8 @@ public class CampfireScreen : MonoBehaviour
 	public TextMeshProUGUI nameText, remainingPointsNumberText;
 	public Button[] heroButtons;
 	public Image[] heroImage;
+	public Image maleSilhouette;
+	public Image femaleSilhouette;
 	public Image portraitBackground;
 	public float heroImageWidth;
 	public float portraitMaxWidth;
@@ -74,6 +76,22 @@ public class CampfireScreen : MonoBehaviour
 		portraitBackground.rectTransform.sizeDelta = new Vector2(portraitBackgroundWidth, portraitBackground.rectTransform.sizeDelta.y);
 	}
 
+	public void SetSilhouette(int index)
+    {
+		int j = titleMetaData.selectedHeroesIndex[index];
+		Hero hero = Heroes.heroes[j];
+		if(hero?.sex == Sex.FEMALE)
+        {
+			maleSilhouette.gameObject.SetActive(false);
+			femaleSilhouette.gameObject.SetActive(true);
+        }
+		else
+        {
+			maleSilhouette.gameObject.SetActive(true);
+			femaleSilhouette.gameObject.SetActive(false);
+		}
+    }
+
 	public void OnHeroSelect(int index)
 	{
 		Debug.Log("Hero select " + index);
@@ -95,6 +113,7 @@ public class CampfireScreen : MonoBehaviour
 		};
 
 		nameText.text = titleMetaData.selectedHeroes[index];
+		SetSilhouette(index);
 
 		//beginButton.interactable = selectedHeroes.Any(b => b);
 	}

@@ -64255,6 +64255,8 @@ MonoBehaviour:
   - {fileID: 9954702}
   - {fileID: 809921465}
   - {fileID: 2091244419}
+  maleSilhouette: {fileID: 608352715}
+  femaleSilhouette: {fileID: 392450653}
   portraitBackground: {fileID: 1576894659}
   heroImageWidth: 280
   portraitMaxWidth: 1421.61
