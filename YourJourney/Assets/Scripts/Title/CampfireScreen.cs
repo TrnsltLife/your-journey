@@ -20,6 +20,12 @@ public class CampfireScreen : MonoBehaviour
 	public float portraitMaxWidth;
 	private float portraitExtraWidth = 0f;
 	//public TextTranslation remainingPointsTextTranslation, skillsTranslationText, roleItemsTranslationText;
+	public TMP_Dropdown skillDropdown, roleDropdown, armorDropdown, hand1Dropdown, hand2Dropdown, trinketDropdown, mountDropdown;
+	List<Item> armorList = new List<Item>();
+	List<Item> hand1List = new List<Item>();
+	List<Item> hand2List = new List<Item>();
+	List<Item> trinketList = new List<Item>();
+	List<Item> mountList = new List<Item>();
 
 	TitleManager tm;
 	TitleMetaData titleMetaData;
@@ -38,6 +44,12 @@ public class CampfireScreen : MonoBehaviour
 
 		SetImages();
 		OnHeroSelect(0);
+
+		PopulateItemDropdown(armorDropdown, armorList, ItemType.ARMOR, 1);
+		PopulateItemDropdown(hand1Dropdown, hand1List, ItemType.HAND, 1);
+		PopulateItemDropdown(hand2Dropdown, hand2List, ItemType.HAND, 1);
+		PopulateItemDropdown(trinketDropdown, trinketList, ItemType.TRINKET, 1);
+		PopulateItemDropdown(mountDropdown, mountList, ItemType.MOUNT, 0);
 
 		gameObject.SetActive( true );
 
@@ -79,7 +91,7 @@ public class CampfireScreen : MonoBehaviour
 	public void SetSilhouette(int index)
     {
 		int j = titleMetaData.selectedHeroesIndex[index];
-		Hero hero = Heroes.heroes[j];
+		Hero hero = Heroes.list[j];
 		if(hero?.sex == Sex.FEMALE)
         {
 			maleSilhouette.gameObject.SetActive(false);
@@ -91,6 +103,32 @@ public class CampfireScreen : MonoBehaviour
 			femaleSilhouette.gameObject.SetActive(false);
 		}
     }
+
+	public void PopulateItemDropdown(TMP_Dropdown dropdown, List<Item> itemList, ItemType type, int tier)
+    {
+		//populate dropdown
+		List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();
+		optionList.Add(new TMP_Dropdown.OptionData(Items.list[0].dataName));
+
+		int selectedIndex = 0;
+
+		List<Item> availableItems = Items.list.Where(item => item.typeId == type && item.tier == tier).ToList();
+		itemList.Clear();
+		itemList.AddRange(availableItems);
+
+		foreach (var item in itemList)
+		{
+			//TODO Translate
+			Collection collection = Collection.FromID(item.collection);
+			string collectionText = "<font=\"Icon\">" + collection.FontCharacter + "</font> ";
+			if(collection == Collection.SPREADING_WAR) { collectionText += " "; } //make it line up better with wider symbols
+			string count = item.count > 1 ? " (" + item.count + ")" : "";
+			optionList.Add(new TMP_Dropdown.OptionData(collectionText + item.dataName + count));
+		}
+		dropdown.ClearOptions();
+		dropdown.AddOptions(optionList);
+		dropdown.SetValueWithoutNotify(selectedIndex);
+	}
 
 	public void OnHeroSelect(int index)
 	{
