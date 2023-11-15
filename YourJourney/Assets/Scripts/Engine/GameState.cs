@@ -201,9 +201,10 @@ public class GameState
 					heroes = state.partyState.heroes.Aggregate( ( acc, cur ) => acc + ", " + cur ),
 					heroArray = state.partyState.heroes,
 					heroIndexArray = state.partyState.heroesIndex,
+					characterSheets = state.partyState.characterSheets,
 					projectType = ProjectType.Standalone,
 					campaignState = null
-				} );
+				} );;
 			}
 			//it's a campaign
 			else if ( state != null && state.campaignState != null )
@@ -217,6 +218,7 @@ public class GameState
 					coverImage = state.coverImage,
 					heroes = state.campaignState.heroes.Aggregate( ( acc, cur ) => acc + ", " + cur ),
 					heroIndexArray = state.campaignState.heroesIndex,
+					characterSheets = state.campaignState.characterSheets,
 					projectType = ProjectType.Campaign,
 					campaignState = state.campaignState,
 					stateGUID = state.campaignState.campaign.campaignGUID,
@@ -272,6 +274,7 @@ public class CampaignState
 	public int saveStateIndex;
 	public string[] heroes;
 	public int[] heroesIndex;
+	public List<CharacterSheet> characterSheets;
 	public string gameName;
 	public Difficulty difficulty;
 	//list of FIRED campaign triggers
@@ -346,6 +349,7 @@ public class PartyState
 	public Difficulty difficulty { get; set; }
 	public string[] heroes { get; set; }
 	public int[] heroesIndex { get; set; }
+	public List<CharacterSheet> characterSheets { get; set; }
 	public int[] lastStandCounter { get; set; }
 	public bool[] isDead { get; set; }
 	public int loreCount { get; set; }
@@ -375,6 +379,7 @@ public class PartyState
 			threatStack = engine.endTurnButton.threatStack,
 			heroes = Bootstrap.gameStarter.heroes,
 			heroesIndex = Bootstrap.gameStarter.heroesIndex,
+			characterSheets = Bootstrap.gameStarter.characterSheets,
 			lastStandCounter = Bootstrap.lastStandCounter,
 			isDead = Bootstrap.isDead,
 			fogList = engine.GetFogState(),
@@ -390,6 +395,7 @@ public class PartyState
 		Bootstrap.gameStarter.scenarioFileName = scenarioFileName;
 		Bootstrap.gameStarter.heroes = heroes;
 		Bootstrap.gameStarter.heroesIndex = heroesIndex;
+		Bootstrap.gameStarter.characterSheets = characterSheets;
 		Bootstrap.gameStarter.loreStartValue = loreStartValue;
 		Bootstrap.gameStarter.xpStartValue = xpStartValue;
 

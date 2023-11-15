@@ -10,6 +10,8 @@ using UnityEngine;
 /// </summary>
 public class Collection
 {
+    public static readonly Collection NONE = new Collection(0, "None", "");
+
     public static readonly Collection CORE_SET = new Collection(1, "Core Set", "r",
         //new Monster[] { new Monster(0), new Monster(1), new Monster(2), new Monster(3), new Monster(4), new Monster(5), new Monster(6) },
         new int[] { 100, 101, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 300, 301, 302, 303, 304, 305, 306, 307, 308, 400, 998, 999 }, //tileId
@@ -84,6 +86,13 @@ public class Collection
     public Boolean DifficultGround { get; private set; }
     public Boolean Fortified { get; private set; }
 
+    Collection(int id, string name, string fontCharacter)
+    {
+        this.ID = id;
+        this.Name = name;
+        this.FontCharacter = fontCharacter;
+    }
+
     Collection(int id, string name, string fontCharacter, /*Monster[] monsters,*/ int[] tileNumbers, Boolean difficultGround, Boolean fortified) =>
         (ID, Name, FontCharacter, /*Monsters,*/ TileNumbers, DifficultGround, Fortified) =
         (id, name, fontCharacter, /*monsters,*/ tileNumbers, difficultGround, fortified);
@@ -94,6 +103,8 @@ public class Collection
     {
         switch (id)
         {
+            case 0:
+                return Collection.NONE;
             case 1:
                 return Collection.CORE_SET;
             case 2:
@@ -115,6 +126,8 @@ public class Collection
     {
         switch (name)
         {
+            case "None":
+                return Collection.NONE;
             case "Core Set":
                 return Collection.CORE_SET;
             case "Villains of Eriador":

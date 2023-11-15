@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 using TMPro;
+using System.Collections.Generic;
 
 public class SelectHeroes : MonoBehaviour
 {
@@ -196,24 +197,48 @@ public class SelectHeroes : MonoBehaviour
 	public void OnNext()
 	{
 		beginButton.interactable = backButton.interactable = false;
-		string[] shn = new string[6].Fill( "" ); //names
-		int[] shi = new int[6].Fill(-1); //index, used for images
-		int shIndex = 0;
-		int shCount = 0;
-		for ( int j=0; j < lineupTotal; j++ )
-		{
+		List<CharacterSheet> characterSheets = titleMetaData.characterSheets;
+		if(characterSheets == null) { characterSheets = new List<CharacterSheet>(); }
+		//Attempt to preserve any CharacterSheet that had already been filled in on the Campfire screen,
+		//so the Role and Item selections remain even if new characters are added or other characters are removed.
+		for(int j=0; j<lineupTotal; j++)
+        {
+			CharacterSheet character = characterSheets.FirstOrDefault(it => it.portraitIndex == j);
 			if (selectedHeroes[j])
-			{
-				shn[shIndex] = heroName[j];
-				shi[shIndex] = j; //AssetDatabase.GetAssetPath(heroImage[j]);
-				shIndex++;
-				shCount++;
+            {
+				if(character == null)
+                {
+					Hero hero = Heroes.FromID(j);
+					int characterIndex = characterSheets.Count;
+					character = new CharacterSheet(heroName[j], j) { race = hero.race, sex = hero.sex, maxHanded = hero.maxHanded, role = hero.role,
+						armorId = Items.FirstAvailable(hero.armor, 1, characterSheets, characterIndex, 0), 
+						hand1Id = Items.FirstAvailable(hero.hand1, 1, characterSheets, characterIndex, 1), 
+						hand2Id = Items.FirstAvailable(hero.hand2, 1, characterSheets, characterIndex, 2), 
+						mountId = Items.FirstAvailable(hero.mount, 1, characterSheets, characterIndex, 0)
+					};
+					characterSheets.Add(character);
+                }
+				else
+                {
+					character.name = heroName[j];
+                }
+            }
+			else
+            {
+				if(character != null)
+				{
+					characterSheets.Remove(character);
+				}
 			}
 		}
-		//shn = shn.Where( s => !string.IsNullOrEmpty( s ) ).ToArray();
-		titleMetaData.selectedHeroes = shn.Take(shCount).ToArray();
-		titleMetaData.selectedHeroesIndex = shi.Take(shCount).ToArray();
-		titleMetaData.selectedHeroesCount = shCount;
+		titleMetaData.selectedHeroes = characterSheets.ConvertAll(it => it.name).ToArray();
+		titleMetaData.selectedHeroesIndex = characterSheets.ConvertAll(it => it.portraitIndex).ToArray();
+		titleMetaData.characterSheets = characterSheets;
+
+		foreach(CharacterSheet cs in characterSheets)
+        {
+			Debug.Log(cs.name + ": " + Items.FromID(cs.armorId).dataName + " / " + Items.FromID(cs.hand1Id).dataName + " / " + Items.FromID(cs.hand2Id).dataName + " / " + Items.FromID(cs.mountId).dataName);
+        }
 
 		finalFader.DOFade( 1, .5f ).OnComplete( () =>
 		{
@@ -229,6 +254,7 @@ public class SelectHeroes : MonoBehaviour
 				titleMetaData.campaignState = campaignState;
 				titleMetaData.campaignState.heroes = titleMetaData.selectedHeroes;
 				titleMetaData.campaignState.heroesIndex = titleMetaData.selectedHeroesIndex;
+				titleMetaData.campaignState.characterSheets = titleMetaData.characterSheets;
 				titleMetaData.campaignState.gameName = titleMetaData.gameName;
 				titleMetaData.campaignState.saveStateIndex = titleMetaData.saveStateIndex;
 				titleMetaData.campaignState.difficulty = titleMetaData.difficulty;
