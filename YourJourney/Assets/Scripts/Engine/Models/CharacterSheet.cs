@@ -26,5 +26,17 @@ public class CharacterSheet
         this.name = name;
         this.portraitIndex = portraitIndex;
     }
+
+    public CharacterSheet Clone()
+    {
+        List<SkillRecord> skillClone = new List<SkillRecord>();
+        foreach(var skill in skillRecords)
+        {
+            skillClone.Add(skill.Clone());
+        }
+        CharacterSheet clone = new CharacterSheet(name, portraitIndex) { race=race, sex=sex, maxHanded=maxHanded, role=role,
+            armorId=armorId, hand1Id=hand1Id, hand2Id=hand2Id, trinketId=trinketId, mountId=mountId, skillRecords=skillClone};
+        return clone;
+    }
 }
 

@@ -158,7 +158,6 @@ public class StateItem
 	public string gameName, scenarioFilename, gameDate, heroes, fullSavePath, fileVersion, coverImage;
 	public string[] heroArray;
 	public int[] heroIndexArray;
-	public List<CharacterSheet> characterSheets;
 	public Guid stateGUID;
 	public ProjectType projectType;
 	public CampaignState campaignState;
@@ -169,9 +168,8 @@ public class TitleMetaData
 	public int slotMode;
 	public ProjectItem projectItem;//set in SelectJourney
 	public CampaignState campaignState;
-	public string[] selectedHeroes; //TODO: Deprecate and use data in characterSheets
-	public int[] selectedHeroesIndex; //TODO: Deprecate and use data in characterSheets
-	public List<CharacterSheet> characterSheets; //stores hero skills and equipment
+	public string[] selectedHeroes;
+	public int[] selectedHeroesIndex;
 	public int saveStateIndex;
 	public string gameName;
 	public string coverImage;
@@ -193,7 +191,6 @@ public class GameStarter
 	public string scenarioFileName;
 	public string[] heroes;
 	public int[] heroesIndex;
-	public List<CharacterSheet> characterSheets;
 	/// <summary>
 	/// setting this to false makes the scenario load state from the previously set saveStateIndex, default=true
 	/// </summary>

@@ -204,7 +204,6 @@ public class CampaignScreen : MonoBehaviour
 		gameStarter.scenarioFileName = campaignState.campaign.scenarioCollection[sIndex].fileName;
 		gameStarter.heroes = campaignState.heroes;
 		gameStarter.heroesIndex = campaignState.heroesIndex;
-		gameStarter.characterSheets = campaignState.characterSheets;
 		gameStarter.difficulty = campaignState.difficulty;
 		gameStarter.coverImage = coverImage; //refers to the scenario cover image
 
@@ -252,7 +251,6 @@ public class CampaignScreen : MonoBehaviour
 		gameStarter.scenarioFileName = campaignState.campaign.scenarioCollection[selectedIndex].fileName;
 		gameStarter.heroes = campaignState.heroes;
 		gameStarter.heroesIndex = campaignState.heroesIndex;
-		gameStarter.characterSheets = campaignState.characterSheets;
 		gameStarter.difficulty = campaignState.difficulty;
 		gameStarter.isNewGame = true;//start scenario fresh
 		gameStarter.coverImage = campaign.coverImage;
@@ -288,7 +286,6 @@ public class CampaignScreen : MonoBehaviour
 		gameStarter.scenarioFileName = gs.partyState.scenarioFileName;
 		gameStarter.heroes = campaignState.heroes;
 		gameStarter.heroesIndex = campaignState.heroesIndex;
-		gameStarter.characterSheets = campaignState.characterSheets;
 		gameStarter.difficulty = campaignState.difficulty;
 		gameStarter.isNewGame = false;
 		gameStarter.coverImage = campaign.coverImage;

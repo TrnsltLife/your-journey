@@ -201,7 +201,6 @@ public class GameState
 					heroes = state.partyState.heroes.Aggregate( ( acc, cur ) => acc + ", " + cur ),
 					heroArray = state.partyState.heroes,
 					heroIndexArray = state.partyState.heroesIndex,
-					characterSheets = state.partyState.characterSheets,
 					projectType = ProjectType.Standalone,
 					campaignState = null
 				} );;
@@ -218,7 +217,6 @@ public class GameState
 					coverImage = state.coverImage,
 					heroes = state.campaignState.heroes.Aggregate( ( acc, cur ) => acc + ", " + cur ),
 					heroIndexArray = state.campaignState.heroesIndex,
-					characterSheets = state.campaignState.characterSheets,
 					projectType = ProjectType.Campaign,
 					campaignState = state.campaignState,
 					stateGUID = state.campaignState.campaign.campaignGUID,
@@ -266,6 +264,8 @@ public class CampaignState
 	//public CampaignStatus campaignStatus;//in menus or playing scenario
 	public ScenarioStatus[] scenarioStatus;//success, failure, not played
 	public int[] scenarioXP, scenarioLore;
+	public List<CharacterSheet>[] startingCharacterSheets; //snapshot of characterSheets at the beginning of a scenario; used for replays
+	public List<CharacterSheet>[] currentCharacterSheets; //snapshot of characterSheets at the current saved/finished state in the scenario
 	public int scenarioPlayingIndex;//currently PLAYING scenario (ie: replays)
 	public int currentScenarioIndex;//the current scenario in the campaign
 	public string gameDate;
@@ -274,7 +274,6 @@ public class CampaignState
 	public int saveStateIndex;
 	public string[] heroes;
 	public int[] heroesIndex;
-	public List<CharacterSheet> characterSheets;
 	public string gameName;
 	public Difficulty difficulty;
 	//list of FIRED campaign triggers
@@ -292,6 +291,8 @@ public class CampaignState
 		scenarioStatus = new ScenarioStatus[campaign.scenarioCollection.Count];
 		scenarioXP = new int[campaign.scenarioCollection.Count];
 		scenarioLore = new int[campaign.scenarioCollection.Count];
+		startingCharacterSheets = new List<CharacterSheet>[campaign.scenarioCollection.Count];
+		currentCharacterSheets = new List<CharacterSheet>[campaign.scenarioCollection.Count];
 		gameDate = DateTime.Today.ToShortDateString();
 		saveStateIndex = -1;
 		scenarioPlayingIndex = 0;
@@ -300,6 +301,8 @@ public class CampaignState
 		scenarioStatus.Fill( ScenarioStatus.NotPlayed );
 		scenarioXP.Fill( 0 );
 		scenarioLore.Fill( 0 );
+		startingCharacterSheets.Fill(null);
+		currentCharacterSheets.Fill(null);
 	}
 
 	public static CampaignState GetState()
@@ -311,6 +314,16 @@ public class CampaignState
 	{
 		Bootstrap.campaignState = this;
 	}
+
+	public static List<CharacterSheet> CloneCharacterSheetList(List<CharacterSheet> list)
+    {
+		List<CharacterSheet> cloneList = new List<CharacterSheet>();
+		foreach(CharacterSheet characterSheet in list)
+        {
+			cloneList.Add(characterSheet.Clone());
+        }
+		return cloneList;
+    }
 
 	/// <summary>
 	/// updates the lore/xp with the highest recorded value, advances scenario index if playing current scenario, updates scenario status 
@@ -349,7 +362,6 @@ public class PartyState
 	public Difficulty difficulty { get; set; }
 	public string[] heroes { get; set; }
 	public int[] heroesIndex { get; set; }
-	public List<CharacterSheet> characterSheets { get; set; }
 	public int[] lastStandCounter { get; set; }
 	public bool[] isDead { get; set; }
 	public int loreCount { get; set; }
@@ -379,7 +391,6 @@ public class PartyState
 			threatStack = engine.endTurnButton.threatStack,
 			heroes = Bootstrap.gameStarter.heroes,
 			heroesIndex = Bootstrap.gameStarter.heroesIndex,
-			characterSheets = Bootstrap.gameStarter.characterSheets,
 			lastStandCounter = Bootstrap.lastStandCounter,
 			isDead = Bootstrap.isDead,
 			fogList = engine.GetFogState(),
@@ -395,7 +406,6 @@ public class PartyState
 		Bootstrap.gameStarter.scenarioFileName = scenarioFileName;
 		Bootstrap.gameStarter.heroes = heroes;
 		Bootstrap.gameStarter.heroesIndex = heroesIndex;
-		Bootstrap.gameStarter.characterSheets = characterSheets;
 		Bootstrap.gameStarter.loreStartValue = loreStartValue;
 		Bootstrap.gameStarter.xpStartValue = xpStartValue;
 

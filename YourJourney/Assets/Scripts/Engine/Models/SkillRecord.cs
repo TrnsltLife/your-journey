@@ -12,4 +12,17 @@ public class SkillRecord
     public List<int> selectedSkillIndex { get; set; } = new List<int>();
 
     public SkillRecord() { }
+
+    public SkillRecord(Role role)
+    {
+        this.role = role;
+    }
+
+    public SkillRecord Clone()
+    {
+        List<int> listClone = new List<int>();
+        listClone.AddRange(selectedSkillIndex);
+        SkillRecord clone = new SkillRecord(role) { xp = xp, selectedSkillIndex = listClone };
+        return clone;
+    }
 }

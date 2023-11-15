@@ -48,10 +48,11 @@ public class CampfireScreen : MonoBehaviour
 	public void ActivateScreen( TitleMetaData metaData, CampfireState campfireState = CampfireState.VIEW )
 	{
 		titleMetaData = metaData;
-		campaignState = metaData.campaignState;
-		characterSheets = campaignState.characterSheets;
-
 		this.campfireState = campfireState;
+
+		campaignState = metaData.campaignState;
+		LoadCharacterSheets();
+
 		stateTextTranslation.Change("campfire.title." + campfireState.ToString(), campfireState.ToString());
 
 		portraitExtraWidth = portraitMaxWidth - (heroImageWidth * SelectHeroes.maxHeroes);
@@ -104,6 +105,33 @@ public class CampfireScreen : MonoBehaviour
 		gameObject.SetActive(false); //hide the SpecialInstructions form but leave scenarioOverlay with coverImage showing
 		TitleManager tm = FindObjectOfType<TitleManager>();
 		tm.LoadScenario();
+	}
+
+	public void LoadCharacterSheets()
+    {
+		if (campfireState == CampfireState.SETUP)
+		{
+			//Start with the starting state of the first scenario
+			characterSheets = campaignState.startingCharacterSheets[0];
+		}
+		else if (campfireState == CampfireState.VIEW)
+		{
+			//Use the current state of the scenario being played right now (continue or replay)
+			characterSheets = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex];
+		}
+		else if (campfireState == CampfireState.UPGRADE || campfireState == CampfireState.REPLAY)
+		{
+			int tempIndex = campaignState.scenarioPlayingIndex - 1;
+			if (tempIndex < 0)
+			{
+				characterSheets = campaignState.startingCharacterSheets[0];
+			}
+			else
+			{
+				//Start with the final state of the previous scenario
+				characterSheets = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex - 1];
+			}
+		}
 	}
 
 	public void ActivateDropdowns(bool active)
@@ -435,6 +463,15 @@ public void PopulateRoleCartouche()
 
 	public void OnNext()
 	{
+		//Add the SkillRecord for the selected role to each characterSheet
+		foreach(var characterSheet in characterSheets)
+        {
+			if (!characterSheet.skillRecords.Exists(it => it.role == characterSheet.role))
+			{
+				SkillRecord record = new SkillRecord(characterSheet.role);
+				characterSheet.skillRecords.Add(record);
+			}
+        }
 		StartGame();
 	}
 

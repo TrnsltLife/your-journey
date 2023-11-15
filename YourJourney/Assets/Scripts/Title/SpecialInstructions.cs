@@ -101,7 +101,6 @@ public class SpecialInstructions : MonoBehaviour
 		gameStarter.scenarioFileName = titleMetaData.projectItem.fileName;
         gameStarter.heroes = titleMetaData.selectedHeroes;
 		gameStarter.heroesIndex = titleMetaData.selectedHeroesIndex;
-		gameStarter.characterSheets = titleMetaData.characterSheets;
         gameStarter.difficulty = titleMetaData.difficulty;
 		gameStarter.isNewGame = true;
 		gameStarter.loreStartValue = s.loreStartValue;

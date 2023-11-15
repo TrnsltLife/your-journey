@@ -197,7 +197,7 @@ public class SelectHeroes : MonoBehaviour
 	public void OnNext()
 	{
 		beginButton.interactable = backButton.interactable = false;
-		List<CharacterSheet> characterSheets = titleMetaData.characterSheets;
+		List<CharacterSheet> characterSheets = titleMetaData?.campaignState?.startingCharacterSheets?[0]; //get List<CharacterSheet> at index [0], i.e. the first scenario. May be null.
 		if(characterSheets == null) { characterSheets = new List<CharacterSheet>(); }
 		//Attempt to preserve any CharacterSheet that had already been filled in on the Campfire screen,
 		//so the Role and Item selections remain even if new characters are added or other characters are removed.
@@ -233,7 +233,6 @@ public class SelectHeroes : MonoBehaviour
 		}
 		titleMetaData.selectedHeroes = characterSheets.ConvertAll(it => it.name).ToArray();
 		titleMetaData.selectedHeroesIndex = characterSheets.ConvertAll(it => it.portraitIndex).ToArray();
-		titleMetaData.characterSheets = characterSheets;
 
 		foreach(CharacterSheet cs in characterSheets)
         {
@@ -254,7 +253,8 @@ public class SelectHeroes : MonoBehaviour
 				titleMetaData.campaignState = campaignState;
 				titleMetaData.campaignState.heroes = titleMetaData.selectedHeroes;
 				titleMetaData.campaignState.heroesIndex = titleMetaData.selectedHeroesIndex;
-				titleMetaData.campaignState.characterSheets = titleMetaData.characterSheets;
+				titleMetaData.campaignState.startingCharacterSheets[0] = characterSheets;
+				titleMetaData.campaignState.currentCharacterSheets[0] = CampaignState.CloneCharacterSheetList(characterSheets);
 				titleMetaData.campaignState.gameName = titleMetaData.gameName;
 				titleMetaData.campaignState.saveStateIndex = titleMetaData.saveStateIndex;
 				titleMetaData.campaignState.difficulty = titleMetaData.difficulty;
