@@ -210,13 +210,15 @@ public class CampaignScreen : MonoBehaviour
 		Bootstrap.campaignState = campaignState;
 		Bootstrap.gameStarter = gameStarter;
 
+		CampfireState campfireState = (sIndex == 0 ? CampfireState.SETUP : CampfireState.UPGRADE);
+
 		//check for a saved state
 		GameState gs = GameState.LoadState( campaignState.saveStateIndex );
 		if ( gs.partyState == null )//no saved state
 		{
 			gameStarter.isNewGame = true;//start scenario fresh
-			Debug.Log( "NEW GAME" );
-			LoadCampfireScreen(sIndex == 0 ? CampfireState.SETUP : CampfireState.UPGRADE);
+			Debug.Log("CONTINUE CAMPAIGN - NEW GAME - CAMPFIRE " + campfireState.ToString() );
+			LoadCampfireScreen(campfireState);
 			return;
 		}
 		else//saved state found, is it current scenario or replay?
@@ -224,15 +226,15 @@ public class CampaignScreen : MonoBehaviour
 			if ( gs.partyState.scenarioFileName == gameStarter.scenarioFileName )//it's the current scenario
 			{
 				gameStarter.isNewGame = false;//otherwise start scenario fresh
-				Debug.Log( "CONTINUING SAVED GAME - CAMPFIRE VIEW" );
+				Debug.Log( "CONTINUE CAMPAIGN - CONTINUING SAVED GAME - CAMPFIRE VIEW" );
 				LoadCampfireScreen(CampfireState.VIEW);
 				return;
 			}
 			else//it's just a replay, toast it and start fresh
 			{
 				gameStarter.isNewGame = true;
-				Debug.Log( "NEW GAME - CAMPFIRE REPLAY" );
-				LoadCampfireScreen(CampfireState.REPLAY);
+				Debug.Log( "CONTINUE CAMPAIGN - REPLAY - NEW GAME - CAMPFIRE " + campfireState.ToString());
+				LoadCampfireScreen(campfireState);
 				return;
 			}
 		}
@@ -260,17 +262,23 @@ public class CampaignScreen : MonoBehaviour
 
 		var scenario = FileManager.LoadScenario( FileManager.GetFullPathWithCampaign( gameStarter.scenarioFileName, campaign.campaignGUID.ToString() ) );
 
+		CampfireState campfireState = selectedIndex == 0 ? CampfireState.SETUP : CampfireState.UPGRADE;
+		Debug.Log("REPLAY SCENARIO - CAMPFIRE " + campfireState.ToString());
+		LoadCampfireScreen(campfireState);
+
+		/*
 		if ( !string.IsNullOrEmpty( scenario.specialInstructions ) )
 		{
 			storyBox.Show( scenario.specialInstructions, () =>
 			{
-				StartGame();
+				LoadCampfireScreen(campfireState);
 			});
 		}
 		else
 		{
-			StartGame();
+			LoadCampfireScreen(campfireState);
 		}
+		*/
 	}
 
 	public void OnContinueReplay()
@@ -293,7 +301,8 @@ public class CampaignScreen : MonoBehaviour
 		Bootstrap.campaignState = campaignState;
 		Bootstrap.gameStarter = gameStarter;
 
-		StartGame();
+		Debug.Log("CONTINUE REPLAY - CAMPFIRE VIEW");
+		LoadCampfireScreen(CampfireState.VIEW);
 	}
 
 	public void OnBack()

@@ -338,10 +338,22 @@ public class CampaignState
 		scenarioLore[scenarioPlayingIndex] = Math.Max( lore, scenarioLore[scenarioPlayingIndex] );
 		scenarioXP[scenarioPlayingIndex] = Math.Max( xp, scenarioXP[scenarioPlayingIndex] );
 
+		//Add the scenario xp to the xp for each character's current role
+		foreach(CharacterSheet characterSheet in currentCharacterSheets[scenarioPlayingIndex])
+        {
+			SkillRecord skillRecord = characterSheet.skillRecords.FirstOrDefault(it => it.role == characterSheet.role);
+			if(skillRecord != null)
+            {
+				skillRecord.xp += scenarioLore[scenarioPlayingIndex];
+            }
+        }
+
 		//only advance current scenario if the current scenario was played
 		//do NOT advance current scenario if this was a REPLAY
-		if ( currentScenarioIndex == scenarioPlayingIndex )
-			currentScenarioIndex = Math.Min( campaign.scenarioCollection.Count - 1, currentScenarioIndex + 1 );
+		if (currentScenarioIndex == scenarioPlayingIndex)
+		{
+			currentScenarioIndex = Math.Min(campaign.scenarioCollection.Count - 1, currentScenarioIndex + 1);
+		}
 		Debug.Log( "current S index: " + currentScenarioIndex );
 		Debug.Log( "lore " + scenarioLore[scenarioPlayingIndex] );
 		Debug.Log( "xp " + scenarioXP[scenarioPlayingIndex] );

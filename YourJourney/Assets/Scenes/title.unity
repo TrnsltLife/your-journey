@@ -1006,7 +1006,7 @@ GameObject:
   - component: {fileID: 38888858}
   - component: {fileID: 38888857}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text 10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7404,7 +7404,7 @@ GameObject:
   - component: {fileID: 227621672}
   - component: {fileID: 227621671}
   m_Layer: 5
-  m_Name: Points
+  m_Name: Points 11
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9464,7 +9464,7 @@ GameObject:
   - component: {fileID: 297804365}
   - component: {fileID: 297804364}
   m_Layer: 5
-  m_Name: Points
+  m_Name: Points 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13606,7 +13606,7 @@ GameObject:
   - component: {fileID: 432329108}
   - component: {fileID: 432329107}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15715,7 +15715,7 @@ GameObject:
   - component: {fileID: 485838418}
   - component: {fileID: 485838417}
   m_Layer: 5
-  m_Name: Points
+  m_Name: Points 9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21234,7 +21234,7 @@ GameObject:
   - component: {fileID: 624691857}
   - component: {fileID: 624691856}
   m_Layer: 5
-  m_Name: Points
+  m_Name: Points 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23189,7 +23189,7 @@ GameObject:
   - component: {fileID: 679747335}
   - component: {fileID: 679747334}
   m_Layer: 5
-  m_Name: Points
+  m_Name: Points 12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37982,7 +37982,7 @@ GameObject:
   - component: {fileID: 1192291094}
   - component: {fileID: 1192291093}
   m_Layer: 5
-  m_Name: Points
+  m_Name: Points 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39151,7 +39151,7 @@ GameObject:
   - component: {fileID: 1237021494}
   - component: {fileID: 1237021493}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text 9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -40002,7 +40002,7 @@ GameObject:
   - component: {fileID: 1247371760}
   - component: {fileID: 1247371759}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text 11
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44104,7 +44104,7 @@ GameObject:
   - component: {fileID: 1372325108}
   - component: {fileID: 1372325107}
   m_Layer: 5
-  m_Name: Points
+  m_Name: Points 10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45064,7 +45064,7 @@ GameObject:
   - component: {fileID: 1407696036}
   - component: {fileID: 1407696035}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text 12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48562,7 +48562,7 @@ GameObject:
   - component: {fileID: 1496909163}
   - component: {fileID: 1496909164}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53699,7 +53699,7 @@ GameObject:
   - component: {fileID: 1619683933}
   - component: {fileID: 1619683932}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -58692,7 +58692,7 @@ GameObject:
   - component: {fileID: 1792598870}
   - component: {fileID: 1792598869}
   m_Layer: 5
-  m_Name: Points
+  m_Name: Points 8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61796,7 +61796,7 @@ GameObject:
   - component: {fileID: 1894308969}
   - component: {fileID: 1894308968}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text 8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61966,7 +61966,7 @@ GameObject:
   - component: {fileID: 1901100640}
   - component: {fileID: 1901100639}
   m_Layer: 5
-  m_Name: Points
+  m_Name: Points 7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -63330,7 +63330,18 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2117919304}
+        m_MethodName: OnSkillSelect
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1927466757
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66009,7 +66020,7 @@ GameObject:
   - component: {fileID: 2014011285}
   - component: {fileID: 2014011284}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text 7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -68586,6 +68597,26 @@ MonoBehaviour:
   - {fileID: 2077480712}
   - {fileID: 405745477}
   - {fileID: 1662601817}
+  skillTextTranslations:
+  - {fileID: 1496909164}
+  - {fileID: 432329107}
+  - {fileID: 1619683932}
+  - {fileID: 2014011284}
+  - {fileID: 1894308968}
+  - {fileID: 1237021493}
+  - {fileID: 38888857}
+  - {fileID: 1247371759}
+  - {fileID: 1407696035}
+  skillCostText:
+  - {fileID: 1192291093}
+  - {fileID: 297804364}
+  - {fileID: 624691856}
+  - {fileID: 1901100639}
+  - {fileID: 1792598869}
+  - {fileID: 485838417}
+  - {fileID: 1372325107}
+  - {fileID: 227621671}
+  - {fileID: 679747334}
   stateTextTranslation: {fileID: 310294871}
   roleTextTranslation: {fileID: 401385898}
   armorTextTranslation: {fileID: 786634774}
@@ -68608,6 +68639,7 @@ MonoBehaviour:
   hand2Dropdown: {fileID: 1081563809}
   trinketDropdown: {fileID: 441217895}
   mountDropdown: {fileID: 905328030}
+  titleDropdown: {fileID: 1905387166}
 --- !u!1 &2120356924 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2279751518182597946, guid: 904f891115a9a284ca7f0379cfc6992c,

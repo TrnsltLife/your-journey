@@ -18,6 +18,7 @@ public class CharacterSheet
     public int trinketId { get; set; }
     public int mountId { get; set; }
     public List<SkillRecord> skillRecords { get; set; } = new List<SkillRecord>();
+    public List<int> titles { get; set; } = new List<int>();
 
     public CharacterSheet() { }
 
@@ -25,6 +26,15 @@ public class CharacterSheet
     {
         this.name = name;
         this.portraitIndex = portraitIndex;
+    }
+
+    public void AddTitle(int titleId)
+    {
+        if(titleId <= 0 || titleId > 33) { return; }
+        if (!titles.Contains(titleId))
+        {
+            titles.Add(titleId);
+        }
     }
 
     public CharacterSheet Clone()
@@ -35,7 +45,7 @@ public class CharacterSheet
             skillClone.Add(skill.Clone());
         }
         CharacterSheet clone = new CharacterSheet(name, portraitIndex) { race=race, sex=sex, maxHanded=maxHanded, role=role,
-            armorId=armorId, hand1Id=hand1Id, hand2Id=hand2Id, trinketId=trinketId, mountId=mountId, skillRecords=skillClone};
+            armorId=armorId, hand1Id=hand1Id, hand2Id=hand2Id, trinketId=trinketId, mountId=mountId, skillRecords=skillClone, titles=new List<int>(titles)};
         return clone;
     }
 }

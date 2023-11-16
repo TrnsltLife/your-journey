@@ -41,6 +41,7 @@ internal class MonsterModifierListConverter : JsonConverter
 			catch (Exception e)
 			{
 				//Convert from an int when loading a new Scenario. Default modifiers will be hydrated from MonsterModifier.FromID. Custom modifiers will be hydrated later in Engine.
+				Debug.Log(e);
 				modifier = MonsterModifier.FromID(item.Value<int>());
 			}
 

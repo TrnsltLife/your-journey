@@ -60,6 +60,15 @@ public  class Items
 		return 0;
     }
 
+	public static int CostToUpgradeTo(ItemSeries seriesId, int upgradeToTier)
+    {
+		int upgradeFromTier = upgradeToTier - 1;
+		if(upgradeFromTier < 1 || upgradeFromTier >= 4) { return 0; }
+		Item item = list.FirstOrDefault(it => it.seriesId == seriesId && it.tier == upgradeFromTier); //all items in the same series should have the same upgrade price at each tier level
+		if(item == null) { return 0; }
+		return item.upgrade;
+    }
+
     public static readonly List<Item> list =new List<Item>
     {
 		new Item(0){collection=0, slotId=Slot.NONE, slot="None", seriesId=ItemSeries.NONE, seriesName="None", dataName="None", originalName="None", tier=0, stats=new string[]{}, upgrade=0, handed=0, ranged=0},

@@ -4,8 +4,9 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static LanguageManager;
 
-public enum CampfireState { SETUP, VIEW, UPGRADE, REPLAY };
+public enum CampfireState { SETUP, VIEW, UPGRADE };
 
 public class CampfireScreen : MonoBehaviour
 {
@@ -22,10 +23,12 @@ public class CampfireScreen : MonoBehaviour
 	public float portraitMaxWidth;
 	private float portraitExtraWidth = 0f;
 	public Button[] skillButtons;
+	public TextTranslation[] skillTextTranslations;
+	public TextMeshProUGUI[] skillCostText;
 	//public TextTranslation remainingPointsTextTranslation, skillsTranslationText, roleItemsTranslationText;
 	public TextTranslation stateTextTranslation, roleTextTranslation, armorTextTranslation, hand1TextTranslation, hand2TextTranslation, trinketTextTranslation, mountTextTranslation;
 	public GameObject skillsHeading, skillPointCartouche, roleCartouche, armorCartouche, hand1Cartouche, hand2Cartouche, trinketCartouche, mountCartouche;
-	public TMP_Dropdown skillDropdown, roleDropdown, armorDropdown, hand1Dropdown, hand2Dropdown, trinketDropdown, mountDropdown;
+	public TMP_Dropdown skillDropdown, roleDropdown, armorDropdown, hand1Dropdown, hand2Dropdown, trinketDropdown, mountDropdown, titleDropdown;
 	List<RoleData> roleList = new List<RoleData>();
 	List<Item> armorList = new List<Item>();
 	List<Item> hand1List = new List<Item>();
@@ -44,6 +47,7 @@ public class CampfireScreen : MonoBehaviour
 	int maxHanded = 0;
 	int hand1Handed = 0;
 	int hand2Handed = 0;
+	int currentLore = 0;
 
 	public void ActivateScreen( TitleMetaData metaData, CampfireState campfireState = CampfireState.VIEW )
 	{
@@ -52,6 +56,7 @@ public class CampfireScreen : MonoBehaviour
 
 		campaignState = metaData.campaignState;
 		LoadCharacterSheets();
+		characterSheets[0].AddTitle(14); //TODO Remove after testing titles
 
 		stateTextTranslation.Change("campfire.title." + campfireState.ToString(), campfireState.ToString());
 
@@ -62,6 +67,16 @@ public class CampfireScreen : MonoBehaviour
 		//Turn Your Journey game title off since we need the screen real estate
 		tm.gameTitle.SetActive(false);
 		tm.gameTitleFlash.SetActive(false);
+
+		//Calculate currentLore if needed, by adding the final lore of each scenario prior to the one being played
+		if(campfireState == CampfireState.UPGRADE)
+        {
+			currentLore = 0;
+			for(int i=0; i<campaignState.scenarioPlayingIndex; i++)
+            {
+				currentLore += campaignState.scenarioLore[i];
+			}
+        }
 
 		//Show/Hide Dropdowns or Cartouches based on CampfireState
 		if (campfireState == CampfireState.SETUP || campfireState == CampfireState.UPGRADE)
@@ -75,8 +90,11 @@ public class CampfireScreen : MonoBehaviour
 			ActivateCartouches(true);
 		}
 
+		SetImages();
+		OnHeroSelect(0);
+
 		//Show/Hide Skill Selection Form based on CampfireState
-		if(campfireState == CampfireState.SETUP)
+		if (campfireState == CampfireState.SETUP)
         {
 			ActivateSkillForm(false, false);
         }
@@ -88,9 +106,6 @@ public class CampfireScreen : MonoBehaviour
         {
 			ActivateSkillForm(true, false);
 		}
-
-		SetImages();
-		OnHeroSelect(0);
 
 		gameObject.SetActive( true );
 
@@ -119,11 +134,12 @@ public class CampfireScreen : MonoBehaviour
 			//Use the current state of the scenario being played right now (continue or replay)
 			characterSheets = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex];
 		}
-		else if (campfireState == CampfireState.UPGRADE || campfireState == CampfireState.REPLAY)
+		else if (campfireState == CampfireState.UPGRADE)
 		{
 			int tempIndex = campaignState.scenarioPlayingIndex - 1;
 			if (tempIndex < 0)
 			{
+				//Start with the starting state of the first scenario
 				characterSheets = campaignState.startingCharacterSheets[0];
 			}
 			else
@@ -157,9 +173,7 @@ public class CampfireScreen : MonoBehaviour
     {
 		skillsHeading.gameObject.SetActive(active);
 		skillPointCartouche.gameObject.SetActive(active);
-
 		skillDropdown.gameObject.SetActive(active);
-		skillDropdown.interactable = interact;
 
 		foreach (var skillButton in skillButtons)
         {
@@ -214,7 +228,7 @@ public class CampfireScreen : MonoBehaviour
 	}
 
 
-public void PopulateRoleCartouche()
+	public void PopulateRoleCartouche()
     {
 		//TODO Translation
 		RoleData role = Roles.FromRole(characterSheets[selectedHero].role);
@@ -287,7 +301,38 @@ public void PopulateRoleCartouche()
 		dropdown.SetValueWithoutNotify(selectedIndex);
 	}
 
-	public void PopulateItemDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int tier, int hand=0)
+	public void PopulateItemDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int tier, int hand = 0)
+    {
+		if (campfireState == CampfireState.SETUP)
+		{
+			PopulateItemSetupDropdown(dropdown, itemList, slot, tier, hand);
+		}
+		else if(campfireState == CampfireState.UPGRADE)
+        {
+			PopulateItemUpgradeDropdown(dropdown, itemList, slot, currentLore, hand);
+		}
+	}
+
+	public void PopulateTitleDropdown()
+    {
+		//populate dropdown
+		List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();
+		foreach(int titleId in characterSheets[selectedHero].titles)
+        {
+			var dropdownOption = new TMP_Dropdown.OptionData(Translate("title." + titleId, "Title " + titleId.ToString()));
+			optionList.Add(dropdownOption);
+		}
+		if(optionList.Count == 0)
+        {
+			var dropdownOption = new TMP_Dropdown.OptionData(Translate("title.None", "None"));
+			optionList.Add(dropdownOption);
+		}
+		titleDropdown.ClearOptions();
+		titleDropdown.AddOptions(optionList);
+		titleDropdown.SetValueWithoutNotify(0);
+	}
+
+	public void PopulateItemSetupDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int tier, int hand=0)
     {
 		//populate dropdown
 		List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();
@@ -312,7 +357,6 @@ public void PopulateRoleCartouche()
 				item.handed <= handedLimit &&
 				Items.ItemAvailable(item.id, characterSheets, selectedHero, hand)
 			).ToList();
-			//TODO Grab just the first available of each item type?
 			itemList.AddRange(availableItems);
 		}
 
@@ -343,6 +387,209 @@ public void PopulateRoleCartouche()
 		dropdown.SetValueWithoutNotify(selectedIndex);
 	}
 
+	public void PopulateItemUpgradeDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int lore, int hand = 0)
+	{
+		//populate dropdown with the current item and any available upgrades
+		List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();
+
+		int selectedIndex = 0;
+		int upgradeCost = 0;
+		int currentTier = 1;
+		bool hasTier4Item =
+			Items.FromID(characterSheets[selectedHero].armorId).tier == 4 ||
+			Items.FromID(characterSheets[selectedHero].hand1Id).tier == 4 ||
+			Items.FromID(characterSheets[selectedHero].hand2Id).tier == 4;
+
+		itemList.Clear();
+
+		Item currentItem = null;
+		if (slot == Slot.ARMOR)
+		{
+			currentItem = Items.FromID(characterSheets[selectedHero].armorId);
+		}
+		else if(slot == Slot.HAND && hand == 1)
+        {
+			currentItem = Items.FromID(characterSheets[selectedHero].hand1Id);
+		}
+		else if (slot == Slot.HAND && hand == 2)
+		{
+			currentItem = Items.FromID(characterSheets[selectedHero].hand2Id);
+		}
+		else if (slot == Slot.MOUNT)
+		{
+			currentItem = Items.FromID(characterSheets[selectedHero].mountId);
+		}
+
+		if (currentItem != null)
+		{
+			itemList.Add(currentItem);
+			upgradeCost = currentItem.upgrade;
+			//Get the upgrade cost for each tier so we can present the right ones to the player. 
+			int upgradeCost2 = Items.CostToUpgradeTo(currentItem.seriesId, 2);
+			int upgradeCost3 = Items.CostToUpgradeTo(currentItem.seriesId, 3);
+			int upgradeCost4 = Items.CostToUpgradeTo(currentItem.seriesId, 4);
+			currentTier = currentItem.tier;
+
+			//Find items in the next tier if the player has enough lore to upgrade, and respecting the only-one-tier-4 rule. (upgradeCost==0 indicates there are no higher upgrades available).
+			if ((currentTier < 3 || !hasTier4Item) && upgradeCost > 0 && currentLore >= upgradeCost)
+			{
+				List<Item> availableUpgrades = Items.list.Where(item =>
+					item.slotId == slot &&
+					item.seriesId == currentItem.seriesId &&
+					item.tier > currentTier &&
+					(
+						(item.tier == 2 && currentLore > upgradeCost2) ||
+						(item.tier == 3 && currentLore > upgradeCost3) ||
+						(item.tier == 4 && currentLore > upgradeCost4 && !hasTier4Item)
+					) &&
+					Items.ItemAvailable(item.id, characterSheets, selectedHero, hand)
+				).ToList();
+				itemList.AddRange(availableUpgrades);
+			}
+		}
+
+		//If there is no item, show None in the dropdown
+		if(itemList.Count == 0)
+        {
+			itemList.Add(Items.list[0]);
+		}
+
+		int i = 0;
+		foreach (var item in itemList)
+		{
+			//TODO Translate
+			Collection collection = Collection.FromID(item.collection);
+			string collectionText = AppendCollectionSpacing(collection, "<font=\"Icon\">" + collection.FontCharacter + "</font>");
+			string tierText = "";
+			if(item.tier == 1) { tierText = " I"; }
+			else if (item.tier == 2) { tierText = " II"; }
+			else if (item.tier == 3) { tierText = " III"; }
+			else if (item.tier == 4) { tierText = " IV"; }
+
+			var dropdownOption = new TMP_Dropdown.OptionData(collectionText + item.dataName + tierText);
+			optionList.Add(dropdownOption);
+			if (
+				(slot == Slot.ARMOR && item.id == characterSheets[selectedHero].armorId) ||
+				(slot == Slot.HAND && hand == 1 && item.id == characterSheets[selectedHero].hand1Id) ||
+				(slot == Slot.HAND && hand == 2 && item.id == characterSheets[selectedHero].hand2Id) ||
+				(slot == Slot.MOUNT && item.id == characterSheets[selectedHero].mountId)
+			)
+			{
+				selectedIndex = i;
+			}
+			i++;
+		}
+		dropdown.ClearOptions();
+		dropdown.AddOptions(optionList);
+		dropdown.SetValueWithoutNotify(selectedIndex);
+	}
+
+	public void PopulateSkillDropdown()
+    {
+		//populate dropdown
+		List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();
+
+		int selectedIndex = 0;
+
+		foreach (var skillRecord in characterSheets[selectedHero].skillRecords)
+		{
+			//TODO Translate
+			RoleData roleData = Roles.FromRole(skillRecord.role);
+
+			var dropdownOption = new TMP_Dropdown.OptionData(roleData.dataName);
+			optionList.Add(dropdownOption);
+		}
+		skillDropdown.ClearOptions();
+		skillDropdown.AddOptions(optionList);
+		skillDropdown.SetValueWithoutNotify(selectedIndex);
+	}
+
+	public void PopulateSkillButtons(SkillRecord skillRecord)
+    {
+		RoleData role = Roles.FromRole(skillRecord.role);
+		for(int i=0; i<skillButtons.Length; i++)
+        {
+			int offsetIndex = i + role.indexOffset;
+
+			Button button = skillButtons[i];
+
+			bool isAvailable = SkillAvailable(role, offsetIndex);
+			bool egoOwns = SkillOwnedByCurrentHero(role, offsetIndex);
+
+			//Hide buttons if needed
+			button.gameObject.SetActive(true);
+			if (offsetIndex >= role.skillCount)
+			{
+				button.gameObject.SetActive(false);
+				continue;
+			}
+			else if(!isAvailable)
+            {
+				button.gameObject.SetActive(false);
+            }
+
+			//Button interactable?
+			if (campfireState != CampfireState.VIEW && (isAvailable || egoOwns))
+			{
+				button.interactable = true;
+			}
+			else
+            {
+				button.interactable = false;
+            }
+
+			//Set button text
+			int skillIndex = offsetIndex + 1;
+			skillTextTranslations[i].Change("skill." + role.dataName + "." + skillIndex, "Skill #" + skillIndex);
+
+            //Set point cost
+            skillCostText[i].text = role.skillCost[offsetIndex].ToString();
+
+			//Set color
+			//Grey for selectable
+			//Green for selected
+			//Red for not selectable (not enough xp, or owned by someone else)
+		}
+	}
+
+	public bool SkillAvailable(RoleData role, int skillIndex)
+	{
+		for (int i = 0; i < characterSheets.Count; i++)
+		{
+			CharacterSheet character = characterSheets[i];
+			SkillRecord skillRecord = character.skillRecords.FirstOrDefault(it => it.role == role.role);
+			if(skillRecord == null) { continue; }
+
+			bool foundSkill = skillRecord.selectedSkillIndex.Contains(skillIndex);
+            if (foundSkill) { return false; }
+		}
+		return true;
+	}
+
+	public bool SkillOwnedByCurrentHero(RoleData role, int skillIndex)
+	{
+		CharacterSheet character = characterSheets[selectedHero];
+		SkillRecord skillRecord = character.skillRecords.FirstOrDefault(it => it.role == role.role);
+		if (skillRecord == null) { return false; }
+
+		bool foundSkill = skillRecord.selectedSkillIndex.Contains(skillIndex);
+		if (foundSkill) { return true; }
+
+		return false;
+	}
+
+
+	public void OnSkillSelect()
+    {
+		int index = skillDropdown.GetComponent<TMP_Dropdown>().value;
+		Debug.Log("OnSkillSelect index: " + index);
+		if(index < 0 || index >= characterSheets[selectedHero].skillRecords.Count) { return; }
+		SkillRecord skillRecord = characterSheets[selectedHero].skillRecords[index];
+		Debug.Log("skillRecord role:" + skillRecord.role + " xp:" + skillRecord.xp);
+
+		PopulateSkillButtons(skillRecord);
+    }
+
 	public void OnRoleSelect()
     {
 		int index = roleDropdown.GetComponent<TMP_Dropdown>().value;
@@ -351,34 +598,57 @@ public void PopulateRoleCartouche()
 
 	public void OnItemSelect(string slotHand)
     {
+		bool previousItemWasTier4 = false;
+		Item item = null;
 		if(slotHand == "armor")
         {
+			previousItemWasTier4 = (Items.FromID(characterSheets[selectedHero].armorId).tier == 4);
 			int index = armorDropdown.GetComponent<TMP_Dropdown>().value;
-			characterSheets[selectedHero].armorId = armorList[index].id;
+			item = armorList[index];
+			characterSheets[selectedHero].armorId = item.id;
 		}
 		else if(slotHand == "hand1")
         {
+			previousItemWasTier4 = (Items.FromID(characterSheets[selectedHero].hand1Id).tier == 4);
 			int index = hand1Dropdown.GetComponent<TMP_Dropdown>().value;
-			characterSheets[selectedHero].hand1Id = hand1List[index].id;
-			hand1Handed = Items.FromID(hand1List[index].id).handed;
+			item = hand1List[index];
+			characterSheets[selectedHero].hand1Id = item.id;
+			hand1Handed = item.handed;
 			PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 1, 2); //Repopulate to hide/reveal one- or two- handed weapons in hand2 based on hand1 selection
 		}
 		else if (slotHand == "hand2")
 		{
+			previousItemWasTier4 = (Items.FromID(characterSheets[selectedHero].hand2Id).tier == 4);
 			int index = hand2Dropdown.GetComponent<TMP_Dropdown>().value;
-			characterSheets[selectedHero].hand2Id = hand2List[index].id;
-			hand2Handed = Items.FromID(hand2List[index].id).handed;
+			item = hand2List[index];
+			characterSheets[selectedHero].hand2Id = item.id;
+			hand2Handed = item.handed;
 			PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1, 1); //Repopulate to hide/reveal one- or two- handed weapons in hand1 based on hand2 selection
 		}
 		else if (slotHand == "trinket")
 		{
 			int index = trinketDropdown.GetComponent<TMP_Dropdown>().value;
-			characterSheets[selectedHero].trinketId = trinketList[index].id;
+			item = trinketList[index];
+			characterSheets[selectedHero].trinketId = item.id;
 		}
 		else if (slotHand == "mount")
 		{
 			int index = mountDropdown.GetComponent<TMP_Dropdown>().value;
-			characterSheets[selectedHero].mountId = mountList[index].id;
+			item = mountList[index];
+			characterSheets[selectedHero].mountId = item.id;
+		}
+
+		if(item.tier == 4 || previousItemWasTier4)
+        {
+			//Repopulate armor to update the tier-4 availability.
+			PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1, 1);
+
+			//Hand1 and Hand2 already handled Hand2 and Hand1.
+			if (slotHand == "armor")
+            {
+				PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1, 1);
+				PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 1, 2);
+			}
 		}
 	}
 
@@ -413,11 +683,20 @@ public void PopulateRoleCartouche()
 		if (campfireState == CampfireState.SETUP || campfireState == CampfireState.UPGRADE)
 		{
 			PopulateRoleDropdown(roleDropdown, roleList);
+
 			PopulateItemDropdown(armorDropdown, armorList, Slot.ARMOR, 1);
 			PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1, 1);
 			PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 1, 2);
 			PopulateItemDropdown(trinketDropdown, trinketList, Slot.TRINKET, 1);
 			PopulateItemDropdown(mountDropdown, mountList, Slot.MOUNT, 0);
+
+			PopulateTitleDropdown();
+
+			if (campfireState == CampfireState.UPGRADE)
+			{
+				PopulateSkillDropdown();
+				OnSkillSelect();
+			}
 		}
 		else if(campfireState == CampfireState.VIEW)
         {
@@ -472,6 +751,10 @@ public void PopulateRoleCartouche()
 				characterSheet.skillRecords.Add(record);
 			}
         }
+
+		//Set the currentCharacterSheets for this scenario index to a copy of the data gathered on this screen
+		campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex] = CampaignState.CloneCharacterSheetList(characterSheets);
+
 		StartGame();
 	}
 

@@ -34,7 +34,7 @@ public class Roles
 
 	public static readonly List<RoleData> list = new List<RoleData> {
 		new RoleData(Role.NONE) {collection=0, dataName="None", skillCount= 0, skillCost= new int[]{}},
-		new RoleData(Role.BEAST_FRIEND) {collection=6, dataName="Beast-friend", skillCount= 6, skillCost= new int[]{0, 0, 6, 6, 8, 8}},
+		new RoleData(Role.BEAST_FRIEND) {collection=6, dataName="Beast-friend", skillCount= 6, indexOffset=2, skillCost= new int[]{0, 0, 6, 6, 8, 8}},
 		new RoleData(Role.BURGLAR) {collection=1, dataName="Burglar", skillCount= 12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
 		new RoleData(Role.CAPTAIN) {collection=1, dataName="Captain", skillCount= 12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
 		new RoleData(Role.DELVER) {collection=3, dataName="Delver", skillCount= 12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},

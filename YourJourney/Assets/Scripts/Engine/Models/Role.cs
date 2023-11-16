@@ -14,6 +14,7 @@ public class RoleData
     public int collection { get; set; }
     public string dataName { get; set; }
     public int skillCount { get; set; }
+    public int indexOffset { get; set; } = 3;
     public int[] skillCost { get; set; }
 
     public RoleData() { }
