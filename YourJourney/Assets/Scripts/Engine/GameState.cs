@@ -266,6 +266,8 @@ public class CampaignState
 	public int[] scenarioXP, scenarioLore;
 	public List<CharacterSheet>[] startingCharacterSheets; //snapshot of characterSheets at the beginning of a scenario; used for replays
 	public List<CharacterSheet>[] currentCharacterSheets; //snapshot of characterSheets at the current saved/finished state in the scenario
+	public List<int>[] startingTrinkets; //trinkets owned by the party at the beginning of a scenario; used for replays
+	public List<int>[] currentTrinkets; //trinkets owned by the party at the current saved/finished state in the scenario
 	public int scenarioPlayingIndex;//currently PLAYING scenario (ie: replays)
 	public int currentScenarioIndex;//the current scenario in the campaign
 	public string gameDate;
@@ -293,6 +295,8 @@ public class CampaignState
 		scenarioLore = new int[campaign.scenarioCollection.Count];
 		startingCharacterSheets = new List<CharacterSheet>[campaign.scenarioCollection.Count];
 		currentCharacterSheets = new List<CharacterSheet>[campaign.scenarioCollection.Count];
+		startingTrinkets = new List<int>[campaign.scenarioCollection.Count];
+		currentTrinkets = new List<int>[campaign.scenarioCollection.Count];
 		gameDate = DateTime.Today.ToShortDateString();
 		saveStateIndex = -1;
 		scenarioPlayingIndex = 0;
@@ -303,6 +307,8 @@ public class CampaignState
 		scenarioLore.Fill( 0 );
 		startingCharacterSheets.Fill(null);
 		currentCharacterSheets.Fill(null);
+		startingTrinkets.Fill(new List<int>());
+		currentTrinkets.Fill(new List<int>());
 	}
 
 	public static CampaignState GetState()

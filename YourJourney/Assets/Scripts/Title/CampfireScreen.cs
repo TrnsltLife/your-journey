@@ -506,7 +506,21 @@ public class CampfireScreen : MonoBehaviour
 
 	public void PopulateSkillButtons(SkillRecord skillRecord)
     {
+		//Calculate remaining XP and set the reaminingPointsNumberText indicator
+		int remainingXP = skillRecord.xp;
 		RoleData role = Roles.FromRole(skillRecord.role);
+		for (int i = 0; i < skillButtons.Length; i++)
+		{
+			int offsetIndex = i + role.indexOffset;
+			bool egoOwns = SkillOwnedByCurrentHero(role, offsetIndex);
+			if(egoOwns)
+            {
+				remainingXP -= role.skillCost[offsetIndex];
+            }
+		}
+		remainingPointsNumberText.text = remainingXP.ToString();
+
+		//Populate buttons
 		for(int i=0; i<skillButtons.Length; i++)
         {
 			int offsetIndex = i + role.indexOffset;
@@ -540,12 +554,13 @@ public class CampfireScreen : MonoBehaviour
 
 			//Set button text
 			int skillIndex = offsetIndex + 1;
-			skillTextTranslations[i].Change("skill." + role.dataName + "." + skillIndex, "Skill #" + skillIndex);
+			skillTextTranslations[i].Change("skill." + role.dataName + "." + skillIndex, Skills.SkillFromRoleID(skillRecord.role, skillIndex).originalName);
 
             //Set point cost
             skillCostText[i].text = role.skillCost[offsetIndex].ToString();
 
 			//Set color
+
 			//Grey for selectable
 			//Green for selected
 			//Red for not selectable (not enough xp, or owned by someone else)
