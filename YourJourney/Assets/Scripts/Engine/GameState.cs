@@ -39,6 +39,7 @@ public class GameState
 	{
 		//TODO return a bool for success?
 		campaignState = CampaignState.GetState();
+		//TODO needed? campaignState.currentCharactersSaved[campaignState.scenarioPlayingIndex] = false; //clear the saved flag on this scenario
 		coverImage = campaignState?.campaign?.coverImage ?? Bootstrap.gameStarter.coverImage; //go with the campaign cover image if available, otherwise whatever's in Bootstrap which could be a scenario cover image
 		partyState = PartyState.GetState( engine );
 		triggerState = engine.triggerManager.GetState();
@@ -150,6 +151,8 @@ public class GameState
 			//s is not null only when quickloading - make sure quickloading into same version of scenario as was quick saved
 			if ( s != null && fm.partyState.scenarioGUID != s.scenarioGUID )
 				return null;
+
+			fm.campaignState.UpgradeMissingCharacterSheets();
 
 			return fm;
 		}
@@ -266,9 +269,12 @@ public class CampaignState
 	public int[] scenarioXP, scenarioLore;
 	public List<CharacterSheet>[] startingCharacterSheets; //snapshot of characterSheets at the beginning of a scenario; used for replays
 	public List<CharacterSheet>[] currentCharacterSheets; //snapshot of characterSheets at the current saved/finished state in the scenario
+	public bool[] currentCharactersSaved; //indicates the player saved their upgrade choices; upgrade screen should load from currentCharactersSaved for unplayed scenarios; clear flag when scenario starts; does not apply to Replays
 	public List<int>[] startingTrinkets; //trinkets owned by the party at the beginning of a scenario; used for replays
 	public List<int>[] currentTrinkets; //trinkets owned by the party at the current saved/finished state in the scenario
-	public int scenarioPlayingIndex;//currently PLAYING scenario (ie: replays)
+	public List<int>[] startingMounts; //mounts owned by the party at the beginning of a scenario; used for replays
+	public List<int>[] currentMounts; //mounts owned by the party at the current saved/finished state in the scenario
+	public int scenarioPlayingIndex; //currently PLAYING scenario (ie: replays)
 	public int currentScenarioIndex;//the current scenario in the campaign
 	public string gameDate;
 
@@ -295,8 +301,11 @@ public class CampaignState
 		scenarioLore = new int[campaign.scenarioCollection.Count];
 		startingCharacterSheets = new List<CharacterSheet>[campaign.scenarioCollection.Count];
 		currentCharacterSheets = new List<CharacterSheet>[campaign.scenarioCollection.Count];
+		currentCharactersSaved = new bool[campaign.scenarioCollection.Count];
 		startingTrinkets = new List<int>[campaign.scenarioCollection.Count];
 		currentTrinkets = new List<int>[campaign.scenarioCollection.Count];
+		startingMounts = new List<int>[campaign.scenarioCollection.Count];
+		currentMounts = new List<int>[campaign.scenarioCollection.Count];
 		gameDate = DateTime.Today.ToShortDateString();
 		saveStateIndex = -1;
 		scenarioPlayingIndex = 0;
@@ -307,8 +316,51 @@ public class CampaignState
 		scenarioLore.Fill( 0 );
 		startingCharacterSheets.Fill(null);
 		currentCharacterSheets.Fill(null);
+		currentCharactersSaved.Fill(false);
 		startingTrinkets.Fill(new List<int>());
 		currentTrinkets.Fill(new List<int>());
+		startingMounts.Fill(new List<int>());
+		currentMounts.Fill(new List<int>());
+	}
+
+	public void UpgradeMissingCharacterSheets()
+    {
+		//Try to prevent these new fields from breaking existing campaigns
+		if(startingCharacterSheets==null)
+        {
+			startingCharacterSheets = new List<CharacterSheet>[campaign.scenarioCollection.Count];
+			startingCharacterSheets.Fill(null);
+		}
+		if(currentCharacterSheets==null)
+        {
+			currentCharacterSheets = new List<CharacterSheet>[campaign.scenarioCollection.Count];
+			currentCharacterSheets.Fill(null);
+		}
+		if(currentCharactersSaved==null)
+        {
+			currentCharactersSaved = new bool[campaign.scenarioCollection.Count];
+			currentCharactersSaved.Fill(false);
+		}
+		if(startingTrinkets==null)
+        {
+			startingTrinkets = new List<int>[campaign.scenarioCollection.Count];
+			startingTrinkets.Fill(new List<int>());
+		}
+		if(currentTrinkets==null)
+        {
+			currentTrinkets = new List<int>[campaign.scenarioCollection.Count];
+			currentTrinkets.Fill(new List<int>());
+		}
+		if(startingMounts==null)
+        {
+			startingMounts = new List<int>[campaign.scenarioCollection.Count];
+			startingMounts.Fill(new List<int>());
+        }
+		if(currentMounts==null)
+        {
+			currentMounts = new List<int>[campaign.scenarioCollection.Count];
+			currentMounts.Fill(new List<int>());
+        }
 	}
 
 	public static CampaignState GetState()
@@ -350,7 +402,7 @@ public class CampaignState
 			SkillRecord skillRecord = characterSheet.skillRecords.FirstOrDefault(it => it.role == characterSheet.role);
 			if(skillRecord != null)
             {
-				skillRecord.xp += scenarioLore[scenarioPlayingIndex];
+				skillRecord.xp += scenarioXP[scenarioPlayingIndex];
             }
         }
 

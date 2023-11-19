@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using TMPro;
@@ -12,7 +13,7 @@ public class CampfireScreen : MonoBehaviour
 {
 	public CampaignScreen campaignScreen;
 	public Image finalFader;
-	public Button continueButton, backButton;
+	public Button continueButton, backButton, saveButton;
 	public TextMeshProUGUI nameText, remainingPointsNumberText, stateText;
 	public Button[] heroButtons;
 	public Image[] heroImage;
@@ -39,10 +40,13 @@ public class CampfireScreen : MonoBehaviour
 	TitleManager tm;
 	TitleMetaData titleMetaData;
 	CampaignState campaignState;
+	List<CharacterSheet> startingCharacterSheets;
 	List<CharacterSheet> characterSheets;
 
 	CampfireState campfireState;
 
+	SkillRecord currentSkillRecord;
+	int currentRemainingXP;
 	int selectedHero = 0;
 	int maxHanded = 0;
 	int hand1Handed = 0;
@@ -83,12 +87,19 @@ public class CampfireScreen : MonoBehaviour
 		{
 			ActivateDropdowns(true);
 			ActivateCartouches(false);
+			saveButton.gameObject.SetActive(true);
 		}
 		else if (campfireState == CampfireState.VIEW)
 		{
 			ActivateDropdowns(false);
 			ActivateCartouches(true);
+			saveButton.gameObject.SetActive(false);
 		}
+		//Save button also inactive on Replays
+		if(campaignState.scenarioPlayingIndex != campaignState.currentScenarioIndex)
+        {
+			saveButton.gameObject.SetActive(false);
+        }
 
 		SetImages();
 		OnHeroSelect(0);
@@ -101,10 +112,12 @@ public class CampfireScreen : MonoBehaviour
 		else if(campfireState == CampfireState.UPGRADE)
         {
 			ActivateSkillForm(true, true);
+			OnSkillDropdownSelect();
 		}
 		else if(campfireState == CampfireState.VIEW)
         {
 			ActivateSkillForm(true, false);
+			OnSkillDropdownSelect();
 		}
 
 		gameObject.SetActive( true );
@@ -127,26 +140,38 @@ public class CampfireScreen : MonoBehaviour
 		if (campfireState == CampfireState.SETUP)
 		{
 			//Start with the starting state of the first scenario
-			characterSheets = campaignState.startingCharacterSheets[0];
+			startingCharacterSheets = campaignState.startingCharacterSheets[0];
 		}
 		else if (campfireState == CampfireState.VIEW)
 		{
 			//Use the current state of the scenario being played right now (continue or replay)
-			characterSheets = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex];
+			startingCharacterSheets = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex];
 		}
 		else if (campfireState == CampfireState.UPGRADE)
 		{
-			int tempIndex = campaignState.scenarioPlayingIndex - 1;
-			if (tempIndex < 0)
+			int previousIndex = campaignState.scenarioPlayingIndex - 1;
+			if (previousIndex < 0)
 			{
 				//Start with the starting state of the first scenario
-				characterSheets = campaignState.startingCharacterSheets[0];
+				startingCharacterSheets = campaignState.startingCharacterSheets[0];
 			}
 			else
 			{
 				//Start with the final state of the previous scenario
-				characterSheets = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex - 1];
+				startingCharacterSheets = campaignState.currentCharacterSheets[previousIndex];
 			}
+		}
+
+		if (campaignState.currentCharactersSaved[campaignState.scenarioPlayingIndex])
+		{
+			//Player used the Save button to save their character sheet state before starting the adventure. They then left the game and came back.
+			//Load their saved data as the currentCharacterSheets. The startingCharacterSheets should still be the end of the last scenario so their
+			////previously selected item tier can still be shown in the list for reselection of the previous tier, or reselection of the upgrade tier.
+			characterSheets = campaignState.startingCharacterSheets[campaignState.scenarioPlayingIndex];
+		}
+		else
+		{
+			characterSheets = CampaignState.CloneCharacterSheetList(startingCharacterSheets);
 		}
 	}
 
@@ -278,7 +303,7 @@ public class CampfireScreen : MonoBehaviour
 
 		int selectedIndex = 0;
 
-		List<RoleData> availableRoles = Roles.list.Where(it => Roles.RoleAvailable(it.role, characterSheets, selectedHero)).ToList();
+		List<RoleData> availableRoles = Roles.list.Where(it => it.role != Role.NONE && Roles.RoleAvailable(it.role, characterSheets, selectedHero)).ToList();
 		roleList.Clear();
 		roleList.AddRange(availableRoles);
 
@@ -301,18 +326,6 @@ public class CampfireScreen : MonoBehaviour
 		dropdown.SetValueWithoutNotify(selectedIndex);
 	}
 
-	public void PopulateItemDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int tier, int hand = 0)
-    {
-		if (campfireState == CampfireState.SETUP)
-		{
-			PopulateItemSetupDropdown(dropdown, itemList, slot, tier, hand);
-		}
-		else if(campfireState == CampfireState.UPGRADE)
-        {
-			PopulateItemUpgradeDropdown(dropdown, itemList, slot, currentLore, hand);
-		}
-	}
-
 	public void PopulateTitleDropdown()
     {
 		//populate dropdown
@@ -332,6 +345,28 @@ public class CampfireScreen : MonoBehaviour
 		titleDropdown.SetValueWithoutNotify(0);
 	}
 
+	public void PopulateItemDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot)
+	{
+		PopulateItemDropdown(dropdown, itemList, slot, 0, 0);
+	}
+
+	public void PopulateItemDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int hand)
+	{
+		PopulateItemDropdown(dropdown, itemList, slot, hand, 1);
+	}
+
+	public void PopulateItemDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int hand, int tier)
+	{
+		if (campfireState == CampfireState.SETUP)
+		{
+			PopulateItemSetupDropdown(dropdown, itemList, slot, tier, hand);
+		}
+		else if (campfireState == CampfireState.UPGRADE)
+		{
+			PopulateItemUpgradeDropdown(dropdown, itemList, slot, currentLore, hand);
+		}
+	}
+
 	public void PopulateItemSetupDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int tier, int hand=0)
     {
 		//populate dropdown
@@ -339,7 +374,12 @@ public class CampfireScreen : MonoBehaviour
 
 		int selectedIndex = 0;
 		itemList.Clear();
-		itemList.Add(Items.list[0]);
+
+		//Allow None to be selected for HAND 2, TRINKET, and MOUNT, but not for ARMOR or HAND 1
+		if (slot == Slot.TRINKET || slot == Slot.MOUNT || (slot == Slot.HAND && hand == 2))
+		{
+			itemList.Add(Items.list[0]); //None
+		}
 
 		int handedLimit = 2;
 		if(hand == 1) { handedLimit = maxHanded - hand2Handed; }
@@ -375,6 +415,7 @@ public class CampfireScreen : MonoBehaviour
 				(slot == Slot.ARMOR && item.id == characterSheets[selectedHero].armorId) ||
 				(slot == Slot.HAND && hand==1 && item.id == characterSheets[selectedHero].hand1Id) ||
 				(slot == Slot.HAND && hand == 2 && item.id == characterSheets[selectedHero].hand2Id) ||
+				(slot == Slot.TRINKET && item.id == characterSheets[selectedHero].trinketId) ||
 				(slot == Slot.MOUNT && item.id == characterSheets[selectedHero].mountId)
 			)
 			{
@@ -385,6 +426,17 @@ public class CampfireScreen : MonoBehaviour
 		dropdown.ClearOptions();
 		dropdown.AddOptions(optionList);
 		dropdown.SetValueWithoutNotify(selectedIndex);
+
+		//Make sure to explicitly set an item by default for every slot in the character's inventory. It will be the role default, or the first in the list, which could include None for some slots (HAND2, TRINKET, MOUNT)
+		if (itemList.Count > 0)
+		{
+			Item selectedItem = itemList[selectedIndex];
+			if (slot == Slot.ARMOR) { characterSheets[selectedHero].armorId = selectedItem.id; }
+			else if (slot == Slot.HAND && hand == 1) { characterSheets[selectedHero].hand1Id = selectedItem.id; }
+			else if (slot == Slot.HAND && hand == 2) { characterSheets[selectedHero].hand2Id = selectedItem.id; }
+			else if (slot == Slot.TRINKET) { characterSheets[selectedHero].trinketId = selectedItem.id; }
+			else if (slot == Slot.MOUNT) { characterSheets[selectedHero].mountId = selectedItem.id; }
+		}
 	}
 
 	public void PopulateItemUpgradeDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int lore, int hand = 0)
@@ -402,23 +454,39 @@ public class CampfireScreen : MonoBehaviour
 
 		itemList.Clear();
 
+		Item startingItem = null;
 		Item currentItem = null;
 		if (slot == Slot.ARMOR)
 		{
+			startingItem = Items.FromID(startingCharacterSheets[selectedHero].armorId);
 			currentItem = Items.FromID(characterSheets[selectedHero].armorId);
 		}
 		else if(slot == Slot.HAND && hand == 1)
         {
+			startingItem = Items.FromID(startingCharacterSheets[selectedHero].hand1Id);
 			currentItem = Items.FromID(characterSheets[selectedHero].hand1Id);
 		}
 		else if (slot == Slot.HAND && hand == 2)
 		{
+			startingItem = Items.FromID(startingCharacterSheets[selectedHero].hand2Id);
 			currentItem = Items.FromID(characterSheets[selectedHero].hand2Id);
+		}
+		else if (slot == Slot.TRINKET)
+		{
+			startingItem = Items.FromID(startingCharacterSheets[selectedHero].trinketId);
+			currentItem = Items.FromID(characterSheets[selectedHero].trinketId);
 		}
 		else if (slot == Slot.MOUNT)
 		{
+			startingItem = Items.FromID(startingCharacterSheets[selectedHero].mountId);
 			currentItem = Items.FromID(characterSheets[selectedHero].mountId);
 		}
+
+		//Add the starting item to the list so the player can backtrack and choose a different upgrade while still on the upgrade screen.
+		if(startingItem != null && currentItem != null && startingItem.id != currentItem.id)
+        {
+			itemList.Add(startingItem);
+        }
 
 		if (currentItem != null)
 		{
@@ -504,8 +572,9 @@ public class CampfireScreen : MonoBehaviour
 		skillDropdown.SetValueWithoutNotify(selectedIndex);
 	}
 
-	public void PopulateSkillButtons(SkillRecord skillRecord)
+	public void PopulateSkillButtons()
     {
+		SkillRecord skillRecord = currentSkillRecord;
 		//Calculate remaining XP and set the reaminingPointsNumberText indicator
 		int remainingXP = skillRecord.xp;
 		RoleData role = Roles.FromRole(skillRecord.role);
@@ -519,6 +588,7 @@ public class CampfireScreen : MonoBehaviour
             }
 		}
 		remainingPointsNumberText.text = remainingXP.ToString();
+		currentRemainingXP = remainingXP;
 
 		//Populate buttons
 		for(int i=0; i<skillButtons.Length; i++)
@@ -537,13 +607,15 @@ public class CampfireScreen : MonoBehaviour
 				button.gameObject.SetActive(false);
 				continue;
 			}
-			else if(!isAvailable)
+			/*
+			else if(!isAvailable && !egoOwns)
             {
 				button.gameObject.SetActive(false);
             }
+			*/
 
 			//Button interactable?
-			if (campfireState != CampfireState.VIEW && (isAvailable || egoOwns))
+			if (campfireState != CampfireState.VIEW && (egoOwns || (isAvailable && role.skillCost[offsetIndex] <= remainingXP)))
 			{
 				button.interactable = true;
 			}
@@ -560,10 +632,21 @@ public class CampfireScreen : MonoBehaviour
             skillCostText[i].text = role.skillCost[offsetIndex].ToString();
 
 			//Set color
-
-			//Grey for selectable
-			//Green for selected
-			//Red for not selectable (not enough xp, or owned by someone else)
+			if(!egoOwns && isAvailable)
+            {
+				//White color for selectable
+				button.GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f, 255f / 255f);
+			}
+			else if (egoOwns)
+			{
+				//Yellow for selected
+				button.GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 0, 255f / 255f);
+			}
+			else if ((!egoOwns && !isAvailable) || role.skillCost[offsetIndex] > remainingXP)
+			{
+				//Red for not selectable (owned by someone else or not enough XP)
+				button.GetComponent<Image>().color = new Color(255f / 255f, 0, 0, 255f / 255f);
+			}
 		}
 	}
 
@@ -594,15 +677,33 @@ public class CampfireScreen : MonoBehaviour
 	}
 
 
-	public void OnSkillSelect()
+	public void OnSkillDropdownSelect()
     {
 		int index = skillDropdown.GetComponent<TMP_Dropdown>().value;
 		Debug.Log("OnSkillSelect index: " + index);
 		if(index < 0 || index >= characterSheets[selectedHero].skillRecords.Count) { return; }
-		SkillRecord skillRecord = characterSheets[selectedHero].skillRecords[index];
-		Debug.Log("skillRecord role:" + skillRecord.role + " xp:" + skillRecord.xp);
+		currentSkillRecord = characterSheets[selectedHero].skillRecords[index];
+		Debug.Log("skillRecord role:" + currentSkillRecord.role + " xp:" + currentSkillRecord.xp);
 
-		PopulateSkillButtons(skillRecord);
+		PopulateSkillButtons();
+    }
+
+	public void OnSkillButtonSelect(int buttonIndex)
+    {
+		Role role = currentSkillRecord.role;
+		RoleData roleData = Roles.FromRole(role);
+		int skillIndex = buttonIndex + roleData.indexOffset;
+		bool isAvailable = SkillAvailable(roleData, skillIndex);
+		bool egoOwns = SkillOwnedByCurrentHero(roleData, skillIndex);
+		if (isAvailable && roleData.skillCost[skillIndex] <= currentRemainingXP)
+		{
+			currentSkillRecord.selectedSkillIndex.Add(skillIndex);
+		}
+		else if(egoOwns)
+        {
+			currentSkillRecord.selectedSkillIndex.Remove(skillIndex);
+        }
+		PopulateSkillButtons();
     }
 
 	public void OnRoleSelect()
@@ -621,6 +722,7 @@ public class CampfireScreen : MonoBehaviour
 			int index = armorDropdown.GetComponent<TMP_Dropdown>().value;
 			item = armorList[index];
 			characterSheets[selectedHero].armorId = item.id;
+			if(campfireState == CampfireState.UPGRADE) { PopulateItemDropdown(armorDropdown, armorList, Slot.ARMOR); }
 		}
 		else if(slotHand == "hand1")
         {
@@ -629,7 +731,8 @@ public class CampfireScreen : MonoBehaviour
 			item = hand1List[index];
 			characterSheets[selectedHero].hand1Id = item.id;
 			hand1Handed = item.handed;
-			PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 1, 2); //Repopulate to hide/reveal one- or two- handed weapons in hand2 based on hand1 selection
+			if (campfireState == CampfireState.UPGRADE) { PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1); }
+			PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 2, 1); //Repopulate to hide/reveal one- or two- handed weapons in hand2 based on hand1 selection
 		}
 		else if (slotHand == "hand2")
 		{
@@ -638,6 +741,7 @@ public class CampfireScreen : MonoBehaviour
 			item = hand2List[index];
 			characterSheets[selectedHero].hand2Id = item.id;
 			hand2Handed = item.handed;
+			if (campfireState == CampfireState.UPGRADE) { PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 2); }
 			PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1, 1); //Repopulate to hide/reveal one- or two- handed weapons in hand1 based on hand2 selection
 		}
 		else if (slotHand == "trinket")
@@ -645,6 +749,7 @@ public class CampfireScreen : MonoBehaviour
 			int index = trinketDropdown.GetComponent<TMP_Dropdown>().value;
 			item = trinketList[index];
 			characterSheets[selectedHero].trinketId = item.id;
+			if (campfireState == CampfireState.UPGRADE) { PopulateItemDropdown(trinketDropdown, trinketList, Slot.TRINKET); }
 		}
 		else if (slotHand == "mount")
 		{
@@ -656,13 +761,13 @@ public class CampfireScreen : MonoBehaviour
 		if(item.tier == 4 || previousItemWasTier4)
         {
 			//Repopulate armor to update the tier-4 availability.
-			PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1, 1);
+			PopulateItemDropdown(armorDropdown, armorList, Slot.ARMOR);
 
 			//Hand1 and Hand2 already handled Hand2 and Hand1.
 			if (slotHand == "armor")
             {
-				PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1, 1);
-				PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 1, 2);
+				PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1);
+				PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 2);
 			}
 		}
 	}
@@ -678,7 +783,7 @@ public class CampfireScreen : MonoBehaviour
 		ColorBlock cb = heroButtons[index].colors;
 		heroButtons[index].colors = new ColorBlock()
 		{
-			normalColor = new Color(0, 255f / 255f, 45f / 255f, 128f / 255f),
+			normalColor = new Color(255f / 255f, 167f / 255f, 124f / 255f, 128f / 255f),
 			pressedColor = cb.pressedColor,
 			selectedColor = cb.selectedColor,
 			colorMultiplier = cb.colorMultiplier,
@@ -701,7 +806,7 @@ public class CampfireScreen : MonoBehaviour
 
 			PopulateItemDropdown(armorDropdown, armorList, Slot.ARMOR, 1);
 			PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1, 1);
-			PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 1, 2);
+			PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 2, 1);
 			PopulateItemDropdown(trinketDropdown, trinketList, Slot.TRINKET, 1);
 			PopulateItemDropdown(mountDropdown, mountList, Slot.MOUNT, 0);
 
@@ -710,7 +815,7 @@ public class CampfireScreen : MonoBehaviour
 			if (campfireState == CampfireState.UPGRADE)
 			{
 				PopulateSkillDropdown();
-				OnSkillSelect();
+				OnSkillDropdownSelect();
 			}
 		}
 		else if(campfireState == CampfireState.VIEW)
@@ -753,6 +858,26 @@ public class CampfireScreen : MonoBehaviour
 			tm.gameTitleFlash.SetActive(true);
 			campaignScreen.ActivateScreen(titleMetaData);
 		} );
+	}
+
+	public void OnSave()
+    {
+		if (campfireState == CampfireState.SETUP)
+		{
+			//Start with the starting state of the first scenario
+			campaignState.startingCharacterSheets[0] = CampaignState.CloneCharacterSheetList(characterSheets);
+		}
+		else if (campfireState == CampfireState.UPGRADE)
+		{
+			campaignState.startingCharacterSheets[campaignState.scenarioPlayingIndex] = CampaignState.CloneCharacterSheetList(characterSheets);
+		}
+
+		//Set the save flag on this scenario so CampfireScreen will load from this scenario's startCharacterSheets instead of the last scenario's currentCharacterSheets
+		campaignState.currentCharactersSaved[campaignState.scenarioPlayingIndex] = true;
+
+		//Save the campaign state that's been updated on this screen
+		var gs = GameState.LoadState(campaignState.saveStateIndex);
+		gs.SaveCampaignState(campaignState.saveStateIndex, campaignState);
 	}
 
 	public void OnNext()

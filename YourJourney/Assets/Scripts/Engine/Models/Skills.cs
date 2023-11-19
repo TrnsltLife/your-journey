@@ -95,7 +95,7 @@ public class Skills
         new Skill(71){collection=3, role=Role.HERBALIST, skillCost=3, dataName="Hands of a Healer", originalName="Hands of a Healer", skillId=5},
         new Skill(72){collection=3, role=Role.HERBALIST, skillCost=3, dataName="Insight", originalName="Insight", skillId=6},
         new Skill(73){collection=3, role=Role.HERBALIST, skillCost=7, dataName="Calming Presence", originalName="Calming Presence", skillId=7},
-        new Skill(74){collection=3, role=Role.HERBALIST, skillCost=7, dataName="Athelas", originalName="Athelas", skillId=8},
+        new Skill(74){collection=3, role=Role.HERBALIST, skillCost=7, dataName="A------", originalName="Athelas", skillId=8},
         new Skill(75){collection=3, role=Role.HERBALIST, skillCost=7, dataName="Natural Remedy", originalName="Natural Remedy", skillId=9},
         new Skill(76){collection=3, role=Role.HERBALIST, skillCost=7, dataName="Innovation", originalName="Innovation", skillId=10},
         new Skill(77){collection=3, role=Role.HERBALIST, skillCost=12, dataName="Phosphorescence", originalName="Phosphorescence", skillId=11},
