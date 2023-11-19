@@ -330,14 +330,15 @@ public class CampfireScreen : MonoBehaviour
     {
 		//populate dropdown
 		List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();
+		string collectionText = "    "; //TODO Add collection icons
 		foreach(int titleId in characterSheets[selectedHero].titles)
         {
-			var dropdownOption = new TMP_Dropdown.OptionData(Translate("title." + titleId, "Title " + titleId.ToString()));
+			var dropdownOption = new TMP_Dropdown.OptionData(collectionText + Translate("title." + titleId, "Title " + titleId.ToString()));
 			optionList.Add(dropdownOption);
 		}
 		if(optionList.Count == 0)
         {
-			var dropdownOption = new TMP_Dropdown.OptionData(Translate("title.None", "None"));
+			var dropdownOption = new TMP_Dropdown.OptionData(collectionText + Translate("title.None", "None"));
 			optionList.Add(dropdownOption);
 		}
 		titleDropdown.ClearOptions();
@@ -427,6 +428,7 @@ public class CampfireScreen : MonoBehaviour
 		dropdown.AddOptions(optionList);
 		dropdown.SetValueWithoutNotify(selectedIndex);
 
+		//Do this because of heroes that don't have default armor and hand1 items set from the Heroes.list, e.g. the Friend of Beasts portrait and all the extra portraits that don't correspond to physical character sheets.
 		//Make sure to explicitly set an item by default for every slot in the character's inventory. It will be the role default, or the first in the list, which could include None for some slots (HAND2, TRINKET, MOUNT)
 		if (itemList.Count > 0)
 		{
