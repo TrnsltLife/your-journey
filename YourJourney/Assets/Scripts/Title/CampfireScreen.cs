@@ -13,7 +13,7 @@ public class CampfireScreen : MonoBehaviour
 {
 	public CampaignScreen campaignScreen;
 	public Image finalFader;
-	public Button continueButton, backButton, saveButton;
+	public Button continueButton, backButton, saveButton, clearTrinketsButton, clearMountsButton;
 	public TextMeshProUGUI nameText, remainingPointsNumberText, stateText;
 	public Button[] heroButtons;
 	public Image[] heroImage;
@@ -40,8 +40,12 @@ public class CampfireScreen : MonoBehaviour
 	TitleManager tm;
 	TitleMetaData titleMetaData;
 	CampaignState campaignState;
-	List<CharacterSheet> startingCharacterSheets;
-	List<CharacterSheet> characterSheets;
+	List<CharacterSheet> startingCharacterSheets; //loaded from campaignState
+	List<CharacterSheet> characterSheets; //as updated on the campfire screen
+	List<int> startingTrinkets; //loaded from campaignState
+	List<int> campfireTrinkets; //as updated on the campfire screen
+	List<int> startingMounts; //loaded from campaignState
+	List<int> campfireMounts; //as updated on the campfire screen
 
 	CampfireState campfireState;
 
@@ -141,11 +145,15 @@ public class CampfireScreen : MonoBehaviour
 		{
 			//Start with the starting state of the first scenario
 			startingCharacterSheets = campaignState.startingCharacterSheets[0];
+			startingTrinkets = campaignState.startingTrinkets[0];
+			startingMounts = campaignState.startingMounts[0];
 		}
 		else if (campfireState == CampfireState.VIEW)
 		{
 			//Use the current state of the scenario being played right now (continue or replay)
 			startingCharacterSheets = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex];
+			startingTrinkets = campaignState.currentTrinkets[campaignState.scenarioPlayingIndex];
+			startingMounts = campaignState.currentMounts[campaignState.scenarioPlayingIndex];
 		}
 		else if (campfireState == CampfireState.UPGRADE)
 		{
@@ -154,11 +162,15 @@ public class CampfireScreen : MonoBehaviour
 			{
 				//Start with the starting state of the first scenario
 				startingCharacterSheets = campaignState.startingCharacterSheets[0];
+				startingTrinkets = campaignState.startingTrinkets[0];
+				startingMounts = campaignState.startingMounts[0];
 			}
 			else
 			{
 				//Start with the final state of the previous scenario
 				startingCharacterSheets = campaignState.currentCharacterSheets[previousIndex];
+				startingTrinkets = campaignState.currentTrinkets[previousIndex];
+				startingMounts = campaignState.currentMounts[previousIndex];
 			}
 		}
 
@@ -168,10 +180,14 @@ public class CampfireScreen : MonoBehaviour
 			//Load their saved data as the currentCharacterSheets. The startingCharacterSheets should still be the end of the last scenario so their
 			////previously selected item tier can still be shown in the list for reselection of the previous tier, or reselection of the upgrade tier.
 			characterSheets = campaignState.startingCharacterSheets[campaignState.scenarioPlayingIndex];
+			campfireTrinkets = campaignState.startingTrinkets[campaignState.scenarioPlayingIndex];
+			campfireMounts = campaignState.startingMounts[campaignState.scenarioPlayingIndex];
 		}
 		else
 		{
 			characterSheets = CampaignState.CloneCharacterSheetList(startingCharacterSheets);
+			campfireTrinkets = new List<int>(startingTrinkets);
+			campfireMounts = new List<int>(startingMounts);
 		}
 	}
 
@@ -183,6 +199,9 @@ public class CampfireScreen : MonoBehaviour
 		hand2Dropdown.gameObject.SetActive(active);
 		trinketDropdown.gameObject.SetActive(active);
 		mountDropdown.gameObject.SetActive(active);
+
+		clearTrinketsButton.gameObject.SetActive(active);
+		clearMountsButton.gameObject.SetActive(active);
 	}
 	public void ActivateCartouches(bool active)
 	{
@@ -360,7 +379,7 @@ public class CampfireScreen : MonoBehaviour
 	{
 		if (campfireState == CampfireState.SETUP)
 		{
-			PopulateItemSetupDropdown(dropdown, itemList, slot, tier, hand);
+			PopulateItemSetupDropdown(dropdown, itemList, slot, hand, tier);
 		}
 		else if (campfireState == CampfireState.UPGRADE)
 		{
@@ -368,7 +387,7 @@ public class CampfireScreen : MonoBehaviour
 		}
 	}
 
-	public void PopulateItemSetupDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int tier, int hand=0)
+	public void PopulateItemSetupDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int hand, int tier)
     {
 		//populate dropdown
 		List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();
@@ -382,6 +401,13 @@ public class CampfireScreen : MonoBehaviour
 			itemList.Add(Items.list[0]); //None
 		}
 
+		//Special treatment for Snow horse. Add it to the list for characters who can have it.
+		ItemSeries mountSeries = Heroes.FromID(characterSheets[selectedHero].portraitIndex).mount;
+		if (slot == Slot.MOUNT && mountSeries != ItemSeries.NONE)
+        {
+            itemList.Add(Items.FromSeriesID(mountSeries)[0]);
+        }
+
 		int handedLimit = 2;
 		if(hand == 1) { handedLimit = maxHanded - hand2Handed; }
 		else if(hand == 2) { handedLimit = maxHanded - hand1Handed; }
@@ -390,7 +416,9 @@ public class CampfireScreen : MonoBehaviour
 		{
 			//No ability to wield another item. Halflings can only wield one-handed. Everyone but shieldmaiden is limited to two-handed. Shieldmaiden can wield one one-handed and one two-handed; or two one-handed.
 		}
-		else
+		else if (slot == Slot.ARMOR || slot == Slot.HAND ||
+				(slot == Slot.TRINKET && campaignState.campaign.startWithTrinkets == true) ||
+				(slot == Slot.MOUNT && campaignState.campaign.startWithMounts == true))
 		{
 			List<Item> availableItems = Items.list.Where(item =>
 				item.slotId == slot &&
@@ -436,25 +464,31 @@ public class CampfireScreen : MonoBehaviour
 			if (slot == Slot.ARMOR) { characterSheets[selectedHero].armorId = selectedItem.id; }
 			else if (slot == Slot.HAND && hand == 1) { characterSheets[selectedHero].hand1Id = selectedItem.id; }
 			else if (slot == Slot.HAND && hand == 2) { characterSheets[selectedHero].hand2Id = selectedItem.id; }
-			else if (slot == Slot.TRINKET) { characterSheets[selectedHero].trinketId = selectedItem.id; }
-			else if (slot == Slot.MOUNT) { characterSheets[selectedHero].mountId = selectedItem.id; }
+			else if (slot == Slot.TRINKET)
+			{
+				characterSheets[selectedHero].trinketId = selectedItem.id;
+			}
+			else if (slot == Slot.MOUNT)
+			{
+				characterSheets[selectedHero].mountId = selectedItem.id;
+			}
 		}
 	}
 
-	public void PopulateItemUpgradeDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int lore, int hand = 0)
+	public void PopulateItemUpgradeDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int lore, int hand)
 	{
 		//populate dropdown with the current item and any available upgrades
 		List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();
 
 		int selectedIndex = 0;
-		int upgradeCost = 0;
-		int currentTier = 1;
-		bool hasTier4Item =
-			Items.FromID(characterSheets[selectedHero].armorId).tier == 4 ||
-			Items.FromID(characterSheets[selectedHero].hand1Id).tier == 4 ||
-			Items.FromID(characterSheets[selectedHero].hand2Id).tier == 4;
 
 		itemList.Clear();
+
+		//Allow None selection for Trinket and Mount
+		if(slot == Slot.TRINKET || slot == Slot.MOUNT)
+        {
+			itemList.Add(Items.list[0]); //None
+        }
 
 		Item startingItem = null;
 		Item currentItem = null;
@@ -473,6 +507,7 @@ public class CampfireScreen : MonoBehaviour
 			startingItem = Items.FromID(startingCharacterSheets[selectedHero].hand2Id);
 			currentItem = Items.FromID(characterSheets[selectedHero].hand2Id);
 		}
+		/*
 		else if (slot == Slot.TRINKET)
 		{
 			startingItem = Items.FromID(startingCharacterSheets[selectedHero].trinketId);
@@ -483,13 +518,102 @@ public class CampfireScreen : MonoBehaviour
 			startingItem = Items.FromID(startingCharacterSheets[selectedHero].mountId);
 			currentItem = Items.FromID(characterSheets[selectedHero].mountId);
 		}
+		*/
 
-		//Add the starting item to the list so the player can backtrack and choose a different upgrade while still on the upgrade screen.
-		if(startingItem != null && currentItem != null && startingItem.id != currentItem.id)
+		if(slot == Slot.TRINKET)
+		{
+			Debug.Log("startingTrinkets: " + String.Join(", ", startingTrinkets));
+
+			//Show all trinkets at the current tier and all upgradeable trinkets
+			List<Item> availableTrinkets = startingTrinkets
+				.ConvertAll(it => Items.FromID(it))
+				.Where(item => Items.TrinketSeriesAvailable(item.seriesId, characterSheets, selectedHero))
+				.ToList();
+
+			Debug.Log("availableTrinkets: " + String.Join(", ", availableTrinkets.ConvertAll(it => it.id + "/" + it.seriesName + "/" + it.tier)));
+			
+			foreach(var currentTrinket in availableTrinkets)
+            {
+				//itemList.Add(currentTrinket);
+				itemList.AddRange(AvailableUpgrades(currentTrinket, slot, hand));
+			}
+		}
+		else if (slot == Slot.MOUNT)
+		{
+			//Special treatment for Snow horse. Add it to the list for characters who can have it.
+			ItemSeries mountSeries = Heroes.FromID(characterSheets[selectedHero].portraitIndex).mount;
+			if (slot == Slot.MOUNT && mountSeries != ItemSeries.NONE)
+			{
+				itemList.Add(Items.FromSeriesID(mountSeries)[0]);
+			}
+
+			List<Item> availableMounts = startingMounts
+				.ConvertAll(it => Items.FromID(it))
+				.Where(item => 
+					item.tier == 0 && //The Snow horse is set to tier -1 so this excludes it from players that aren't granted access explicitly
+					Items.ItemAvailable(item.id, characterSheets, selectedHero, hand))
+				.ToList();
+			itemList.AddRange(availableMounts);
+		}
+		else //ARMOR, HAND 1, HAND 2
+		{
+			//Add the starting item to the list so the player can backtrack and choose a different upgrade while still on the upgrade screen.
+			//if (startingItem != null && currentItem != null && startingItem.id != currentItem.id)
+			//{
+			//	itemList.Add(startingItem);
+			//}
+			//itemList.AddRange(AvailableUpgrades(currentItem, slot, hand));
+
+			itemList.AddRange(AvailableUpgrades(startingItem, slot, hand));
+		}
+
+		//If there is no item, show None in the dropdown
+		if (itemList.Count == 0)
         {
-			itemList.Add(startingItem);
-        }
+			itemList.Add(Items.list[0]); //None
+		}
 
+		int i = 0;
+		foreach (var item in itemList)
+		{
+			//TODO Translate
+			Collection collection = Collection.FromID(item.collection);
+			string collectionText = AppendCollectionSpacing(collection, "<font=\"Icon\">" + collection.FontCharacter + "</font>");
+			string tierText = "";
+			if(item.tier == 1) { tierText = " I"; }
+			else if (item.tier == 2) { tierText = " II"; }
+			else if (item.tier == 3) { tierText = " III"; }
+			else if (item.tier == 4) { tierText = " IV"; }
+
+			var dropdownOption = new TMP_Dropdown.OptionData(collectionText + item.dataName + tierText);
+			optionList.Add(dropdownOption);
+			if (
+				(slot == Slot.ARMOR && item.id == characterSheets[selectedHero].armorId) ||
+				(slot == Slot.HAND && hand == 1 && item.id == characterSheets[selectedHero].hand1Id) ||
+				(slot == Slot.HAND && hand == 2 && item.id == characterSheets[selectedHero].hand2Id) ||
+				(slot == Slot.TRINKET && item.id == characterSheets[selectedHero].trinketId) ||
+				(slot == Slot.MOUNT && item.id == characterSheets[selectedHero].mountId)
+			)
+			{
+				selectedIndex = i;
+			}
+			i++;
+		}
+		dropdown.ClearOptions();
+		dropdown.AddOptions(optionList);
+		dropdown.SetValueWithoutNotify(selectedIndex);
+	}
+
+	public List<Item> AvailableUpgrades(Item currentItem, Slot slot, int hand)
+    {
+		int upgradeCost = 0;
+		int currentTier = 1;
+		bool hasTier4Item =
+			Items.FromID(characterSheets[selectedHero].armorId).tier == 4 ||
+			Items.FromID(characterSheets[selectedHero].hand1Id).tier == 4 ||
+			Items.FromID(characterSheets[selectedHero].hand2Id).tier == 4;
+
+		List<Item> itemList = new List<Item>();
 		if (currentItem != null)
 		{
 			itemList.Add(currentItem);
@@ -517,41 +641,7 @@ public class CampfireScreen : MonoBehaviour
 				itemList.AddRange(availableUpgrades);
 			}
 		}
-
-		//If there is no item, show None in the dropdown
-		if(itemList.Count == 0)
-        {
-			itemList.Add(Items.list[0]);
-		}
-
-		int i = 0;
-		foreach (var item in itemList)
-		{
-			//TODO Translate
-			Collection collection = Collection.FromID(item.collection);
-			string collectionText = AppendCollectionSpacing(collection, "<font=\"Icon\">" + collection.FontCharacter + "</font>");
-			string tierText = "";
-			if(item.tier == 1) { tierText = " I"; }
-			else if (item.tier == 2) { tierText = " II"; }
-			else if (item.tier == 3) { tierText = " III"; }
-			else if (item.tier == 4) { tierText = " IV"; }
-
-			var dropdownOption = new TMP_Dropdown.OptionData(collectionText + item.dataName + tierText);
-			optionList.Add(dropdownOption);
-			if (
-				(slot == Slot.ARMOR && item.id == characterSheets[selectedHero].armorId) ||
-				(slot == Slot.HAND && hand == 1 && item.id == characterSheets[selectedHero].hand1Id) ||
-				(slot == Slot.HAND && hand == 2 && item.id == characterSheets[selectedHero].hand2Id) ||
-				(slot == Slot.MOUNT && item.id == characterSheets[selectedHero].mountId)
-			)
-			{
-				selectedIndex = i;
-			}
-			i++;
-		}
-		dropdown.ClearOptions();
-		dropdown.AddOptions(optionList);
-		dropdown.SetValueWithoutNotify(selectedIndex);
+		return itemList;
 	}
 
 	public void PopulateSkillDropdown()
@@ -682,10 +772,8 @@ public class CampfireScreen : MonoBehaviour
 	public void OnSkillDropdownSelect()
     {
 		int index = skillDropdown.GetComponent<TMP_Dropdown>().value;
-		Debug.Log("OnSkillSelect index: " + index);
 		if(index < 0 || index >= characterSheets[selectedHero].skillRecords.Count) { return; }
 		currentSkillRecord = characterSheets[selectedHero].skillRecords[index];
-		Debug.Log("skillRecord role:" + currentSkillRecord.role + " xp:" + currentSkillRecord.xp);
 
 		PopulateSkillButtons();
     }
@@ -776,8 +864,6 @@ public class CampfireScreen : MonoBehaviour
 
 	public void OnHeroSelect(int index)
 	{
-		Debug.Log("Hero select " + index);
-
 		if (index >= characterSheets.Count) { return; }
 
 		ResetHeroes();
@@ -802,15 +888,27 @@ public class CampfireScreen : MonoBehaviour
 		hand1Handed = Items.FromID(characterSheets[selectedHero].hand1Id).handed;
 		hand2Handed = Items.FromID(characterSheets[selectedHero].hand2Id).handed;
 
+		//Hide Hand 2 if character has maxHanded == 1, e.g. Halflings
+		if(maxHanded == 1)
+        {
+			hand2TextTranslation.gameObject.SetActive(false);
+			hand2Dropdown.gameObject.SetActive(false);
+        }
+		else
+        {
+			hand2TextTranslation.gameObject.SetActive(true);
+			hand2Dropdown.gameObject.SetActive(true);
+		}
+
 		if (campfireState == CampfireState.SETUP || campfireState == CampfireState.UPGRADE)
 		{
 			PopulateRoleDropdown(roleDropdown, roleList);
 
-			PopulateItemDropdown(armorDropdown, armorList, Slot.ARMOR, 1);
+			PopulateItemDropdown(armorDropdown, armorList, Slot.ARMOR, 0, 1);
 			PopulateItemDropdown(hand1Dropdown, hand1List, Slot.HAND, 1, 1);
 			PopulateItemDropdown(hand2Dropdown, hand2List, Slot.HAND, 2, 1);
-			PopulateItemDropdown(trinketDropdown, trinketList, Slot.TRINKET, 1);
-			PopulateItemDropdown(mountDropdown, mountList, Slot.MOUNT, 0);
+			PopulateItemDropdown(trinketDropdown, trinketList, Slot.TRINKET, 0, 1);
+			PopulateItemDropdown(mountDropdown, mountList, Slot.MOUNT, 0, 0);
 
 			PopulateTitleDropdown();
 
@@ -851,6 +949,89 @@ public class CampfireScreen : MonoBehaviour
 		}
 	}
 
+	void UpdatePartyTrinkets()
+    {
+		if (campfireState == CampfireState.SETUP && campaignState.campaign.startWithTrinkets)
+		{
+			List<int> trinkets = new List<int>();
+			foreach (var characterSheet in characterSheets)
+			{
+				if (characterSheet.trinketId != 0)
+				{
+					trinkets.Add(characterSheet.trinketId);
+				}
+			}
+			campfireTrinkets = trinkets;
+		}
+		else if (campfireState == CampfireState.UPGRADE)
+		{
+			List<int> trinkets = new List<int>(campfireTrinkets);
+			foreach (var characterSheet in characterSheets)
+			{
+				if (characterSheet.trinketId != 0)
+				{
+					if (!trinkets.Contains(characterSheet.trinketId))
+					{
+						//Look for other versions (tiers) of the trinket's series and remove them
+						Item newTrinket = Items.FromID(characterSheet.trinketId);
+						List<int> removalList = new List<int>();
+						foreach(int oldTrinketId in trinkets)
+                        {
+							Item oldTrinket = Items.FromID(oldTrinketId);
+							if(oldTrinket.seriesId == newTrinket.seriesId)
+                            {
+								removalList.Add(oldTrinket.id);
+                            }
+                        }
+						foreach(int removeTrinketId in removalList)
+                        {
+							trinkets.Remove(removeTrinketId);
+                        }
+					}
+
+					//Ad the character's current trinket
+					trinkets.Add(characterSheet.trinketId);
+				}
+			}
+			campfireTrinkets = trinkets;
+		}
+	}
+
+	void UpdatePartyMounts()
+    {
+		if (campfireState == CampfireState.SETUP && campaignState.campaign.startWithMounts)
+		{
+			List<int> mounts = new List<int>();
+			foreach (var characterSheet in characterSheets)
+			{
+				if (characterSheet.mountId != 0)
+				{
+					mounts.Add(characterSheet.mountId);
+				}
+			}
+			campfireMounts = mounts;
+		}
+		//No upgrades for mounts, so no code needed for UPGRADE.
+	}
+
+	public void OnClearTrinkets()
+    {
+		foreach(var characterSheet in characterSheets)
+        {
+			characterSheet.trinketId = 0;
+        }
+		PopulateItemDropdown(trinketDropdown, trinketList, Slot.TRINKET);
+    }
+
+	public void OnClearMounts()
+    {
+		foreach (var characterSheet in characterSheets)
+		{
+			characterSheet.mountId = 0;
+		}
+		PopulateItemDropdown(mountDropdown, mountList, Slot.MOUNT);
+	}
+
 	public void OnBack()
 	{
 		finalFader.DOFade( 1, .5f ).OnComplete( () =>
@@ -868,10 +1049,14 @@ public class CampfireScreen : MonoBehaviour
 		{
 			//Start with the starting state of the first scenario
 			campaignState.startingCharacterSheets[0] = CampaignState.CloneCharacterSheetList(characterSheets);
+			campaignState.startingTrinkets[0] = new List<int>(campfireTrinkets);
+			campaignState.startingMounts[0] = new List<int>(campfireMounts);
 		}
 		else if (campfireState == CampfireState.UPGRADE)
 		{
 			campaignState.startingCharacterSheets[campaignState.scenarioPlayingIndex] = CampaignState.CloneCharacterSheetList(characterSheets);
+			campaignState.startingTrinkets[campaignState.scenarioPlayingIndex] = new List<int>(campfireTrinkets);
+			campaignState.startingMounts[campaignState.scenarioPlayingIndex] = new List<int>(campfireMounts);
 		}
 
 		//Set the save flag on this scenario so CampfireScreen will load from this scenario's startCharacterSheets instead of the last scenario's currentCharacterSheets
@@ -894,8 +1079,13 @@ public class CampfireScreen : MonoBehaviour
 			}
         }
 
-		//Set the currentCharacterSheets for this scenario index to a copy of the data gathered on this screen
+		UpdatePartyTrinkets();
+		UpdatePartyMounts();
+
+		//Set the currentCharacterSheets for this scenario index from a copy of the data gathered on this screen
 		campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex] = CampaignState.CloneCharacterSheetList(characterSheets);
+		campaignState.currentTrinkets[campaignState.scenarioPlayingIndex] = campfireTrinkets;
+		campaignState.currentMounts[campaignState.scenarioPlayingIndex] = campfireMounts;
 
 		StartGame();
 	}

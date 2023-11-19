@@ -17,6 +17,9 @@ public class Campaign
 	public ObservableCollection<CampaignItem> scenarioCollection { get; set; }
 	public ObservableCollection<Trigger> triggerCollection { get; set; }
 
+	public bool startWithTrinkets { get; set; }
+	public bool startWithMounts { get; set; }
+
 	public Campaign()
 	{
 		scenarioCollection = new ObservableCollection<CampaignItem>();

@@ -47,6 +47,19 @@ public  class Items
         return true;
     }
 
+	public static bool TrinketSeriesAvailable(ItemSeries seriesId, List<CharacterSheet> characters, int charIndex)
+	{
+		for (int i = 0; i < characters.Count; i++)
+		{
+			CharacterSheet character = characters[i];
+			if(i != charIndex) //a different character than the selected one
+			{
+				if(Items.FromID(character.trinketId).seriesId == seriesId) { return false; }
+			}
+		}
+		return true;
+	}
+
 	public static int FirstAvailable(ItemSeries seriesId, int tier, List<CharacterSheet> characters, int charIndex, int handIndex)
     {
 		List<Item> items = FromSeriesID(seriesId);
@@ -283,7 +296,7 @@ public  class Items
 		new Item(209){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.MEADOW_HART, seriesName="Meadow Hart", dataName="Meadow Hart", originalName="Meadow Hart", tier=0, stats=new string[]{"Agility", "Spirit"}, trait="Creature", upgrade=0, handed=0, ranged=0},
 		new Item(210){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.PACK_MULE, seriesName="Pack Mule", dataName="Pack Mule", originalName="Pack Mule", tier=0, trait="Creature", upgrade=0, handed=0, ranged=0},
 		new Item(211){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.QUICKBEAM, seriesName="Quickbeam", dataName="Quickbeam", originalName="Quickbeam", tier=0, stats=new string[]{"Wild"}, upgrade=0, handed=0, ranged=0},
-		new Item(212){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.SNOWBRIGHT, seriesName="Snowbright", dataName="Snowbright", originalName="Snowbright", tier=0, trait="Creature", upgrade=0, handed=0, ranged=0},
+		new Item(212){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.SNOWBRIGHT, seriesName="Snowbright", dataName="Snowbright", originalName="Snowbright", tier=-1, trait="Creature", upgrade=0, handed=0, ranged=0},
 		new Item(213){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.SWIFT_STEED, seriesName="Swift Steed", dataName="Swift Steed", originalName="Swift Steed", tier=0, trait="Creature", upgrade=0, handed=0, ranged=0},
 		new Item(214){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.TRAVELLERS_HORSE, seriesName="Traveller's Horse", dataName="Traveller's Horse", originalName="Traveller's Horse", tier=0, trait="Creature", upgrade=0, handed=0, ranged=0},
 		new Item(215){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.WAR_CHARGER, seriesName="War Charger", dataName="War Charger", originalName="War Charger", tier=0, stats=new string[]{"Might", "Wisdom"}, trait="Creature", upgrade=0, handed=0, ranged=0},
