@@ -2,16 +2,16 @@
 
 ## [Your Journey Patreon](http://www.patreon.com/YourJourneyRPG)
 
-# Your Journey - v0.28 - Windows and Mac
+# Your Journey - v0.29 - Windows and Mac
 The companion playback app for the Journeys in Middle Earth Scenario Editor, forked from [GlowPuff's original project](https://github.com/GlowPuff/your-journey) with new tiles from [Celstra](https://github.com/Celstra/JiMEditor).
 
 #### Download the latest release
-[Download the Newest Release!](https://github.com/TrnsltLife/your-journey/releases/tag/v0.28) Featuring tiles from Shadowed Paths, enemies from all the expansions, more character portraits, and UI translations in English and French, ability to read translated scenarios, and a skinnable enemy system! The newest features are additional confirmation dialogs for combat and Last Stands, and a quest log or Chronicle accessible from the Party Panel.
+[Download the Newest Release!](https://github.com/TrnsltLife/your-journey/releases/tag/v0.29) The Campfire Screen, with item, role, and skill tracking for Campaigns, is now partially implemented! Featuring tiles from Shadowed Paths, enemies from all the expansions, more character portraits, and UI translations in English and French, ability to read translated scenarios, and a skinnable enemy system! The newest features are additional confirmation dialogs for combat and Last Stands, and a quest log or Chronicle accessible from the Party Panel.
 
 ([View GlowPuff's original releases](https://github.com/GlowPuff/your-journey/releases))
 
 #### Installation instructions - Windows
-1. Unzip the YourJourney_Win_v0.28.zip file somewhere and run "Your Journey.exe".
+1. Unzip the YourJourney_Win_v0.29.zip file somewhere and run "Your Journey.exe".
 2. Put your .jime scenario files (like [The Watch at Weathertop](https://drive.google.com/file/d/1Rr2HZlZ-ba17b714xOql2_Dgg5pnyWIg/view?usp=sharing) by [Noldorion](https://boardgamegeek.com/user/Noldorion)) in the "Your Journey" folder in your Documents folder (Windows users). You can also grab [The Search for the Citadel](https://github.com/TrnsltLife/YourJourneyScenarios/releases/tag/v0.27-citadel) which is a test scenario that demonstrates a translated scenario in French.
 3. Hit the "New Game" button at the title.
 4. Create a save slot on the next screen (just start typing when it asks for a name, then press enter).
@@ -33,7 +33,8 @@ The companion playback app for the Journeys in Middle Earth Scenario Editor, for
 
 ## LIMITATIONS:
 * The corruption mechanic is not implemented.
-* You have to manage your inventory and skill cards yourself, based on the Lore and XP you can see on the Party Panel.
+* For Campaigns, you can manage your roles, skills, armor, and weapons on the Campfire Screen! But trinkets, mounts, and titles are still tracked by you for the time being.
+* For standalone scenarios, you have to manage your inventory and skill cards yourself, based on the Lore and XP you can see on the Party Panel or at the end of an adventure.
 
 ## The Scenario Editor
 The editor is available in [a separate repository](https://github.com/TrnsltLife/JiMEditor).
