@@ -98,7 +98,6 @@ public class SelectHeroes : MonoBehaviour
 
 	public void OnHeroScroll( int direction )
     {
-		Debug.Log("Scroll " + (direction < 0 ? "left" : "right") + "...");
 		bool updated = false;
 		if (direction == -1)
 		{
