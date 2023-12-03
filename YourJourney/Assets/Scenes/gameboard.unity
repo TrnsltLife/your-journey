@@ -8658,6 +8658,8 @@ MonoBehaviour:
     type: 3}
   dialogPanelPrefab: {fileID: 3818924565081631625, guid: cc1ea2c9e6689bb4cb16c827e95db237,
     type: 3}
+  heroSelectionPanelPrefab: {fileID: 3818924565081631625, guid: 33efd64f19d286543978a6059d6eedce,
+    type: 3}
   uiRoot: {fileID: 1996677956}
   engine: {fileID: 0}
 --- !u!114 &965560137

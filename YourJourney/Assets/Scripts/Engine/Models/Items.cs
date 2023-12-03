@@ -17,7 +17,12 @@ public  class Items
         return list.Where(it => it.seriesId == seriesId).ToList();
     }
 
-    public static bool ItemAvailable(int id, List<CharacterSheet> characters, int charIndex, int handIndex)
+	public static Item FromSeriesIDAndTier(ItemSeries seriesId, int tier)
+	{
+		return list.Where(it => it.seriesId == seriesId && it.tier == tier).ToList().FirstOrDefault();
+	}
+
+	public static bool ItemAvailable(int id, List<CharacterSheet> characters, int charIndex, int handIndex)
     {
 		Item item = Items.FromID(id);
 		if(item == null) { return false; }
@@ -45,6 +50,34 @@ public  class Items
             }
         }
         return true;
+    }
+
+	public static List<int> ListGiveableItemsFromIds(List<int> itemList, List<int> currentTrinkets, List<int> currentMounts)
+    {
+		//With the initial itemList which contains tier-1 trinkets and/or tier-? mounts, and the currentTrinkets and currentMounts owned by the party (unknown tier),
+		//what tier-1 trinkets, and what mounts, can actually be given to the party? (Exclude items they already have a version of. Exclude trinkets if they have a higher tier.)
+
+		//Convert the current list of trinkets at whatever upgraded tier they are, to a list of the tier 1 trinket ids
+		List<int> starterTrinkets = new List<int>();
+		foreach(int itemId in currentTrinkets)
+        {
+			starterTrinkets.Add(Items.FromSeriesIDAndTier(Items.FromID(itemId).seriesId, 1).id);
+        }
+
+		//We don't need to convert the mounts because there are no upgrades for mounts
+
+		//Cull the itemList by removing items that are already owned by the players/party
+		List<int> newList = new List<int>();
+		foreach(int itemId in itemList)
+        {
+			if(starterTrinkets.Contains(itemId) || currentMounts.Contains(itemId)) { continue; }
+			else
+            {
+				newList.Add(itemId);
+            }
+        }
+
+		return newList;
     }
 
 	public static bool TrinketSeriesAvailable(ItemSeries seriesId, List<CharacterSheet> characters, int charIndex)
