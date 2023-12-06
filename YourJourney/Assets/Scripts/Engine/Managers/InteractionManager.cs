@@ -558,8 +558,12 @@ public class InteractionManager : MonoBehaviour
 		List<Item> giveItems = new List<Item>();
 		int missingItems = 0;
 
-		//Get a list of items we're trying to give that aren't alrady owned by the party
-		List<int> giveableItems = Items.ListGiveableItemsFromIds(ii.itemList, Bootstrap.campaignState.currentTrinkets[scenarioIndex], Bootstrap.campaignState.currentMounts[scenarioIndex]);
+		//Get a list of items we're trying to give that aren't already owned by the party
+		List<int> giveableItems = new List<int>(giveItems.ConvertAll(i => i.id));
+		if (Bootstrap.campaignState != null)
+		{
+			giveableItems = Items.ListGiveableItemsFromIds(ii.itemList, Bootstrap.campaignState.currentTrinkets[scenarioIndex], Bootstrap.campaignState.currentMounts[scenarioIndex]);
+		}
 
 		//Loop until we've given selected the items we're supposed to (a random assortment out of the list of possible items)
 		for (int i=0; i<giveCount; i++)
@@ -568,8 +572,7 @@ public class InteractionManager : MonoBehaviour
 			{
 				//Get a random item
 				int itemIndex = Bootstrap.random.Next(giveableItems.Count);
-				//if (itemIndex < giveableItems.Count)
-				//{
+
 				Item item = Items.FromID(giveableItems[itemIndex]);
 				if (Bootstrap.campaignState != null)
 				{
@@ -580,7 +583,6 @@ public class InteractionManager : MonoBehaviour
 
 				//Remove the item we just gave from the giveable list so we don't try to give it again
 				giveableItems.Remove(item.id);
-				//}
 			}
 			else
             {
@@ -641,6 +643,88 @@ public class InteractionManager : MonoBehaviour
 	void HandleTitle(IInteraction it, Action<InteractionResult> action = null)
 	{
 		//TODO
+		TitleInteraction ti = (TitleInteraction)it;
+		int giveCount = ti.randomizedTitlesCount;
+		if (giveCount <= 0) { giveCount = 1; } //Sometimes randomizedItemCount from the editor might be 0; but always give at least one title.
+		int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+		List<Title> giveTitles = new List<Title>();
+		int missingTitles = 0;
+
+		//Get a list of titles we're trying to give that aren't already owned by the party
+		List<int> giveableTitles = new List<int>(giveTitles.ConvertAll(i => i.id));
+		if (Bootstrap.campaignState != null)
+		{
+			giveableTitles = Titles.ListGiveableTitlesFromIds(ti.titleList, Bootstrap.campaignState.currentCharacterSheets[scenarioIndex]);
+		}
+
+		//Loop until we've given selected the items we're supposed to (a random assortment out of the list of possible titles)
+		for (int i = 0; i < giveCount; i++)
+		{
+			if (giveableTitles.Count > 0)
+			{
+				//Get a random title
+				int titleIndex = Bootstrap.random.Next(giveableTitles.Count);
+
+				Title title = Titles.FromID(giveableTitles[titleIndex]);
+				giveTitles.Add(title);
+
+				//Remove the title we just gave from the giveable list so we don't try to give it again
+				giveableTitles.Remove(title.id);
+			}
+			else
+			{
+				missingTitles++;
+			}
+		}
+
+		TitleFollowup(ti, giveTitles, missingTitles, action);
+	}
+
+	public void TitleFollowup(TitleInteraction ti, List<Title> giveTitles, int missingTitles, Action<InteractionResult> originalAction)
+	{
+		if (giveTitles.Count > 0)
+		{
+			Title title = giveTitles[0];
+			giveTitles.RemoveAt(0);
+			//Ask the players which hero to assign that title to (permanently)
+			//GetNewHeroSelctionPanel will call this method TitleFollowup when it's done
+			GetNewHeroSelectionPanel().Show(ti, giveTitles, missingTitles, title, originalAction, (b) =>
+			{
+				//engine.triggerManager.FireTrigger(ii.triggerAfterName);
+
+				int selectedHero = b.value;
+
+				if (Bootstrap.campaignState != null)
+				{
+					//Add the new title to the titles list for the selected hero
+					int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+					Bootstrap.campaignState.currentCharacterSheets[scenarioIndex][selectedHero].titles.Add(title.id);
+				}
+			});
+		}
+		else
+		{
+			//No more items to give. Give final lore.
+			int fallbackLore = 0;
+			int fallbackXP = 0;
+			int fallbackThreat = 0;
+			if (missingTitles > 0 && (missingTitles < ti.randomizedTitlesCount || ti.fallbackTrigger == "None"))
+			{
+				//Add additional lore when some items were given; or no items were given but there's no fallback trigger
+				fallbackLore = ti.loreFallback * missingTitles;
+				fallbackXP = ti.xpFallback * missingTitles;
+				fallbackThreat = ti.threatFallback * missingTitles;
+			}
+			else if (missingTitles > 0 && missingTitles == ti.randomizedTitlesCount && ti.fallbackTrigger != "None")
+			{
+				engine.triggerManager.FireTrigger(ti.fallbackTrigger); //trigger fallback trigger if there is one
+			}
+
+			originalAction?.Invoke(new InteractionResult() { removeToken = true }); //cause Tile to remove token
+			engine.triggerManager.FireTrigger(ti.triggerAfterName);
+			//Give rewards, including extra rewards for missing titles (if any)
+			FindObjectOfType<LorePanel>().AddReward(ti.loreReward + fallbackLore, ti.xpReward + fallbackXP, ti.threatReward + fallbackThreat);
+		}
 	}
 
 	void HandleMultiEvent( IInteraction it, Action<InteractionResult> action )

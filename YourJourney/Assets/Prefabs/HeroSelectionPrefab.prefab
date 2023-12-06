@@ -1088,7 +1088,7 @@ MonoBehaviour:
   - {fileID: 7452979348147038970}
   - {fileID: 397102033512056502}
   portraitBackground: {fileID: 4449030908463000015}
-  heroImageWidth: 282
+  heroImageWidth: 287
   portraitMaxWidth: 1421.61
 --- !u!1 &3818924565081631625
 GameObject:
@@ -2316,7 +2316,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Select
+  m_text: Confirm
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9bdbc38f329f78e438d6e4cf6e4caab7, type: 2}
   m_sharedMaterial: {fileID: 1729330054117016761, guid: 9bdbc38f329f78e438d6e4cf6e4caab7,
@@ -2386,7 +2386,7 @@ MonoBehaviour:
   m_margin: {x: 116.46479, y: 38.807186, z: 115.3231, w: 38.80727}
   m_textInfo:
     textComponent: {fileID: 651786536535682798}
-    characterCount: 6
+    characterCount: 7
     spriteCount: 0
     spaceCount: 0
     wordCount: 1
@@ -2421,8 +2421,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ca0829215dddce4e9a6dc6ee1ee228b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TextKey: heroSelection.button.Select
-  DefaultText: Select
+  TextKey: heroSelection.button.Confirm
+  DefaultText: Confirm
 --- !u!1 &8418504456717926873
 GameObject:
   m_ObjectHideFlags: 0

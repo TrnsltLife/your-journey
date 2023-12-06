@@ -28,8 +28,17 @@ public class HeroSelectionPanel : MonoBehaviour
 	int selectedHero = -1;
 
 	ItemInteraction itemInteraction;
+	Item giveItem;
 	List<Item> giveItems;
 	int missingItems;
+
+	TitleInteraction titleInteraction;
+	Title giveTitle;
+	List<Title> giveTitles;
+	int missingTitles;
+
+	int corruption;
+
 	Action<InteractionResult> originalAction;
 
 	private void CalculatePanelPosition()
@@ -51,25 +60,49 @@ public class HeroSelectionPanel : MonoBehaviour
 
 	public void Show(ItemInteraction ii, List<Item> giveItems, int missingItems, Item item, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
     {
-		Show(ii, giveItems, missingItems, item, 0, originalAction, actions);
-    }
-	public void Show(ItemInteraction ii, List<Item> giveItems, int missingItems, int corruption, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
-	{
-		Show(ii, giveItems, missingItems, null, corruption, originalAction, actions);
-	}
-
-	public void Show(ItemInteraction ii, List<Item> giveItems, int missingItems, Item item, int corruption, Action<InteractionResult> originalAction, Action<InteractionResult> actions )
-	{
 		itemInteraction = ii;
+		this.giveItem = item;
 		this.giveItems = giveItems;
 		this.missingItems = missingItems;
 		this.originalAction = originalAction;
 
+		Show(actions);
+    }
+
+	public void Show(TitleInteraction ti, List<Title> giveTitles, int missingTitles, Title title, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
+	{
+		titleInteraction = ti;
+		this.giveTitle = title;
+		this.giveTitles = giveTitles;
+		this.missingTitles = missingTitles;
+		this.originalAction = originalAction;
+
+		Show(actions);
+	}
+
+	public void Show(ItemInteraction ii,int corruption, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
+	{
+		this.corruption = corruption;
+	}
+
+	public void Show(Action<InteractionResult> actions )
+	{
 		CalculatePanelPosition();
 		FindObjectOfType<TileManager>().ToggleInput( true );
 
-		SetText(item, corruption);
-		SetSelectionText(item, corruption);
+		if (giveItem != null)
+		{
+			SetText(giveItem);
+		}
+		else if(giveTitle != null)
+        {
+			SetText(giveTitle);
+        }
+		else
+        {
+			SetText(corruption);
+        }
+
 		SetImages();
 
 		UpdateSubmitButtonInteractability();
@@ -123,70 +156,120 @@ public class HeroSelectionPanel : MonoBehaviour
 
 			//Set the size of the background image behind the hero images so it fits however many heroes we have
 			float portraitBackgroundWidth = portraitExtraWidth + (heroImageWidth * Bootstrap.gameStarter.heroes.Length);
+			if (portraitBackgroundWidth > portraitMaxWidth) { portraitBackgroundWidth = portraitMaxWidth; }
 			portraitBackground.rectTransform.sizeDelta = new Vector2(portraitBackgroundWidth, portraitBackground.rectTransform.sizeDelta.y);
-		}
-	}
+        }
+    }
 
-	void SetText(Item item, int corruption)
-	{
-		string text = "";
+    void SetText(Item item)
+    {
+        string text = "";
+		string text2 = "";
 
 		//TODO Translate
-		if (item != null)
-		{
-			string icon = "t"; //Start out with "t" for TRINKET
-			if (item.slotId == Slot.MOUNT) { icon = "m"; }
-			text = "One hero gains <font=\"Icon\">" + icon + "</font> " + item.dataName + ".\n\n";
-			if (item.slotId == Slot.TRINKET)
-			{
-				text += "That hero may equip it immediately even if other trinkets are already equipped. Add the full number of depletion tokens to the trinket.";
-			}
-			else
-            {
-				text += "That hero may equip it immediately even if other mounts are already equipped.";
-			}
+        string icon = "t"; //Start out with "t" for TRINKET
+        string iconText = "<font=\"Icon\">" + icon + "</font> ";
+        string itemName = Translate("item." + item.seriesName + "." + item.tier + "." + item.dataName, item.dataName);
+        text = Translate("heroSelection.text.HeroGainsTrinket", "One hero gains the {0} {1} trinket.", new List<string> { iconText, itemName });
+		text2 = Translate("heroSelection.text.ChooseWhoGainsTrinket", "Choose a hero to gain the {0} {1} trinket.", new List<string> { iconText, itemName });
+		if (item.slotId == Slot.MOUNT)
+        {
+            icon = "m";
+            text = Translate("heroSelection.text.HeroGainsMount", "One hero gains the {0} {1} mount.", new List<string> { iconText, itemName });
+			text2 = Translate("heroSelection.text.ChooseWhoGainsMount", "Choose a hero to gain the {0} {1} mount.", new List<string> { iconText, itemName });
 		}
-		else if (corruption > 0)
+
+		text += "\n\n";
+
+        if (item.slotId == Slot.TRINKET)
+        {
+            text += Translate("heroSelection.text.TrinketText", "That hero may equip it immediately even if other trinkets are already equipped. Add the full number of depletion tokens to the trinket.");
+        }
+        else //MOUNT
+        {
+            text += Translate("heroSelection.text.MountText", "That hero may equip it immediately even if other mounts are already equipped.");
+        }
+
+        mainText.text = text;
+        dummy.text = text;
+
+		selectionText.text = text2;
+
+		Scenario.Chronicle(text);
+		Scenario.ChroniclePS("\n" + text2);
+
+		float preferredHeight = dummy.preferredHeight; //Dummy text (which must be active) is used to find the correct preferredHeight so it can then be set on the mainText which is in a scroll view viewport
+        dummy.text = ""; //After we have the height we clear dummy.text so it doesn't show up anymore
+
+        //TODO Fix later?
+        //These were to scale the text box to the size of the text, but they scale the whole panel. Since the portrait background, hero portraits, and select button are in that panel, it was messing up the alignment.
+        //var dialogHeight = Math.Min(525, 30 + preferredHeight + 90);
+        //rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, dialogHeight);
+    }
+
+	void SetText(Title title)
+	{
+		string text = "";
+		string text2 = "";
+
+		//TODO Translate
+		string titleName = Translate("title." + title.id, "Title " + title.id);
+		//Choose a hero to gain the "Fire-Giver" title and immediately prepare it.
+		text = Translate("heroSelection.text.HeroGainsTitle", "One hero gains the {0} title and prepares it immediately.", new List<string> { titleName, title.id.ToString() });
+		text2 = Translate("heroSelection.text.ChooseWhoGainsTitle", "Choose a hero to gain the {0} title (Title {1}).", new List<string> { titleName, title.id.ToString() });
+
+		mainText.text = text;
+		dummy.text = text;
+
+		selectionText.text = text2;
+
+		Scenario.Chronicle(text);
+		Scenario.ChroniclePS("\n" + text2);
+
+		float preferredHeight = dummy.preferredHeight; //Dummy text (which must be active) is used to find the correct preferredHeight so it can then be set on the mainText which is in a scroll view viewport
+		dummy.text = ""; //After we have the height we clear dummy.text so it doesn't show up anymore
+
+		//TODO Fix later?
+		//These were to scale the text box to the size of the text, but they scale the whole panel. Since the portrait background, hero portraits, and select button are in that panel, it was messing up the alignment.
+		//var dialogHeight = Math.Min(525, 30 + preferredHeight + 90);
+		//rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, dialogHeight);
+	}
+
+	void SetText(int corruption)
+	{
+		string text = "";
+		string text2 = "";
+
+		//TODO Translate
+		if (corruption > 0)
 		{
 			text = "One hero to gains " + corruption + " corruption token.\n\n";
 			text += "If the hero would gain a 4th corruption token, the hero must successfully perform a Last Stand or else perish.";
+
+			text2 = "Choose a hero to gain " + corruption + " corruption token.";
 		}
 		else if (corruption < 0)
 		{
-			text = "One hero to removes " + corruption + " corruption token.";
+			text = "One hero removes " + corruption + " corruption token.";
+
+			text2 = "Choose a hero to remove " + corruption + " corruption token.";
 		}
 
 		mainText.text = text;
 		dummy.text = text;
 
+		selectionText.text = text2;
+
 		Scenario.Chronicle(text);
+		Scenario.ChroniclePS("\n" + text2);
 
 		float preferredHeight = dummy.preferredHeight; //Dummy text (which must be active) is used to find the correct preferredHeight so it can then be set on the mainText which is in a scroll view viewport
 		dummy.text = ""; //After we have the height we clear dummy.text so it doesn't show up anymore
 
+		//TODO Fix later?
+		//These were to scale the text box to the size of the text, but they scale the whole panel. Since the portrait background, hero portraits, and select button are in that panel, it was messing up the alignment.
 		//var dialogHeight = Math.Min(525, 30 + preferredHeight + 90);
-
 		//rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, dialogHeight);
-	}
-
-	void SetSelectionText(Item item, int corruption)
-    {
-		//TODO Translate
-		if(item != null)
-        {
-			string icon = "t"; //Start out with "t" for TRINKET
-			if(item.slotId == Slot.MOUNT) { icon = "m"; }
-			selectionText.text = "Select a hero to gain <font=\"Icon\">" + icon + "</font> " + item.dataName + ".";
-        }
-		else if(corruption > 0)
-        {
-			selectionText.text = "Select a hero to gain " + corruption + " corruption token.";
-        }
-		else if(corruption < 0)
-        {
-			selectionText.text = "Select a hero to remove " + corruption + " corruption token.";
-		}
-		Scenario.Chronicle(selectionText.text);
 	}
 
 	public void OnHeroSelect(int index)
@@ -238,13 +321,22 @@ public class HeroSelectionPanel : MonoBehaviour
 
 	public void OnSubmit()
 	{
-		//TODO Record the hero's name
+		//Record the hero's name in the Chronicle
 		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + Bootstrap.gameStarter.heroes[selectedHero] + "]");
 
+		//"Return" the selected hero to the InteractionManager
 		buttonActions?.Invoke( new InteractionResult() { value = selectedHero } );
 		Hide();
 
-		//Call back to InteractionManager.ItemFollowup to trigger the HeroSelectionPanel for the next item, or do final lore/xp/threat rewards, or do a fallbackTriiger
-		FindObjectOfType<InteractionManager>().ItemFollowup(itemInteraction, giveItems, missingItems, originalAction);
+		if(giveItem != null)
+        {
+			//Call back to InteractionManager.ItemFollowup to trigger the HeroSelectionPanel for the next item, or do final lore/xp/threat rewards, or do a fallbackTrigger
+			FindObjectOfType<InteractionManager>().ItemFollowup(itemInteraction, giveItems, missingItems, originalAction);
+		}
+		else if(giveTitle != null)
+        {
+			//Call back to InteractionManager.TitleFollowup to trigger the HeroSelectionPanel for the next title, or do final lore/xp/threat rewards, or do a fallbackTrigger
+			FindObjectOfType<InteractionManager>().TitleFollowup(titleInteraction, giveTitles, missingTitles, originalAction);
+		}
 	}
 }
