@@ -8658,6 +8658,8 @@ MonoBehaviour:
     type: 3}
   dialogPanelPrefab: {fileID: 3818924565081631625, guid: cc1ea2c9e6689bb4cb16c827e95db237,
     type: 3}
+  heroSelectionPanelPrefab: {fileID: 3818924565081631625, guid: 33efd64f19d286543978a6059d6eedce,
+    type: 3}
   uiRoot: {fileID: 1996677956}
   engine: {fileID: 0}
 --- !u!114 &965560137
@@ -14099,7 +14101,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'You Have Earned
 
-    10 Lore'
+    0 Lore'
 --- !u!222 &1429571427
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -14681,7 +14683,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'Threat Reduced By
 
-    10'
+    0'
 --- !u!222 &1456957100
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -17464,7 +17466,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'You Have Earned
 
-    10 XP'
+    0 XP'
 --- !u!222 &1817721785
 CanvasRenderer:
   m_ObjectHideFlags: 0

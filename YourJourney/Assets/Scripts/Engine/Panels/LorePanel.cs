@@ -30,8 +30,16 @@ public class LorePanel : MonoBehaviour
 		else
 			threatacc = threatamount;
 
-		threatText.text = Translate("reward.text.ThreatIncreased", "Threat Increased By\r\n" + threatacc,
-			new List<string> { threatacc.ToString() });
+		if (threatacc > 0)
+		{
+			threatText.text = Translate("reward.text.ThreatIncreased", "Threat Increased By\r\n" + threatacc,
+				new List<string> { threatacc.ToString() });
+		}
+		else if(threatacc < 0)
+        {
+			threatText.text = Translate("reward.text.ThreatReduced", "Threat Reduced By\r\n" + (threatacc * -1),
+				new List<string> { (threatacc * -1).ToString() });
+		}
 
 		Scenario.Chronicle(threatText.text);
 
@@ -75,8 +83,17 @@ public class LorePanel : MonoBehaviour
 			new List<string> { loreacc.ToString() });
 		xpText.text = Translate("reward.text.XPEarned", "You Have Earned\r\n" + xpacc + " XP.",
 			new List<string> { xpacc.ToString() });
-		threatText.text = Translate("reward.text.ThreatReduced", "Threat Reduced By\r\n" + threatacc,
-			new List<string> { threatacc.ToString() });
+
+		if (threatacc > 0)
+		{
+			threatText.text = Translate("reward.text.ThreatReduced", "Threat Reduced By\r\n" + threatacc,
+				new List<string> { threatacc.ToString() });
+		}
+		else if(threatacc < 0)
+        {
+			threatText.text = Translate("reward.text.ThreatIncreased", "Threat Increased By\r\n" + (threatacc * -1),
+				new List<string> { (threatacc * -1).ToString() });
+		}
 
 		Scenario.Chronicle(loreText.text + "\n" + xpText.text + "\n" + threatText.text);
 
