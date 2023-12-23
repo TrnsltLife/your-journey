@@ -14101,7 +14101,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'You Have Earned
 
-    10 Lore'
+    0 Lore'
 --- !u!222 &1429571427
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -14683,7 +14683,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'Threat Reduced By
 
-    10'
+    0'
 --- !u!222 &1456957100
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -17466,7 +17466,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'You Have Earned
 
-    10 XP'
+    0 XP'
 --- !u!222 &1817721785
 CanvasRenderer:
   m_ObjectHideFlags: 0
