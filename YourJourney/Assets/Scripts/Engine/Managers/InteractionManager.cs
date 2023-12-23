@@ -554,15 +554,15 @@ public class InteractionManager : MonoBehaviour
 		ItemInteraction ii = (ItemInteraction)it;
 		int giveCount = ii.randomizedItemsCount;
 		if(giveCount <= 0) { giveCount = 1; } //Sometimes randomizedItemCount from the editor might be 0; but always give at least one item.
-		int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
 		List<Item> giveItems = new List<Item>();
 		int missingItems = 0;
 
 		//Get a list of items we're trying to give that aren't already owned by the party
-		List<int> giveableItems = new List<int>(giveItems.ConvertAll(i => i.id));
+		List<int> giveableItems = new List<int>(ii.itemList);
 		if (Bootstrap.campaignState != null)
 		{
-			giveableItems = Items.ListGiveableItemsFromIds(ii.itemList, Bootstrap.campaignState.currentTrinkets[scenarioIndex], Bootstrap.campaignState.currentMounts[scenarioIndex]);
+			int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+			giveableItems = Items.ListGiveableItemsFromIds(giveableItems, Bootstrap.campaignState.currentTrinkets[scenarioIndex], Bootstrap.campaignState.currentMounts[scenarioIndex]);
 		}
 
 		//Loop until we've given selected the items we're supposed to (a random assortment out of the list of possible items)
@@ -577,6 +577,7 @@ public class InteractionManager : MonoBehaviour
 				if (Bootstrap.campaignState != null)
 				{
 					//Add the item to the party's list of owned trinkets for the current scenario; also to the giveItems list which will be used in the dialogs
+					int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
 					Bootstrap.campaignState.currentTrinkets[scenarioIndex].Add(item.id);
 				}
 				giveItems.Add(item);
@@ -646,18 +647,18 @@ public class InteractionManager : MonoBehaviour
 		TitleInteraction ti = (TitleInteraction)it;
 		int giveCount = ti.randomizedTitlesCount;
 		if (giveCount <= 0) { giveCount = 1; } //Sometimes randomizedItemCount from the editor might be 0; but always give at least one title.
-		int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
 		List<Title> giveTitles = new List<Title>();
 		int missingTitles = 0;
 
 		//Get a list of titles we're trying to give that aren't already owned by the party
-		List<int> giveableTitles = new List<int>(giveTitles.ConvertAll(i => i.id));
+		List<int> giveableTitles = new List<int>(ti.titleList);
 		if (Bootstrap.campaignState != null)
 		{
-			giveableTitles = Titles.ListGiveableTitlesFromIds(ti.titleList, Bootstrap.campaignState.currentCharacterSheets[scenarioIndex]);
+			int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+			giveableTitles = Titles.ListGiveableTitlesFromIds(giveableTitles, Bootstrap.campaignState.currentCharacterSheets[scenarioIndex]);
 		}
 
-		//Loop until we've given selected the items we're supposed to (a random assortment out of the list of possible titles)
+		//Loop until we've given selected the items we're supposed to ( random assortment out of the list of possible titles)
 		for (int i = 0; i < giveCount; i++)
 		{
 			if (giveableTitles.Count > 0)
