@@ -8,8 +8,6 @@ The companion playback app for the Journeys in Middle Earth Scenario Editor, for
 #### Download the latest release
 [Download the Newest Release!](https://github.com/TrnsltLife/your-journey/releases/tag/v0.30) The Campfire Screen, with item, role, and skill tracking for Campaigns, is now fully implemented! Featuring tiles from Shadowed Paths, enemies from all the expansions, more character portraits, and UI translations in English and French, ability to read translated scenarios, and a skinnable enemy system! The other new features include additional confirmation dialogs for combat and Last Stands, and a quest log or Chronicle accessible from the Party Panel.
 
-([View GlowPuff's original releases](https://github.com/GlowPuff/your-journey/releases))
-
 #### Installation instructions - Windows
 1. Unzip the YourJourney_Win_v0.30.zip file somewhere and run "Your Journey.exe".
 2. Put your .jime scenario files (like [The Watch at Weathertop](https://drive.google.com/file/d/1Rr2HZlZ-ba17b714xOql2_Dgg5pnyWIg/view?usp=sharing) by [Noldorion](https://boardgamegeek.com/user/Noldorion)) in the "Your Journey" folder in your Documents folder (Windows users). You can also grab [The Search for the Citadel](https://github.com/TrnsltLife/YourJourneyScenarios/releases/tag/v0.27-citadel) which is a test scenario that demonstrates a translated scenario in French.
@@ -21,7 +19,7 @@ The companion playback app for the Journeys in Middle Earth Scenario Editor, for
 8. Click the "Begin Journey" button to start playing!
 
 #### Installation instructions - Mac
-1. Download YourJourney_Mac_v0.28.zip file somewhere and run "YourJourney_v0.30". If it tells you it can't run the software because it can't verify there aren't any viruses, try again and tell it to Open anyways.
+1. Download YourJourney_Mac_v0.30.app.zip file somewhere and run "YourJourney_v0.30". If it tells you it can't run the software because it can't verify there aren't any viruses, try again and tell it to Open anyways.
 2. Put your .jime scenario files (like [The Watch at Weathertop](https://drive.google.com/file/d/1Rr2HZlZ-ba17b714xOql2_Dgg5pnyWIg/view?usp=sharing) by [Noldorion](https://boardgamegeek.com/user/Noldorion)) in the "Your Journey" folder in your User folder (Mac users), e.g. /Users/(your-user-name)/Your Journey/Weathertop.jime.
 3. Hit the "New Game" button at the title.
 4. Create a save slot on the next screen (just start typing when it asks for a name, then press enter).
