@@ -591,7 +591,10 @@ public class InteractionManager : MonoBehaviour
 			}
 		}
 
-		ItemFollowup(ii, giveItems, missingItems, action);
+		GetNewTextPanel().ShowTextInteraction(it, () =>
+		{
+			ItemFollowup(ii, giveItems, missingItems, action);
+		});
 	}
 
 	public void ItemFollowup(ItemInteraction ii, List<Item> giveItems, int missingItems, Action<InteractionResult> originalAction)
@@ -678,7 +681,10 @@ public class InteractionManager : MonoBehaviour
 			}
 		}
 
-		TitleFollowup(ti, giveTitles, missingTitles, action);
+		GetNewTextPanel().ShowTextInteraction(it, () =>
+		{
+			TitleFollowup(ti, giveTitles, missingTitles, action);
+		});
 	}
 
 	public void TitleFollowup(TitleInteraction ti, List<Title> giveTitles, int missingTitles, Action<InteractionResult> originalAction)
