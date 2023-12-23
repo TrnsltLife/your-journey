@@ -10,14 +10,14 @@ public  class Titles
 	public static List<int> ListGiveableTitlesFromIds(List<int> titleList, List<CharacterSheet> characterSheets)
     {
         //Loop over the titleList and loop over all the characters. Only keep the titles that aren't already owned.
-		List<int> giveableTitles = new List<int>();
+		List<int> giveableTitles = new List<int>(titleList);
         foreach (int titleId in titleList)
         {
             foreach (CharacterSheet characterSheet in characterSheets)
             {
-                if (!characterSheet.titles.Contains(titleId))
+                if (characterSheet.titles.Contains(titleId))
                 {
-                    giveableTitles.Add(titleId);
+                    giveableTitles.Remove(titleId);
                 }
             }
         }
