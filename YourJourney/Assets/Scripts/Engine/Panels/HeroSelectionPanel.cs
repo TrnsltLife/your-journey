@@ -274,7 +274,7 @@ public class HeroSelectionPanel : MonoBehaviour
 
 	public void OnHeroSelect(int index)
 	{
-		if (index >= Bootstrap.campaignState.heroes.Length) { return; }
+		if (index >= Bootstrap.gameStarter.heroes.Length) { return; }
 
 		ResetHeroes();
 
@@ -302,7 +302,7 @@ public class HeroSelectionPanel : MonoBehaviour
 
 	void ResetHeroes()
 	{
-		for (int i = 0; i < Bootstrap.campaignState.heroes.Length; i++)
+		for (int i = 0; i < Bootstrap.gameStarter.heroes.Length; i++)
 		{
 			ColorBlock cb = heroButtons[i].colors;
 			heroButtons[i].colors = new ColorBlock()
