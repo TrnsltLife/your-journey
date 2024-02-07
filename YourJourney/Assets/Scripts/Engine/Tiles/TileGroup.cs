@@ -120,7 +120,15 @@ public class TileGroup
 
 			if (tileroot.isStartTile )
 			{
-				startPosition = tile.GetChildren( "token attach" )[0].position.Y( SpawnMarker.SPAWN_HEIGHT );
+				//Check for a Start token. If it exists, it was taken care of by the AddFixedToken and RevealStartToken methods elsewhere in this file.
+				Token startToken = tileroot.tokenList.Where(it => it.tokenType == TokenType.Start).FirstOrDefault();
+				TokenState startTokenState = tile.tokenStates.Where(it => it.metaData.tokenType == TokenType.Start).FirstOrDefault();
+
+				//Default Starting Position
+				if(startTokenState == null)
+				{
+					startPosition = tile.GetChildren("token attach")[0].position.Y(SpawnMarker.SPAWN_HEIGHT);
+				}
 				tile.isExplored = true;
 			}
 		}
@@ -203,8 +211,16 @@ public class TileGroup
 			//find starting position if applicable and add the player spawn marker
 			if ( bt.isStartTile )
 			{
+				//Check for a Start token. If it exists, it was taken care of by the AddFixedToken and RevealStartToken methods elsewhere in this file.
+				Token startToken = bt.tokenList.Where(it => it.tokenType == TokenType.Start).FirstOrDefault();
+				TokenState startTokenState = tile.tokenStates.Where(it => it.metaData.tokenType == TokenType.Start).FirstOrDefault();
+
+				//Default Starting Position
+				if (startTokenState == null)
+				{
+					startPosition = tile.GetChildren("token attach")[0].position.Y(SpawnMarker.SPAWN_HEIGHT);
+				}
 				tile.isExplored = true;
-				startPosition = tile.GetChildren( "token attach" )[0].position.Y( SpawnMarker.SPAWN_HEIGHT );
 			}
 		}
 
@@ -485,6 +501,10 @@ public class TileGroup
 			{
 				go = Object.Instantiate(tileManager.noneTokenPrefab, tile.transform);
 			}
+			else if (t.tokenType == TokenType.Start)
+            {
+				go = Object.Instantiate(tileManager.startTokenPrefab, tile.transform);
+            }
 			else if ( t.tokenType == TokenType.Search )
 			{
 				go = Object.Instantiate( tileManager.searchTokenPrefab, tile.transform );
@@ -642,7 +662,11 @@ public class TileGroup
 			var tokenPos = new Vector3( center.x + offset.x, 2, center.z + offset.z );
 			go.transform.position = tokenPos.Y( 0 );
 
-			usedPositions.Add( go.transform );
+			if (t.tokenType != TokenType.Start)
+			{
+				//Store the used position, but not for a Start token which isn't a normal token
+				usedPositions.Add(go.transform);
+			}
 
 			//Rotate terrain tokens for square map
 			Vector3 rotateCenter = Vector3.zero;
@@ -653,7 +677,6 @@ public class TileGroup
 
 				rotateCenter = tokenPos + new Vector3(tokenSizeX / 2, 0, -tokenSizeZ / 2);
 				go.transform.RotateAround(rotateCenter, Vector3.up, (float)t.angle);
-				//Debug.Log("rotate token with size [" + tokenSizeX + ", " + tokenSizeZ + "] " + t.angle + " degrees around " + rotateCenter + " vs tokenPos " + tokenPos);
 			}
 
 			tile.tokenStates.Add( new TokenState()
@@ -1049,11 +1072,17 @@ public class TileGroup
 	public void RevealInteractiveTokens( bool startTileOnly = false )
 	{
 		//Debug.Log( "RevealInteractiveTokens" );
-		foreach ( Tile t in tileList )
-			if ( startTileOnly && t.baseTile.isStartTile )
+		foreach (Tile t in tileList)
+			if (startTileOnly && t.baseTile.isStartTile)
+			{
+				t.RevealStartToken();
 				t.RevealInteractiveTokens();
-			else if ( !startTileOnly )
+			}
+			else if (!startTileOnly)
+			{
+				t.RevealStartToken();
 				t.RevealInteractiveTokens();
+			}
 	}
 
 	/// <summary>

@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public enum ScenarioType { Journey, Battle }
-public enum InteractionType { Text, Threat, StatTest, Decision, Branch, Darkness, MultiEvent, Persistent, Conditional, Dialog, Replace, Reward, Item, Title, None }
+public enum InteractionType { Text, Threat, StatTest, Decision, Branch, Darkness, MultiEvent, Persistent, Conditional, Dialog, Replace, Reward, Item, Title, Start }
 public enum MonsterType { Ruffian, GoblinScout, OrcHunter, OrcMarauder, HungryVarg, HillTroll, Wight, 
 						Atari, Gargletarg, Chartooth,
 						GiantSpider, PitGoblin, OrcTaskmaster, Shadowman, AnonymousThing, CaveTroll, Balerock, SpawnOfUglygiant,
@@ -17,7 +17,7 @@ public enum ProjectType { Standalone, Campaign }
 public enum Ability { Might, Agility, Wisdom, Spirit, Wit, Wild, Random, None }
 public enum TerrainToken { None, Pit, Mist, Barrels, Table, FirePit, Statue }
 public enum ButtonIcon { None, Action, OK, Continue, Next }
-public enum TokenType { Search, Person, Threat, Darkness, DifficultGround, Fortified, Terrain, None }
+public enum TokenType { Search, Person, Threat, Darkness, DifficultGround, Fortified, Terrain, None, Start }
 public enum PersonType { Human, Elf, Halfpint, Dwarf, None }
 public enum TerrainType {
 	None, Barrels, Boulder, Bush, FirePit, Mist, Pit, Statue, Stream, Table, Wall, //Core Set
