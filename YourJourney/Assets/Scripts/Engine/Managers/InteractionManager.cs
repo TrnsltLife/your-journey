@@ -135,6 +135,8 @@ public class InteractionManager : MonoBehaviour
 
 	public IInteraction GetInteractionByName( string name )
 	{
+		if (name == "None")
+			return null;
 		if ( allInteractions.Any( x => x.dataName == name ) )
 			return allInteractions.Where( x => x.dataName == name ).First();
 		else
