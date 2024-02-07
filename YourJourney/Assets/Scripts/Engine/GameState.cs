@@ -152,13 +152,17 @@ public class GameState
 			if ( s != null && fm.partyState.scenarioGUID != s.scenarioGUID )
 				return null;
 
-			fm.campaignState.UpgradeMissingCharacterSheets();
+			if (fm.campaignState != null)
+			{
+				fm.campaignState.UpgradeMissingCharacterSheets();
+			}
 
 			return fm;
 		}
 		catch ( Exception e )
 		{
 			Debug.Log( "CRITICAL ERROR: LoadState::" + filename );
+			Debug.Log(e);
 			Debug.Log( e.Message );
 			return null;
 		}
