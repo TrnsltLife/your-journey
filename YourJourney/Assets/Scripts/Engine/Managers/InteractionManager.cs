@@ -101,34 +101,36 @@ public class InteractionManager : MonoBehaviour
 	/// </summary>
 	IInteraction CreateInteraction( IInteraction interaction )
 	{
-		if ( interaction.interactionType == InteractionType.Text )
+		if (interaction.interactionType == InteractionType.Text)
 			return (TextInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Threat )
+		else if (interaction.interactionType == InteractionType.Threat)
 			return (ThreatInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.StatTest )
+		else if (interaction.interactionType == InteractionType.StatTest)
 			return (StatTestInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Decision )
+		else if (interaction.interactionType == InteractionType.Decision)
 			return (DecisionInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Branch )
+		else if (interaction.interactionType == InteractionType.Branch)
 			return (BranchInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Darkness )
+		else if (interaction.interactionType == InteractionType.Darkness)
 			return (DarknessInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.MultiEvent )
+		else if (interaction.interactionType == InteractionType.MultiEvent)
 			return (MultiEventInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Persistent )
+		else if (interaction.interactionType == InteractionType.Persistent)
 			return (PersistentInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Conditional )
+		else if (interaction.interactionType == InteractionType.Conditional)
 			return (ConditionalInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Dialog )
+		else if (interaction.interactionType == InteractionType.Dialog)
 			return (DialogInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Replace )
+		else if (interaction.interactionType == InteractionType.Replace)
 			return (ReplaceTokenInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Reward )
+		else if (interaction.interactionType == InteractionType.Reward)
 			return (RewardInteraction)interaction;
 		else if (interaction.interactionType == InteractionType.Item)
 			return (ItemInteraction)interaction;
 		else if (interaction.interactionType == InteractionType.Title)
 			return (TitleInteraction)interaction;
+		else if (interaction.interactionType == InteractionType.Start)
+			return (StartInteraction)interaction;
 
 		throw new Exception( "Couldn't create Interaction from: " + interaction.dataName );
 	}
@@ -179,7 +181,6 @@ public class InteractionManager : MonoBehaviour
 	{
 		string translatedButtonText = Translate("interaction." + btnText, btnText);
 
-		//Debug.Log( "QueryTokenInteraction: " + name );
 		//remove any MARKERS
 		var objs = FindObjectsOfType<SpawnMarker>();
 		foreach ( var ob in objs )
@@ -188,6 +189,8 @@ public class InteractionManager : MonoBehaviour
 				Destroy( ob.gameObject );
 			if ( ob.name == "STARTMARKER" )
 				ob.gameObject.SetActive( false );
+			if (ob.name.StartsWith("Start Token"))
+				ob.gameObject.SetActive(false);
 		}
 
 		if ( tokenInteractions.Count > 0 )
@@ -355,6 +358,10 @@ public class InteractionManager : MonoBehaviour
 		else if ( it.interactionType == InteractionType.Title )
         {
 			HandleTitle(it, action);
+        }
+		else if ( it.interactionType == InteractionType.Start )
+        {
+			//Do nothing
         }
 		else
 			GetNewTextPanel().ShowOkContinue( $"Data Error (ShowInteraction)\r\nCould not find Interaction with type '{it.interactionType}'.", ButtonIcon.Continue );

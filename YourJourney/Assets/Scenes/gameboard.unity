@@ -8812,6 +8812,8 @@ MonoBehaviour:
     type: 3}
   noneTokenPrefab: {fileID: 1269221177118494018, guid: 3bc092f1fe4aac549b12bbe7874eeb88,
     type: 3}
+  startTokenPrefab: {fileID: 5151020017912508224, guid: 62759e3e5858c7345a8053b73ff956a7,
+    type: 3}
   humanTokenPrefab: {fileID: 988778545020331381, guid: 4136ed13163164f4685c552801870696,
     type: 3}
   elfTokenPrefab: {fileID: 988778545020331381, guid: a1e81e1645fa63448a036d6056f506b3,

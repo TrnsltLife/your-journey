@@ -320,6 +320,11 @@ public class Tile : MonoBehaviour
 		exploreToken.DOLocalMoveY( .3f, 1 ).SetEase( Ease.OutBounce );
 	}
 
+	public void RevealStartToken()
+    {
+		RevealToken(TokenType.Start);
+    }
+
 	public void RevealInteractiveTokens()
 	{
 		RevealToken( TokenType.Search );
@@ -380,10 +385,11 @@ public class Tile : MonoBehaviour
 	/// </summary>
 	void RevealToken( TokenType ttype )
 	{
-		Debug.Log("RevealToken " + ttype);
 		//var size = tilemesh.GetComponent<MeshRenderer>().bounds.size;
 		var center = tilemesh.GetComponent<MeshRenderer>().bounds.center;
 		Transform[] tf = GetChildren( ttype.ToString() );
+
+		Debug.Log("RevealToken " + ttype + " x " + tf.Count());
 
 		for ( int i = 0; i < tf.Length; i++ )
 		{
@@ -399,9 +405,10 @@ public class Tile : MonoBehaviour
 			//only want FIXED tokens
 			if ( !metaData.isRandom )//&& !metaData.hasBeenReplaced )
 			{
+				Debug.Log("RevealToken " + ttype + " !metaData.isRandmom");
 				string tBy = metaData.triggeredByName;
 				//skip if it's triggeredBy
-				if ( tBy != "None" )
+				if ( tBy != "None")
 				{
 					//if it's not in the list, keep it hidden because it hasn't activated yet, move to next token in loop
 					if ( !tokenTriggerList.Contains( tBy ) )//( tBy != "None" )
@@ -416,6 +423,8 @@ public class Tile : MonoBehaviour
 				//offset = Vector3.Reflect( offset, new Vector3( 0, 0, 1 ) );
 
 				//tf[i].position = new Vector3( center.x + offset.x, 2, center.z + offset.z );
+				Debug.Log("RevealToken " + ttype + " DOLocalMoveY .3f, 1");
+
 				tf[i].gameObject.SetActive( true );
 				tf[i].position = tf[i].position.Y( 2 );
 				tf[i].RotateAround( center, Vector3.up, baseTile.angle );
@@ -426,6 +435,8 @@ public class Tile : MonoBehaviour
 			}
 			else //if ( !metaData.hasBeenReplaced )
 			{
+				Debug.Log("RevealToken " + ttype + " else");
+				Debug.Log("RevealToken " + ttype + " DOLocalMoveY .3f, 1");
 				//random tokens are already placed during tile creation using preset transforms built into the mesh "token attach"
 				tf[i].gameObject.SetActive( true );
 				tf[i].position = tf[i].position.Y( 2 );
@@ -435,10 +446,13 @@ public class Tile : MonoBehaviour
 				tState = tokenStates.Where( x => x.metaData.interactionName == metaData.interactionName ).FirstOr( null );
 			}
 
+			Debug.Log("RevealToken " + ttype + " tState " + tState);
+
 			if ( tState != null )
 			{
 				tState.isActive = true;
 				tState.localPosition = tf[i].localPosition.Y( .3f );
+				Debug.Log("RevealToken " + ttype + " set active and localPosition: " + tState.localPosition);
 			}
 		}
 	}
@@ -600,6 +614,8 @@ public class Tile : MonoBehaviour
 						Destroy( ob.gameObject );
 					if ( ob.name == "STARTMARKER" )
 						ob.gameObject.SetActive( false );
+					if (ob.name.StartsWith("Start Token"))
+						ob.gameObject.SetActive(false);
 				}
 
 				Tile tile = objectHit.parent.GetComponent<Tile>();
@@ -751,6 +767,10 @@ public class Tile : MonoBehaviour
 		if (tokenState.metaData.tokenType == TokenType.None)
 		{
 			go = GameObject.Instantiate(tileManager.noneTokenPrefab, gameObject.transform);
+		}
+		else if (tokenState.metaData.tokenType == TokenType.Start)
+		{
+			go = GameObject.Instantiate(tileManager.startTokenPrefab, gameObject.transform);
 		}
 		else if ( tokenState.metaData.tokenType == TokenType.Search )
 		{

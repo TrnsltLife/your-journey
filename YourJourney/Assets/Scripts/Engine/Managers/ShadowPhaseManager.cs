@@ -70,6 +70,8 @@ public class ShadowPhaseManager : MonoBehaviour
 				Destroy( ob.gameObject );
 			if ( ob.name == "STARTMARKER" )
 				ob.gameObject.SetActive( false );
+			if (ob.name.StartsWith("Start Token"))
+				ob.gameObject.SetActive(false);
 		}
 
 		alphaValue = 0;
