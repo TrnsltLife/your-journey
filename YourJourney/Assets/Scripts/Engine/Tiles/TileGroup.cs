@@ -824,6 +824,7 @@ public class TileGroup
 	TokenType HandlePersistentTokenSwap( string eventName )
 	{
 		IInteraction persEvent = GlowEngine.FindObjectOfType<InteractionManager>().GetInteractionByName( eventName );
+		if(persEvent == null) { return TokenType.None; }
 
 		if ( persEvent is PersistentInteraction )
 		{
