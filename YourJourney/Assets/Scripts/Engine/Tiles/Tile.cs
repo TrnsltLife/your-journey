@@ -759,7 +759,7 @@ public class Tile : MonoBehaviour
 	} );
 	}
 
-	void CreateToken( TokenState tokenState )
+	void CreateToken( TokenState tokenState, bool createStartToken = true )
 	{
 		GameObject go = null;
 		TileManager tileManager = FindObjectOfType<TileManager>();
@@ -770,6 +770,7 @@ public class Tile : MonoBehaviour
 		}
 		else if (tokenState.metaData.tokenType == TokenType.Start)
 		{
+            if (!createStartToken) { return; } //Special case when loading a saved game. We don't want to create the Start Token again.
 			go = GameObject.Instantiate(tileManager.startTokenPrefab, gameObject.transform);
 		}
 		else if ( tokenState.metaData.tokenType == TokenType.Search )
@@ -926,7 +927,7 @@ public class Tile : MonoBehaviour
 		//recreate tokens
 		foreach ( TokenState ts in singleTileState.tokenStates )
 		{
-			CreateToken( ts );
+			CreateToken( ts, false );
 		}
 
 		//remove any tokens that are created from replaced event
