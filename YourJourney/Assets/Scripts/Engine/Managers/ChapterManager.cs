@@ -226,6 +226,11 @@ public class ChapterManager : MonoBehaviour
 				tg.Colorize();
 				tg.isExplored = true;
 			}
+			else if (firstChapter)
+            {
+				//Starting tile group unexplored, but we still need to colorize the starting tile
+				tg.Colorize(true);
+            }
 
 			FindObjectOfType<CamControl>().MoveTo( tg.groupCenter );
 

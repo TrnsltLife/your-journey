@@ -30,6 +30,10 @@ public class LorePanel : MonoBehaviour
 		else
 			threatacc = threatamount;
 
+		loreText.text = "";
+		xpText.text = "";
+
+
 		if (threatacc > 0)
 		{
 			threatText.text = Translate("reward.text.ThreatIncreased", "Threat Increased By\r\n" + threatacc,
