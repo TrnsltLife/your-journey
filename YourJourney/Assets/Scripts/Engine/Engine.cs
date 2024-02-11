@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using DG.Tweening;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static LanguageManager;
 
 public class Engine : MonoBehaviour
 {
@@ -31,6 +35,7 @@ public class Engine : MonoBehaviour
 	private Sprite scenarioSprite;
 	private Vector2 scenarioImageSize = new Vector2(1024, 512);
 	public TextMeshProUGUI scenarioOverlayText;
+	public TextAsset monsterActivationJson;
 
 	public bool debug = false;
 
@@ -82,6 +87,23 @@ public class Engine : MonoBehaviour
 			return;
 		}
 
+		//Load Monster Activations, Modifiers
+		LoadDefaultMonsterActivations();
+		LoadDefaultMonsterModifiers();
+		LoadCustomMonsterModifiers();
+
+		//Load Skins
+		var skinsManager = GetComponent<SkinsManager>();
+		skinsManager.Awake(); //not sure why this is needed but it is. Otherwise it hasn't awoken before the next call which then fails because of a null pointer.
+		SkinsManager.LoadSkins(Bootstrap.GetSkinpack());
+		OnSkinpackUpdate(Bootstrap.GetSkinpack());
+
+		//Load Translations
+		LanguageManager.LoadLanguage(Bootstrap.GetLanguage());
+		OnLanguageUpdate(Bootstrap.GetLanguage());
+		LanguageManager.AssignScenarioTranslations(scenario.translationObserver.ToList());
+
+
 		//first objective/interaction/trigger are DUMMIES (None), remove them
 		scenario.objectiveObserver.RemoveAt( 0 );
 		scenario.interactionObserver.RemoveAt( 0 );
@@ -121,6 +143,39 @@ public class Engine : MonoBehaviour
 		}
 	}
 
+	private void LoadDefaultMonsterActivations()
+    {
+		List<MonsterActivations> activations = JsonConvert.DeserializeObject<List<MonsterActivations>>(monsterActivationJson.text);
+		foreach (var activation in activations)
+		{
+			scenario.activationsObserver.Add(activation);
+		}
+    }
+
+	private void LoadDefaultMonsterModifiers()
+    {
+		Debug.Log("LoadDefaultMonsterMOdifiers()");
+		List<MonsterModifier> modifiers = MonsterModifier.Values.ToList();
+		foreach(var modifier in modifiers)
+        {
+			scenario.monsterModifiersObserver.Add(modifier);
+        }
+		Debug.Log("LoadDefaultMonsterMOdifiers() finished");
+	}
+
+	private void LoadCustomMonsterModifiers()
+    {
+		Debug.Log("LoadCustomMonsterMOdifiers()");
+		foreach (ThreatInteraction threat in scenario.interactionObserver.Where(it => it.interactionType == InteractionType.Threat))
+		{
+			foreach (Monster monster in threat.monsterCollection)
+			{
+				monster.LoadCustomModifiers(scenario.monsterModifiersObserver);
+			}
+		}
+		Debug.Log("LoadCustomMonsterMOdifiers() finished");
+	}
+
 	IEnumerator BeginGame()
 	{
 		while ( !doneLoading )
@@ -151,12 +206,13 @@ public class Engine : MonoBehaviour
 
 	public void StartNewGame()
 	{
+		MonsterManager.InitMonsterPool(); //Reset monster pool very time a new game is started so last game's monster pool doesn't persist to the new game.
 		if ( !debug )
 		{
 			//only show intro text if it's not empty
 			if ( !string.IsNullOrEmpty( scenario.introBookData.pages[0] ) )
 			{
-				interactionManager.GetNewTextPanel().ShowOkContinue( scenario.introBookData.pages[0], ButtonIcon.Continue, () =>
+				interactionManager.GetNewTextPanel().ShowOkContinue(Interpret("scenario.introduction", scenario.introBookData.pages[0]), ButtonIcon.Continue, () =>
 					{
 						uiControl.interactable = true;
 
@@ -275,21 +331,27 @@ public class Engine : MonoBehaviour
 		FindObjectOfType<LorePanel>().AddReward( scenario.loreReward, scenario.xpReward );
 
 		bool success = scenario.scenarioEndStatus[resName];//default reso
-		string msg = success ? "S U C C E S S" : "F A I L U R E";
+		string msg = success ? Translate("game.text.Success", "SUCCESS") : Translate("game.text.Failure", "FAILURE");
 		string end = "\r\n\r\n";
 		if(scenario.projectType == ProjectType.Campaign)
         {
-			end += "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.";
+			end += Translate("game.text.Rewards", "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.", 
+				new List<string> { Bootstrap.loreCount.ToString(), Bootstrap.xpCount.ToString()});
         }
 		else
         {
-			end += "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.\r\n"
-				+ "With your starting values, that gives you " + (Bootstrap.gameStarter.loreStartValue + Bootstrap.loreCount) + " Lore "
-				+ "and " + (Bootstrap.gameStarter.xpStartValue + Bootstrap.xpCount) + " XP.\r\n\r\n"
-				+ "Be sure to write this down if you want to continue with another standalone scenario.";
+			int totalLore = Bootstrap.gameStarter.loreStartValue + Bootstrap.loreCount;
+			int totalXP = Bootstrap.gameStarter.xpStartValue + Bootstrap.xpCount;
+			end += Translate("game.text.Rewards", "You earned " + Bootstrap.loreCount + " Lore and " + Bootstrap.xpCount + " XP.",
+					new List<string> { Bootstrap.loreCount.ToString(), Bootstrap.xpCount.ToString() }) 
+				+ "\r\n"
+				+ Translate("game.text.RunningTotal", "With your starting values, that gives you " + (totalLore) + " Lore and " + (totalXP) + " XP.",
+					new List<string> { totalLore.ToString(), totalXP.ToString() }) 
+				+ "\r\n\r\n"
+				+ Translate("game.text.Reminder", "Be sure to write this down if you want to continue with another standalone scenario.");
 		}
 		var text = interactionManager.GetNewTextPanel();
-		text.ShowOkContinue( "The Scenario has ended.\r\n\r\n" + msg + end, ButtonIcon.Continue, () =>
+		text.ShowOkContinue( Translate("game.text.ScenarioEnded", "The Scenario has ended.") + "\r\n\r\n" + msg + end, ButtonIcon.Continue, () =>
 			{
 				fader.gameObject.SetActive( true );
 				fader.DOFade( 1, 2 ).OnComplete( () =>
@@ -377,7 +439,7 @@ public class Engine : MonoBehaviour
 
 	public void OnShowSettings()
 	{
-		settingsDialog.Show( "Quit to Title", OnQuit );
+		settingsDialog.Show("settings.QuitToTitle", "Quit to Title", OnLanguageUpdate, OnQuit, OnSkinpackUpdate );
 	}
 
 	public void OnQuit()
@@ -391,6 +453,28 @@ public class Engine : MonoBehaviour
 		{
 			SceneManager.LoadScene( "title" );
 		} );
+	}
+
+	public void OnSkinpackUpdate(string skinpackName)
+    {
+		Debug.Log("Engine.OnSkinpackUpdate(" + skinpackName + ")");
+		SkinsManager.LoadSkins( skinpackName );
+
+		//Update any existing CombatPanel -- actually currently the Settings Dialog can't be used while the Combat Panel is open so we don't need to do this
+		//CombatPanel combatPanel = FindObjectOfType<CombatPanel>();
+		//if(combatPanel != null) { combatPanel.UpdateSkins(); }
+
+		//Update all the MonsterButtons
+		MonsterManager monsterManager = FindObjectOfType<MonsterManager>();
+		monsterManager.UpdateSkins();
+    }
+
+	public void OnLanguageUpdate(string languageName)
+	{
+		Debug.Log("Engine.OnLanguageUpdate(" + languageName + ")");
+		LanguageManager.LoadLanguage(languageName);
+		LanguageManager.UpdateCurrentLanguage(languageName);
+		LanguageManager.CallSubscribers();
 	}
 
 	public void RemoveFog( string chName )
@@ -419,6 +503,8 @@ public class Engine : MonoBehaviour
 				Destroy( ob.gameObject );
 			if ( ob.name == "STARTMARKER" )
 				ob.gameObject.SetActive( false );
+			if (ob.name.StartsWith("Start Token"))
+				ob.gameObject.SetActive(false);
 		}
 	}
 

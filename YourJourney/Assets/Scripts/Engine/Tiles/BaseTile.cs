@@ -61,7 +61,7 @@ public class BaseTile : ITile
 		triggerName = "None";
 	}
 
-	virtual public string ToString()
+	public override string ToString()
     {
 		return idNumber + tileSide + " [" + position + "] " + angle + "*, " + tokenCount + " tokens" + (isStartTile ? "[start]" : "");
     }

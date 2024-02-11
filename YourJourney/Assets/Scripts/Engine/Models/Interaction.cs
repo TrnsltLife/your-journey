@@ -14,6 +14,7 @@ public class Interaction
 	public bool isTokenInteraction;
 	public bool isFromThreatThreshold;
 	public TextBookData eventBookData;
+	public string tokenInteractionText;
 
 	//Attribute Test
 	public Ability testAttribute;

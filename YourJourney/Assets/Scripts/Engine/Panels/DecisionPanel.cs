@@ -2,6 +2,7 @@
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using static LanguageManager;
 
 public class DecisionPanel : MonoBehaviour
 {
@@ -17,13 +18,18 @@ public class DecisionPanel : MonoBehaviour
 	Action<InteractionResult> buttonActions;
 	Transform root;
 
-	private void Awake()
+	private void CalculatePanelPosition()
 	{
 		rect = GetComponent<RectTransform>();
 		group = GetComponent<CanvasGroup>();
-		gameObject.SetActive( false );
+		gameObject.SetActive(false);
 		sp = transform.position;
 		ap = rect.anchoredPosition;
+	}
+
+	private void Awake()
+	{
+		CalculatePanelPosition();
 		root = transform.parent;
 		mainText.alignment = TextAlignmentOptions.Top; //We set this here instead of the editor to make it easier to see mainText and dummy are lined up with each other in the editor
 		dummy.alignment = TextAlignmentOptions.Top;
@@ -31,6 +37,7 @@ public class DecisionPanel : MonoBehaviour
 
 	public void Show( DecisionInteraction branchInteraction, Action<InteractionResult> actions = null )
 	{
+		CalculatePanelPosition();
 		FindObjectOfType<TileManager>().ToggleInput( true );
 
 		btn1.SetActive( true );
@@ -43,12 +50,15 @@ public class DecisionPanel : MonoBehaviour
 		overlay.DOFade( 1, .5f );
 
 		gameObject.SetActive( true );
-		btn1Text.text = branchInteraction.choice1;
-		btn2Text.text = branchInteraction.choice2;
-		btn3Text.text = branchInteraction.choice3;
+		btn1Text.text = Interpret(branchInteraction.TranslationKey("choice1"), branchInteraction.choice1);
+		btn2Text.text = Interpret(branchInteraction.TranslationKey("choice2"), branchInteraction.choice2);
+		btn3Text.text = Interpret(branchInteraction.TranslationKey("choice3"), branchInteraction.choice3);
 		buttonActions = actions;
 
-		SetText( branchInteraction.eventBookData.pages[0] );
+		SetText( Interpret(branchInteraction.TranslationKey("eventText"), branchInteraction.eventBookData.pages[0]) );
+		Scenario.Chronicle(mainText.text + "\n[" + btn1Text.text + "] [" + btn2Text.text + "]" +
+			(branchInteraction.isThreeChoices ? " [" + btn3Text.text + "]" : ""));
+
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
 
@@ -90,6 +100,7 @@ public class DecisionPanel : MonoBehaviour
 	{
 		DisableButtons();
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn1Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn1 = true } );
 		Hide();
 	}
@@ -98,6 +109,7 @@ public class DecisionPanel : MonoBehaviour
 	{
 		DisableButtons();
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn2Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn2 = true } );
 		Hide();
 	}
@@ -106,6 +118,7 @@ public class DecisionPanel : MonoBehaviour
 	{
 		DisableButtons();
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn3Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn3 = true } );
 		Hide();
 	}
@@ -114,6 +127,7 @@ public class DecisionPanel : MonoBehaviour
 	{
 		DisableButtons();
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + btn4Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn4 = true } );
 		Hide();
 	}

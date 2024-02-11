@@ -6,6 +6,8 @@ public class MetaData : MonoBehaviour
 	public string triggerName;
 	public string interactionName;
 	public string triggeredByName;
+	public string tokenInteractionText;
+	public string tokenInteractionKey;
 	public TokenType tokenType;
 	public PersonType personType;
 	public TerrainType terrainType;
@@ -21,6 +23,8 @@ public class MetaDataJSON
 	public string triggerName;
 	public string interactionName;
 	public string triggeredByName;
+	public string tokenInteractionText;
+	public string tokenInteractionKey;
 	public TokenType tokenType;
 	public PersonType personType;
 	public TerrainType terrainType;
@@ -37,6 +41,8 @@ public class MetaDataJSON
 		triggerName = md.triggerName;
 		interactionName = md.interactionName;
 		triggeredByName = md.triggeredByName;
+		tokenInteractionText = md.tokenInteractionText;
+		tokenInteractionKey = md.tokenInteractionKey;
 		tokenType = md.tokenType;
 		personType = md.personType;
 		terrainType = md.terrainType;

@@ -3,18 +3,25 @@ using UnityEngine.UI;
 using DG.Tweening;
 using System.Linq;
 using System;
+using static LanguageManager;
+using System.Collections.Generic;
+using UnityEngine.EventSystems;
+using TMPro;
 
 public class CombatPanel : MonoBehaviour
 {
 	public RectTransform healthMeter;
 	public Sprite selectedButton, unselectedButton;
-	public GameObject large, armored, bloodthirsty, eliteBG;
+	public GameObject large, armored, bloodthirsty, eliteBG, rangedIcon;
 	public Text monsterName, damageText;
 	public CanvasGroup canvasGroup;
 	public MonsterItem[] monsterItems;
 	public Button applyButton;
 	public Button[] modifierButtons;
 	public GameObject[] monsterImages;
+	public GameObject[] monsterModifierLabels;
+	public TextMeshProUGUI modifierDescriptionText;
+	public Image bannerIcon;
 
 	CombatModify modifier;
 	Monster monster = null;
@@ -36,8 +43,41 @@ public class CombatPanel : MonoBehaviour
 		pierceSelected = lethalSelected = stunSelected = smiteSelected = sunderSelected = cleaveSelected = false;
 	}
 
-	public bool Show( Monster monster )
+	/*
+	public void UpdateSkins()
+    {
+		for(int i = 0; i<monsterImages.Length; i++)
+        {
+			UpdateSkin(i);
+		}
+	}
+	*/
+
+	public void UpdateSkin(int monsterIndex, int skinVariant = 0)
+    {
+		monsterImages[monsterIndex].GetComponent<Image>().overrideSprite = SkinsManager.SkinVariant(monsterIndex, skinVariant); //Set monster skin override based on current value in SkinsManager.monsterSkins array
+	}
+
+	public void SetBanner(Sprite sprite)
 	{
+		if (sprite != null)
+		{
+			bannerIcon.sprite = sprite;
+			bannerIcon.gameObject.SetActive(true);
+		}
+		else
+        {
+			bannerIcon.gameObject.SetActive(false);
+		}
+	}
+
+	public bool Show( Monster monster, Sprite bannerSprite, int skinVariant = 0 )
+	{
+		Debug.Log("CombatPanel.Show(" + monster.dataName + ")");
+		this.monster = monster;
+		UpdateSkin((int)monster.monsterType, skinVariant);
+		SetBanner(bannerSprite);
+
 		//remove any spawn markers, since player will have seen them by now
 		var objs = FindObjectsOfType<SpawnMarker>();
 		foreach ( var ob in objs )
@@ -47,8 +87,10 @@ public class CombatPanel : MonoBehaviour
 		}
 
 		//set the appropriate monster image
-		for ( int i = 0; i < monsterImages.Length; i++ )
-			monsterImages[i].SetActive( false );
+		for (int i = 0; i < monsterImages.Length; i++)
+		{
+			monsterImages[i].SetActive(false);
+		}
 		monsterImages[(int)monster.monsterType].SetActive( true );
 
 		if ( monsterGUID == monster.GUID && gameObject.activeSelf )
@@ -64,6 +106,9 @@ public class CombatPanel : MonoBehaviour
 			canvasGroup.DOFade( 1, .5f );
 		}
 
+		//Ranged
+		rangedIcon.SetActive(monster.isRanged);
+
 		FindObjectOfType<TileManager>().ToggleInput( true );
 
 		pierceSelected = lethalSelected = stunSelected = smiteSelected = sunderSelected = cleaveSelected = false;
@@ -76,17 +121,85 @@ public class CombatPanel : MonoBehaviour
 		applyButton.interactable = true;
 		damage = 0;
 		damageText.text = damage.ToString();
-		this.monster = monster;
 		foreach ( var m in monsterItems )
 			m.Hide();
 		for ( int i = 0; i < monster.count; i++ )
 			monsterItems[i].Show( monster, i );
-		monsterName.text = monster.dataName;
-		large.SetActive( monster.isLarge );
-		armored.SetActive( monster.isArmored );
-		bloodthirsty.SetActive( monster.isBloodThirsty );
+		//monsterName.text = monster.dataName;
+		monsterName.text = Monster.MonsterNameObject(monster, monster.count);
+		ShowModifierLabels(monster);
+		modifierDescriptionText.text = "";
+		//large.SetActive( monster.isLarge );
+		//armored.SetActive( monster.isArmored );
+		//bloodthirsty.SetActive( monster.isBloodThirsty );
 
 		return true;
+	}
+
+	public void ShowModifierLabels(Monster monster)
+    {
+		large.SetActive(false);
+		armored.SetActive(false);
+		bloodthirsty.SetActive(false);
+
+		for (int i = 0; i < Monster.MAX_MODIFIERS; i++)
+        {
+			monsterModifierLabels[i].SetActive(false);
+        }
+
+		monster.RandomizeModifiers();
+
+		for (int i=0; i<monster.modifierList.Count; i++)
+        {
+			Text t = monsterModifierLabels[i].GetComponent<Text>();
+			if (monster.modifierList[i].id >= MonsterModifier.START_OF_CUSTOM_MODIFIERS)
+			{
+				t.text = Interpret("enemyBonus." + monster.modifierList[i].dataName + ".name", monster.modifierList[i].name);
+			}
+			else
+			{
+				t.text = Translate("combat.bonus." + monster.modifierList[i].name, monster.modifierList[i].name);
+			}
+			monsterModifierLabels[i].SetActive(true);
+        }
+    }
+
+	public void PointerEnterModifierLabel(int modifierIndex)
+    {
+		Debug.Log("PointerEnterModifierLabel(" + modifierIndex + ")");
+
+		if (modifierIndex <= monster.modifierList.Count)
+		{
+			MonsterModifier mod = monster.modifierList[modifierIndex];
+			List<string> mods = new List<string>();
+			if (mod.health != 0) { mods.Add((mod.health > 0 ? "+" : "") + mod.health + " " + Translate("combat.modifier.Health", "Health")); }
+			if (mod.armor != 0) { mods.Add((mod.armor > 0 ? "+" : "") + mod.armor + " " + Translate("combat.modifier.Armor", "Armor")); }
+			if (mod.sorcery != 0) { mods.Add((mod.sorcery > 0 ? "+" : "") + mod.sorcery + " " + Translate("combat.modifier.Sorcery", "Sorcery")); }
+			if (mod.damage != 0) { mods.Add((mod.damage > 0 ? "+" : "") + mod.damage + " " + Translate("damage.Damage", "Damage")); }
+			if (mod.fear != 0) { mods.Add((mod.fear > 0 ? "+" : "") + mod.fear + " " + Translate("damage.Fear", "Fear")); }
+
+			List<string> immunities = new List<string>();
+			if (mod.immuneCleave || mod.fakeCleave) { immunities.Add(Translate("combat.button.Cleave", "Cleave")); }
+			if (mod.immuneLethal || mod.fakeLethal) { immunities.Add(Translate("combat.button.Lethal", "Lethal")); }
+			if (mod.immunePierce || mod.fakePierce) { immunities.Add(Translate("combat.button.Pierce", "Pierce")); }
+			if (mod.immuneSmite || mod.fakeSmite) { immunities.Add(Translate("combat.button.Smite", "Smite")); }
+			if (mod.immuneStun || mod.fakeStun) { immunities.Add(Translate("combat.button.Stun", "Stun")); }
+			if (mod.immuneSunder || mod.fakeSunder) { immunities.Add(Translate("combat.button.Sunder", "Sunder")); }
+
+			if(immunities.Count > 0) { mods.Add(Translate("combat.modifier.ImmuneTo", "Immune to") + " " + string.Join(", ", immunities)); }
+
+			modifierDescriptionText.text = string.Join("; ", mods);
+		}
+		else
+        {
+			modifierDescriptionText.text = "";
+        }
+    }
+
+	public void PointerExitModifierLabel(int modifierIndex)
+	{
+		Debug.Log("PointerExitModifierLabel(" + modifierIndex + ")");
+		modifierDescriptionText.text = "";
 	}
 
 	public void Hide( bool unselect = false )
@@ -145,7 +258,12 @@ public class CombatPanel : MonoBehaviour
 
 	void DoDamage()
 	{
-		modifier = new CombatModify() { Pierce = pierceSelected, Smite = smiteSelected, Sunder = sunderSelected, Cleave = cleaveSelected, Lethal = lethalSelected, Stun = stunSelected };
+		modifier = new CombatModify() { Pierce = pierceSelected && !monster.immunePierce, 
+										Smite = smiteSelected && !monster.immuneSmite, 
+										Sunder = sunderSelected && !monster.immuneSunder, 
+										Cleave = cleaveSelected && !monster.immuneCleave, 
+										Lethal = lethalSelected && !monster.immuneLethal, 
+										Stun = stunSelected && !monster.immuneStun };
 
 		int r = monsterItems[0].Damage( damage, modifier );
 		if ( monster.count > 1 )
@@ -177,52 +295,71 @@ public class CombatPanel : MonoBehaviour
 
 	public void OnApply()
 	{
-		var sp = FindObjectOfType<ShadowPhaseManager>();
-		var mm = FindObjectOfType<MonsterManager>();
-		var im = FindObjectOfType<InteractionManager>();
-		applyButton.interactable = false;
-		//how many died this attack
-		int deadCount = monsterItems.Where( x => x.isDead && x.activeMonster ).Count() - monster.deathTally;
-
-		monster.deadCount = deadCount;//shadow phase reads this number
-		monster.deathTally += deadCount;//how many have died total
-
-		for ( int i = 0; i < monster.count; i++ )
-			monsterItems[i].Apply( stunSelected );
-
-		//elite enemies are able to perform counterattacks even	when they are exhausted
-		//stunning exhausts a group - if the group is elite it also cannot counterattack this attack
-
-		Hide( true );
-
-		if ( deadCount > 0 )
+		string monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
+		gameObject.SetActive(false);
+		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowYesNo(Translate("combat.text.ConfirmHits", "Do you want to apply {0} hits to {1}?",
+			new List<string> { damage.ToString(), monsterName }), res =>
 		{
-			//if we're here from the shadow phase AND ALL monsters died, bug out and let shadow phase continue
-			if ( sp.doingShadowPhase && monster.deathTally == monster.count )
+			if (res.btn1)
 			{
-				mm.RemoveMonster( monster );
-				sp.NotifyInterrupt();
-			}
-			else if ( sp.doingShadowPhase )//otherwise at least 1 killed, remove
-			{
-				im.GetNewTextPanel().ShowOkContinue( $"Remove {deadCount} {monster.dataName}(s) from the board.", ButtonIcon.Continue, null
-					);
-			}
-			else if ( !sp.doingShadowPhase )//otherwise not in SP, continue
-			{
-				if ( monster.deathTally < monster.count )
+				var sp = FindObjectOfType<ShadowPhaseManager>();
+				var mm = FindObjectOfType<MonsterManager>();
+				var im = FindObjectOfType<InteractionManager>();
+				applyButton.interactable = false;
+				//how many died this attack
+				int deadCount = monsterItems.Where(x => x.isDead && x.activeMonster).Count() - monster.deathTally;
+
+				monster.deadCount = deadCount;//shadow phase reads this number
+				monster.deathTally += deadCount;//how many have died total
+
+				for (int i = 0; i < monster.count; i++)
+					monsterItems[i].Apply(stunSelected);
+
+				//elite enemies are able to perform counterattacks even	when they are exhausted
+				//stunning exhausts a group - if the group is elite it also cannot counterattack this attack
+
+				Hide(true);
+
+				if (deadCount > 0)
 				{
-					im.GetNewTextPanel().ShowOkContinue( $"Remove {deadCount} {monster.dataName}(s) from the board.", ButtonIcon.Continue, () =>
+					//if we're here from the shadow phase AND ALL monsters died, bug out and let shadow phase continue
+					if (sp.doingShadowPhase && monster.deathTally == monster.count)
 					{
-						QueryCounterAttack( monster );
-					} );
+						mm.RemoveMonster(monster);
+						sp.NotifyInterrupt();
+					}
+					else if (sp.doingShadowPhase)//otherwise at least 1 killed, remove
+					{
+						MonsterManager.ReturnMonsterToPool(monster.monsterType, monster.deadCount);
+						monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
+						string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monsterName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
+						im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, null);
+					}
+					else if (!sp.doingShadowPhase)//otherwise not in SP, continue
+					{
+						if (monster.deathTally < monster.count)
+						{
+							MonsterManager.ReturnMonsterToPool(monster.monsterType, monster.deadCount);
+							monsterName = Monster.MonsterNameObject(monster, monster.deadCount);
+							string monsterText = Translate("dialog.text.RemoveMonsters", $"Remove {monster.deadCount} {monster.dataName}(s) from the board.", new List<string> { monster.deadCount.ToString(), monsterName });
+
+							im.GetNewTextPanel().ShowOkContinue(monsterText, ButtonIcon.Continue, () =>
+							{
+								QueryCounterAttack(monster);
+							});
+						}
+						else
+							mm.RemoveMonster(monster);
+					}
 				}
-				else
-					mm.RemoveMonster( monster );
+				else if (!sp.doingShadowPhase)//only counterattack if NOT in sp
+					QueryCounterAttack(monster);
 			}
-		}
-		else if ( !sp.doingShadowPhase )//only counterattack if NOT in sp
-			QueryCounterAttack( monster );
+			else
+            {
+				gameObject.SetActive(true);
+			}
+		});
 	}
 
 	void QueryCounterAttack( Monster monster )
@@ -234,7 +371,7 @@ public class CombatPanel : MonoBehaviour
 			return;
 		}
 
-		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowYesNo( "Can the enemy counterattack?", res =>
+		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowYesNo( Translate("attack.text.EnemyCounterattack", "Can the enemy counterattack?") , res =>
 		{
 			if ( res.btn1 )
 			{

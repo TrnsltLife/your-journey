@@ -1196,6 +1196,7 @@ GameObject:
   - component: {fileID: 8968846589664848941}
   - component: {fileID: 9187249412259705158}
   - component: {fileID: 5900394151311041581}
+  - component: {fileID: 3433566592399002064}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -1277,6 +1278,20 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!114 &3433566592399002064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6814301734907255230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ca0829215dddce4e9a6dc6ee1ee228b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TextKey: stand.button.Fail
+  DefaultText: Fail
 --- !u!1 &7148154375570330494
 GameObject:
   m_ObjectHideFlags: 0
@@ -1877,6 +1892,7 @@ GameObject:
   - component: {fileID: 1837536543266580547}
   - component: {fileID: 6576887097414608233}
   - component: {fileID: 4127886280048866281}
+  - component: {fileID: 3393249708158438997}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -1958,6 +1974,20 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!114 &3393249708158438997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8171815057684314131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ca0829215dddce4e9a6dc6ee1ee228b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TextKey: stand.button.Pass
+  DefaultText: Pass
 --- !u!1 &8387985213702501588
 GameObject:
   m_ObjectHideFlags: 0
@@ -2084,6 +2114,7 @@ GameObject:
   - component: {fileID: 8478595164267692157}
   - component: {fileID: 7577044824245715984}
   - component: {fileID: 5279421562486288909}
+  - component: {fileID: 3116923420122256961}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -2165,3 +2196,17 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!114 &3116923420122256961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9221945334898401608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ca0829215dddce4e9a6dc6ee1ee228b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TextKey: damage.button.Continue
+  DefaultText: Continue

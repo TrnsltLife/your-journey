@@ -2,6 +2,8 @@
 using System.Collections;
 using UnityEngine;
 using DG.Tweening;
+using System.Collections.Generic;
+using static LanguageManager;
 
 public class ShadowPhaseManager : MonoBehaviour
 {
@@ -50,7 +52,7 @@ public class ShadowPhaseManager : MonoBehaviour
 			|| FindObjectOfType<ProvokeMessage>().provokeMode )
 			return;
 
-		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowYesNo( "End your turn and begin the Shadow Phase?", result =>
+		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowYesNo( Translate("dialog.text.BeginShadowPhase", "End your turn and begin the Shadow Phase?"), result =>
 		{
 			if ( result.btn1 )
 				DoEndTurn();
@@ -68,6 +70,8 @@ public class ShadowPhaseManager : MonoBehaviour
 				Destroy( ob.gameObject );
 			if ( ob.name == "STARTMARKER" )
 				ob.gameObject.SetActive( false );
+			if (ob.name.StartsWith("Start Token"))
+				ob.gameObject.SetActive(false);
 		}
 
 		alphaValue = 0;
@@ -94,7 +98,7 @@ public class ShadowPhaseManager : MonoBehaviour
 		Debug.Log( "***STARTED COROUTINE" );
 		FindObjectOfType<TileManager>().ToggleInput( true );
 		//SHADOW PHASE announcement
-		phaseNotification.Show( "Shadow Phase" );
+		phaseNotification.Show( Translate("dialog.text.ShadowPhase", "Shadow Phase") );
 		yield return new WaitForSeconds( 3 );
 
 		//INSPIRATION STEP
@@ -128,9 +132,9 @@ public class ShadowPhaseManager : MonoBehaviour
 		{
 			var im = FindObjectOfType<InteractionManager>();
 			bool waiting = true;
-			im.GetNewTextPanel().ShowOkContinue( "Your fellowship is prepared to face the shadow."
+			im.GetNewTextPanel().ShowOkContinue( Translate("dialog.text.FellowshipPrepared", "Your fellowship is prepared to face the shadow.")
 				+ "\r\n\r\n"
-				+ "Each hero gains 1 inspiration.", 
+				+ Translate("dialog.text.EachGainInspiration", "Each hero gains 1 inspiration."),
 					ButtonIcon.Continue, () => waiting = false );
 
 			while ( waiting )
@@ -186,11 +190,16 @@ public class ShadowPhaseManager : MonoBehaviour
 				moveA = monsters[i].movementValue;
 				moveB = moveA * 2;
             }
-			tp.ShowYesNo( $"Move {moveA}: Attack {heroName} or closest Hero.\r\n\r\nCan this enemy group attack a target?\r\n\r\nIf you have a skill to attack or apply damage to this enemy group, do it now by selecting its Enemy Button.", res =>
-			{
-				waiting = false;
-				iResult = res;
-			} );
+			tp.ShowYesNo( Translate("attack.text.MoveAttack", $"Move {moveA}: Attack {heroName} or closest Hero.", new List<string> { moveA.ToString(), heroName }) +
+                "\r\n\r\n" +
+                Translate("attack.text.CanAttack", "Can this enemy group attack a target?") +
+				"\r\n\r\n" +
+				Translate("attack.text.ApplyDamageButton", "If you have a skill to attack or apply damage to this enemy group, do it now by selecting its Enemy Button."), 
+				res =>
+				{
+					waiting = false;
+					iResult = res;
+				} );
 			//wait
 			//int startingActive = monsters[i].ActiveMonsterCount;
 			while ( waiting )
@@ -221,7 +230,7 @@ public class ShadowPhaseManager : MonoBehaviour
 			{
 				tp.RemoveBox();
 				waiting = true;
-				im.GetNewTextPanel().ShowOkContinue( $"This enemy group's activation is canceled.", ButtonIcon.Continue, () => { waiting = false; } );
+				im.GetNewTextPanel().ShowOkContinue( Translate("attack.text.EnemyCanceled", "This enemy group's activation is canceled."), ButtonIcon.Continue, () => { waiting = false; } );
 				while ( waiting )
 					yield return null;
 			}
@@ -242,7 +251,12 @@ public class ShadowPhaseManager : MonoBehaviour
 				{
 					Debug.Log( "***NO ATTACK" );
 					waiting = true;
-					im.GetNewTextPanel().ShowOkContinue( $"Move {monsters[i].dataName} group {moveB} spaces towards {heroName}.", ButtonIcon.Continue, () => waiting = false );
+					int remaining = monsters[i].count - monsters[i].deathTally;
+					string monsterName = Monster.MonsterNameAttacker(monsters[i], remaining);
+					string translateKey = "attack.text.single.MoveTowards";
+					if (remaining > 1) { translateKey = "attack.text.plural.MoveTowards"; }
+					im.GetNewTextPanel().ShowOkContinue( Translate(translateKey, $"{monsterName} move {moveB} spaces towards {heroName}.", new List<string> { monsterName, moveB.ToString(), heroName }), 
+						ButtonIcon.Continue, () => waiting = false );
 					//wait
 					while ( waiting )
 						yield return null;
@@ -276,8 +290,10 @@ public class ShadowPhaseManager : MonoBehaviour
 		//2*hero count + # unexplored tiles + 1 per threat token
 		int hc = 2 * Bootstrap.gameStarter.heroes.Length;
 		int ut = 0;
-		if ( Bootstrap.gameStarter.difficulty != Difficulty.Adventure )
-			FindObjectOfType<TileManager>().UnexploredTileCount();
+		if (Bootstrap.gameStarter.difficulty != Difficulty.Adventure)
+		{
+			ut = FindObjectOfType<TileManager>().UnexploredTileCount();
+		}
 		int tt = FindObjectOfType<TileManager>().ThreatTokenCount();
 		Debug.Log( "***hero threat: " + hc );
 		Debug.Log( "***unexplored threat: " + ut );
@@ -290,7 +306,7 @@ public class ShadowPhaseManager : MonoBehaviour
 		//	yield return new WaitForSeconds( 2 );
 
 		bool waiting = true;
-		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue( $"Threat increases by {threat}.", ButtonIcon.Continue, () => waiting = false );
+		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue( Translate("dialog.text.ThreatIncreases", $"Threat increases by {threat}.", new List<string> { threat.ToString() }), ButtonIcon.Continue, () => waiting = false );
 
 		while ( waiting )
 			yield return null;
@@ -319,11 +335,11 @@ public class ShadowPhaseManager : MonoBehaviour
 	{
 		var im = FindObjectOfType<InteractionManager>();
 		//RALLY PHASE announcement
-		phaseNotification.Show( "Rally Phase" );
+		phaseNotification.Show( Translate("dialog.text.RallyPhase", "Rally Phase") );
 		yield return new WaitForSeconds( 3 );
 
 		bool waiting = true;
-		im.GetNewTextPanel().ShowOkContinue( "Each Hero resets their deck and Scouts 2.", ButtonIcon.Continue, () =>
+		im.GetNewTextPanel().ShowOkContinue( Translate("dialog.text.EachResetScout2", "Each Hero resets their deck and Scouts 2."), ButtonIcon.Continue, () =>
 		{
 			waiting = false;
 		} );
@@ -333,7 +349,7 @@ public class ShadowPhaseManager : MonoBehaviour
 
 		FindObjectOfType<MonsterManager>().ReadyAll();
 		//ACTION PHASE announcement
-		phaseNotification.Show( "Action Phase" );
+		phaseNotification.Show( Translate("dialog.text.ActionPhase", "Action Phase") );
 
 		DOTween.To( () => alphaValue, x =>
 		{

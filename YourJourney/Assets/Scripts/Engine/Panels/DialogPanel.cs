@@ -3,6 +3,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static LanguageManager;
 
 public class DialogPanel : MonoBehaviour
 {
@@ -20,13 +21,18 @@ public class DialogPanel : MonoBehaviour
 
 	DialogInteraction dialogInteraction;
 
-	private void Awake()
+	private void CalculatePanelPosition()
 	{
 		rect = GetComponent<RectTransform>();
 		group = GetComponent<CanvasGroup>();
 		//gameObject.SetActive( false );
 		sp = transform.position;
 		ap = rect.anchoredPosition;
+	}
+
+	private void Awake()
+	{
+		CalculatePanelPosition();
 		root = transform.parent;
 		mainText.alignment = TextAlignmentOptions.Top; //We set this here instead of the editor to make it easier to see mainText and dummy are lined up with each other in the editor
 		dummy.alignment = TextAlignmentOptions.Top;
@@ -34,6 +40,7 @@ public class DialogPanel : MonoBehaviour
 
 	public void Show( DialogInteraction di, Action<InteractionResult> actions = null )
 	{
+		CalculatePanelPosition();
 		gameObject.SetActive( true );
 		FindObjectOfType<TileManager>().ToggleInput( true );
 
@@ -58,15 +65,21 @@ public class DialogPanel : MonoBehaviour
 		overlay.DOFade( 1, .5f );
 
 		group.alpha = 0;
-		btn1Text.text = di.choice1;
-		btn2Text.text = di.choice2;
-		btn3Text.text = di.choice3;
+		btn1Text.text = Interpret(di.TranslationKey("choice1"), di.choice1);
+		btn2Text.text = Interpret(di.TranslationKey("choice2"), di.choice2);
+		btn3Text.text = Interpret(di.TranslationKey("choice3"), di.choice3);
 		buttonActions = actions;
 
 		if ( !di.isDone )
-			SetText( di.eventBookData.pages[0] );
+			SetText( Interpret(di.TranslationKey("eventText"), di.eventBookData.pages[0]) );
 		else
-			SetText( di.persistentText );
+			SetText( Interpret(di.TranslationKey("persistentText"), di.persistentText) );
+
+
+		Scenario.Chronicle(mainText.text + "\n" +
+			(!String.IsNullOrEmpty(di.choice1) ? "[<font=\"Icon\">I</font>" + btn1Text.text + "]" : "") +
+			(!String.IsNullOrEmpty(di.choice2) ? " [<font=\"Icon\">I</font>" + btn2Text.text + "]" : "") +
+			(!String.IsNullOrEmpty(di.choice3) ? " [<font=\"Icon\">I</font>" + btn3Text.text + "]" : ""));
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
@@ -115,6 +128,7 @@ public class DialogPanel : MonoBehaviour
 		if ( dialogInteraction.c1Used && dialogInteraction.c2Used && dialogInteraction.c3Used )
 			dialogInteraction.isDone = true;
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[<font=\"Icon\">I</font>" + btn1Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn1 = true, removeToken = false } );
 		Hide();
 	}
@@ -127,6 +141,7 @@ public class DialogPanel : MonoBehaviour
 		if ( dialogInteraction.c1Used && dialogInteraction.c2Used && dialogInteraction.c3Used )
 			dialogInteraction.isDone = true;
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[<font=\"Icon\">I</font>" + btn2Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn2 = true, removeToken = false } );
 		Hide();
 	}
@@ -139,6 +154,7 @@ public class DialogPanel : MonoBehaviour
 		if ( dialogInteraction.c1Used && dialogInteraction.c2Used && dialogInteraction.c3Used )
 			dialogInteraction.isDone = true;
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[<font=\"Icon\">I</font>" + btn3Text.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { btn3 = true, removeToken = false } );
 		Hide();
 	}
@@ -147,6 +163,7 @@ public class DialogPanel : MonoBehaviour
 	{
 		DisableButtons();
 
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + cancelText.text + "]");
 		buttonActions?.Invoke( new InteractionResult() { canceled = true, removeToken = false } );
 		Hide();
 	}

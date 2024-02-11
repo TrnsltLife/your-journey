@@ -12,6 +12,7 @@ public class MonsterButton : MonoBehaviour
 	public Image bannerIcon;
 
 	int lastCount;
+	int skinVariant = 0;
 
 	[HideInInspector]
 	public bool markRemove = false;
@@ -19,8 +20,16 @@ public class MonsterButton : MonoBehaviour
 	bool hidden;
 	MonsterManager manager;
 
+	public void UpdateSkin()
+    {
+		int monsterIndex = (int)monster.monsterType;
+		skinVariant = SkinsManager.RandomSkinVariantIndex(monsterIndex);
+		monsters[monsterIndex].GetComponent<Image>().overrideSprite = SkinsManager.SkinVariant(monsterIndex, skinVariant); //Set monster skin override based on current value in SkinsManager.monsterSkins array
+	}
+
 	public void AddToBar( bool isElite, MonsterManager m )
 	{
+		UpdateSkin();
 		standard.SetActive( !isElite );
 		elite.SetActive( isElite );
 		manager = m;
@@ -87,7 +96,7 @@ public class MonsterButton : MonoBehaviour
 			return;
 		}
 
-		if ( FindObjectOfType<MonsterManager>().ShowCombatPanel( monster ) )
+		if ( FindObjectOfType<MonsterManager>().ShowCombatPanel( monster, bannerIcon.sprite, skinVariant) )
 			selected.SetActive( true );
 		else
 			selected.SetActive( false );

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Linq;
 using System;
 using TMPro;
+using static LanguageManager;
 
 public class ObjectiveManager : MonoBehaviour
 {
@@ -18,6 +19,21 @@ public class ObjectiveManager : MonoBehaviour
 		objectiveList = new List<Objective>( s.objectiveObserver );
 		currentObjective = null;
 		//Debug.Log( $"Objective Manager: {objectiveList.Count} Objectives Found" );
+
+		LanguageManager.AddSubscriber(onUpdateTranslation);
+		onUpdateTranslation();
+	}
+
+	public void onUpdateTranslation()
+	{
+		if (currentObjective != null)
+		{
+			objectiveText.text = Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder);
+		}
+		else
+        {
+			objectiveText.text = Translate("objective.NoObjective", "No Objective");
+		}
 	}
 
 	/// <summary>
@@ -31,11 +47,11 @@ public class ObjectiveManager : MonoBehaviour
 			currentObjective = objectiveList.Where( x => x.triggeredByName == name ).First();
 			Debug.Log( "TrySetObjective() FOUND: " + currentObjective.dataName );
 			//set reminder text
-			objectiveText.text = currentObjective.objectiveReminder;
+			objectiveText.text = Scenario.Chronicle(Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder));
 
 			//only show summary if not skipped
 			if ( !currentObjective.skipSummary )
-				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue( currentObjective.textBookData.pages[0], ButtonIcon.Continue, () =>
+				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Interpret(currentObjective.TranslationKey("summary"), currentObjective.textBookData.pages[0]), ButtonIcon.Continue, () =>
 				{
 					followupAction?.Invoke();
 				} );
@@ -59,11 +75,11 @@ public class ObjectiveManager : MonoBehaviour
 			Debug.Log( "Found Objective" );
 			currentObjective = objectiveList.Where( x => x.dataName == name ).First();
 			//set reminder text
-			objectiveText.text = currentObjective.objectiveReminder;
+			objectiveText.text = Scenario.Chronicle(Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder));
 
 			//only show summary if not skipped
 			if ( !currentObjective.skipSummary )
-				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue( currentObjective.textBookData.pages[0], ButtonIcon.Continue, () =>
+				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Interpret(currentObjective.TranslationKey("summary"), currentObjective.textBookData.pages[0]), ButtonIcon.Continue, () =>
 				{
 					followupAction?.Invoke();
 				} );
@@ -84,7 +100,7 @@ public class ObjectiveManager : MonoBehaviour
 		{
 			currentObjective = objectiveList.Where( x => x.dataName == name ).First();
 			//set reminder text
-			objectiveText.text = currentObjective.objectiveReminder;
+			objectiveText.text = Scenario.Chronicle(Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder));
 		}
 	}
 
@@ -105,7 +121,7 @@ public class ObjectiveManager : MonoBehaviour
 	{
 		if ( currentObjective == null )
 			return false;
-		Debug.Log( "TryCompleteObjective: " + name );
+		Debug.Log( "TryCompleteObjective: " + triggername);
 
 		//objective is complete, remove it and fire any on complete trigger
 		//TODO - show completion textbox?  show lore earned?
@@ -115,12 +131,12 @@ public class ObjectiveManager : MonoBehaviour
 			FindObjectOfType<LorePanel>().AddReward( currentObjective.loreReward, currentObjective.xpReward, currentObjective.threatReward );
 			string t = currentObjective.nextTrigger;
 			currentObjective = null;
-			objectiveText.text = "No Objective";
+			objectiveText.text = Translate("objective.NoObjective", "No Objective");
 			FindObjectOfType<TriggerManager>().FireTrigger( t );
 			return true;
 		}
 
-		Debug.Log( "TryCompleteObjective NOT FOUND: " + name );
+		Debug.Log( "TryCompleteObjective NOT FOUND: " + triggername);
 		return false;
 	}
 
@@ -129,12 +145,12 @@ public class ObjectiveManager : MonoBehaviour
 		if ( objectiveState.currentObjective != Guid.Empty )
 		{
 			currentObjective = objectiveList.Where( x => x.GUID == objectiveState.currentObjective ).First();
-			objectiveText.text = currentObjective.objectiveReminder;
+			objectiveText.text = Scenario.Chronicle(Interpret(currentObjective.TranslationKey("reminder"), currentObjective.objectiveReminder));
 		}
 		else
 		{
 			currentObjective = null;
-			objectiveText.text = "No Objective";
+			objectiveText.text = Scenario.Chronicle(Translate("objective.NoObjective", "No Objective"));
 		}
 	}
 

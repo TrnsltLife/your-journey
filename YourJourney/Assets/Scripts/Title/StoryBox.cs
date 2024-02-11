@@ -11,36 +11,29 @@ public class StoryBox : MonoBehaviour
 	//public Image fader;
 
 	RectTransform rect;
-	Vector2 ap;
+	//Vector2 ap;
 	Vector3 sp;
 	Action action;
 
 	private void Awake()
 	{
 		rect = canvasGroup.gameObject.GetComponent<RectTransform>();
-		//ap = itemContainer.anchoredPosition;
 		sp = canvasGroup.gameObject.transform.position;
 	}
 
 	public void Show( string t, Action a )
 	{
 		rect = canvasGroup.gameObject.GetComponent<RectTransform>();
-		//ap = itemContainer.anchoredPosition;
 		sp = canvasGroup.gameObject.transform.position;
 
 		gameObject.SetActive( true );
-
-		//if ( ptype == ProjectType.Standalone )
-		//	fader.color = new Color( 0, 0, 0, 220f / 255f );
-		//else
-		//	fader.color = new Color( 0, 0, 0, 1 );
 
 		action = a;
 		canvasGroup.alpha = 0;
 		canvasGroup.gameObject.SetActive( true );
 		canvasGroup.DOFade( 1, .5f );
 
-		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
+		//rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		canvasGroup.gameObject.transform.DOMoveY( sp.y, .75f );
 
 		SetText( t );

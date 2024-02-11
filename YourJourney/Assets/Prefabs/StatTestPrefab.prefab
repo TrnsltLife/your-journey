@@ -1155,6 +1155,7 @@ GameObject:
   - component: {fileID: 3481645953143989064}
   - component: {fileID: 3481645953143989067}
   - component: {fileID: 7283163224731383208}
+  - component: {fileID: 7583175046067679642}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -1300,6 +1301,20 @@ MonoBehaviour:
   - {fileID: 0}
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7583175046067679642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3481645953143989068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ca0829215dddce4e9a6dc6ee1ee228b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TextKey: test.button.Success
+  DefaultText: Success
 --- !u!1 &3481645953169746383
 GameObject:
   m_ObjectHideFlags: 0
@@ -1311,6 +1326,7 @@ GameObject:
   - component: {fileID: 3481645953169746379}
   - component: {fileID: 3481645953169746378}
   - component: {fileID: 3345714714275983675}
+  - component: {fileID: 4577510713891130461}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -1456,6 +1472,20 @@ MonoBehaviour:
   - {fileID: 0}
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &4577510713891130461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3481645953169746383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ca0829215dddce4e9a6dc6ee1ee228b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TextKey: test.button.Failure
+  DefaultText: Failure
 --- !u!1 &3481645953986259789
 GameObject:
   m_ObjectHideFlags: 0
@@ -1569,6 +1599,7 @@ MonoBehaviour:
   btn1: {fileID: 3481645952817825923}
   btn2: {fileID: 3481645954077242280}
   continueBtn: {fileID: 7148154375570330494}
+  submitBtn: {fileID: 8418504456717926873}
   overlay: {fileID: 3481645952642935975}
   progressRoot: {fileID: 8033225603565928559}
 --- !u!1 &3481645954077242280
@@ -2473,6 +2504,7 @@ GameObject:
   - component: {fileID: 3698057666472718066}
   - component: {fileID: 5310148083133497975}
   - component: {fileID: 651786536535682798}
+  - component: {fileID: 6299282748079602988}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -2618,6 +2650,20 @@ MonoBehaviour:
   - {fileID: 0}
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &6299282748079602988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7898386011392098146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ca0829215dddce4e9a6dc6ee1ee228b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TextKey: test.button.Submit
+  DefaultText: Submit
 --- !u!1 &8033225603565928559
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,19 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
+using static LanguageManager;
 
 /// <summary>
 /// Models one GROUP of enemies (up to 3 enemies in a group)
 /// </summary>
 public class Monster
 {
+	public static readonly int MAX_MODIFIERS = 7;
+	public static readonly int REASONABLE_MODIFIERS = 3;
+
 	public Guid GUID;
 	public int id;
+	public int index;
 	public int activationsId;
 	public string dataName;
+	public string enumName;
 	public bool isEmpty;
 	public string triggerName;
 
@@ -36,6 +43,9 @@ public class Monster
 	public bool isBloodThirsty;
 	public bool isArmored;
 	public bool isElite;
+	[JsonConverter(typeof(MonsterModifierListConverter))]
+	public List<MonsterModifier> modifierList = new List<MonsterModifier>();
+	public int randomizedModifiersCount;
 	public bool hasBanner = false;
 	public Ability negatedBy { get; set; }
 	public MonsterType monsterType { get; set; }
@@ -43,6 +53,12 @@ public class Monster
 	public int movementValue;
 	public int loreReward;
 	public bool defaultStats;
+	public bool immuneCleave { get; set; } = false;
+	public bool immuneLethal { get; set; } = false;
+	public bool immunePierce { get; set; } = false;
+	public bool immuneSmite { get; set; } = false;
+	public bool immuneStun { get; set; } = false;
+	public bool immuneSunder { get; set; } = false;
 
 	[DefaultValue( true )]
 	[JsonProperty( DefaultValueHandling = DefaultValueHandling.Populate )]
@@ -56,12 +72,12 @@ public class Monster
 	[JsonIgnore]
 	public ThreatInteraction interaction;//the interaction that spawned this
 
-	public static string[] monsterNames = { "Ruffian", "Goblin Scout", "Orc Hunter", "Orc Marauder", "Hungry Warg", "Hill Troll", "Wight",
-											"Atarin", "Gulgotar", "Coalfang",
-											"Giant Spider", "Pit Goblin", "Orc Taskmaster", "Shadowman", "Nameless Thing", "Cave Troll", "Balrog", "Spawn of Ungoliant",
-											"Supplicant of Morgoth", "Ursa", "Ollie",
-											"Fell Beast", "Warg Rider", "Siege Engine", "War Oliphaunt", "Soldier", "Uruk Warrior",
-											"Lord Angon", "Witch-king of Angmar", "Eadris"
+	public static string[] monsterNames = { "Ruffian", "Goblin Scout", "Orc Hunter", "Orc Marauder", "Hungry Varg", "Hill Troll", "Wight",
+											"Atari", "Gargletarg", "Chartooth",
+											"Giant Spider", "Pit Goblin", "Orc Taskmaster", "Shadowman", "Anonymous Thing", "Cave Troll", "Balerock", "Spawn of Uglygiant",
+											"Supplicant of More-Goth", "Ursula", "Oliver",
+											"Foul Beast", "Varg Rider", "Siege Engine", "War Elephant", "Soldier", "High-Orc Warrior",
+											"Lord Javelin", "Lich-King", "Endris"
 	};
 
 	public int[] currentHealth { get; set; } = new int[3];
@@ -74,26 +90,6 @@ public class Monster
 	public int deadCount;
 	public float fCost;
 	public float singlecost;
-
-	//lines up with MonsterType enum
-	public static int[] MonsterCost = new int[] { 7, 4, 10, 9, 14, 25, 17, //Core Set
-		1000, 1000, 1000, //Villains of Eriador
-		5, 4, 14, 17, 27, 20, 1000, 36, //Shadowed Paths
-		1000, 1000, 1000, //Dwellers in Darkness
-		24, 14, 22, 30, 8, 11, //Spreading War
-		1000, 1000, 1000 //Scourges of the Wastes
-	};
-
-	public static int[] MonsterCount = new int[] { 6, 6, 3, 6, 3, 1, 3, //Core Set
-		1, 1, 1, //Villains of Eriador
-		6, 6, 3, 3, 3, 2, 1, 1, //Shadowed Paths
-		1, 1, 1, //Dwellers in Darkness
-		3, 3, 2, 1, 6, 6, //Spreading War
-		1, 1, 1, //Scourges of the Wastes
-	};
-	//large, bloodthirsty, armored
-	public static int[] ModCost = new int[] { 3, 6, 4, 4, 7, 3, 6, 6, 10, 8, 9, 6, 10 };
-	public static string[] modNames = new string[13] { "Large", "Bloodthirsty", "Armored", "Huge", "Shrouded", "Terrifying", "Spike Armor", "Well-Equipped", "Veteran", "Wary", "Guarded", "Hardened", "Alert" };
 
 	/// <summary>
 	/// returns # of monsters that are alive
@@ -116,6 +112,140 @@ public class Monster
 	public Monster()
 	{
 
+	}
+
+	public void UpdateModifiersAndElite()
+    {
+		if (isArmored && !modifierList.Contains(MonsterModifier.ARMORED)) { modifierList.Add(MonsterModifier.ARMORED); isArmored = false; }
+		if (isBloodThirsty && !modifierList.Contains(MonsterModifier.BLOODTHIRSTY)) { modifierList.Add(MonsterModifier.BLOODTHIRSTY); isBloodThirsty = false; }
+		if (isLarge && !modifierList.Contains(MonsterModifier.LARGE)) { modifierList.Add(MonsterModifier.LARGE); isLarge = false; }
+		if (modifierList.Count > 0) { isElite = true; }
+	}
+
+	public void LoadCustomModifiers(ObservableCollection<MonsterModifier> customModifiers)
+	{
+		//The default JSON converter for MonsterModifier can't look at the scenario's list of custom MonsterModifiers. So we need to hydrate it when we load the Monster in the MonsterEditorWindow.
+		for (int i = 0; i < modifierList.Count; i++)
+		{
+			if (modifierList[i].id >= MonsterModifier.START_OF_CUSTOM_MODIFIERS)
+			{
+				MonsterModifier modData = customModifiers.First(it => it.id == modifierList[i].id);
+				if (modData != null)
+				{
+					modifierList[i] = modData;
+				}
+			}
+		}
+	}
+
+	public bool AddModifier(MonsterModifier mod)
+    {
+		if (modifierList.Count < MAX_MODIFIERS && !modifierList.Contains(mod))
+        {
+			modifierList.Add(mod);
+			return true;
+        }
+		return false;
+    }
+
+	public void RandomizeModifiers()
+    {
+		//If randomizedModifiersCount is set to a number greater than 0 and less than modifierList.Count, pick thta number of modifiers at random.
+
+		if(randomizedModifiersCount == 0 || randomizedModifiersCount == modifierList.Count) { return; } //use all the modifiers
+
+		MonsterModifier[] modifierArray = GlowEngine.RandomizeArray(modifierList.ToArray());
+		modifierList.Clear();
+		for(int i = 0; i < randomizedModifiersCount && i < modifierArray.Length; i++)
+        {
+			modifierList.Add(modifierArray[i]);
+        }
+		randomizedModifiersCount = 0; //Set to 0 so any future calls to this function will not change the modifierList.
+    }
+
+	public int CalculateExtraDamage()
+	{
+		int extra = 0;
+		foreach (var mod in modifierList)
+		{
+			extra += mod.damage;
+		}
+		return extra;
+	}
+
+	public int CalculateExtraFear()
+    {
+		int extra = 0;
+		foreach(var mod in modifierList)
+        {
+			extra += mod.fear;
+        }
+		return extra;
+    }
+
+	public static List<MonsterType> Goblins()
+	{
+		return new List<MonsterType> { MonsterType.GoblinScout, MonsterType.GoblinScout, MonsterType.VargRider };
+	}
+
+	public static List<MonsterType> Orcs()
+	{
+		return new List<MonsterType> { MonsterType.OrcHunter, MonsterType.OrcMarauder, MonsterType.OrcTaskmaster, MonsterType.HighOrcWarrior, MonsterType.Gargletarg, MonsterType.SupplicantOfMoreGoth, MonsterType.LordJavelin };
+	}
+
+	public static List<MonsterType> Humans()
+	{
+		return new List<MonsterType> { MonsterType.Ruffian, MonsterType.Soldier, MonsterType.Atari, MonsterType.Endris };
+	}
+
+	public static List<MonsterType> Spirits()
+	{
+		return new List<MonsterType> { MonsterType.Wight, MonsterType.Shadowman, MonsterType.Ursula, MonsterType.LichKing };
+	}
+
+	public static List<MonsterType> Trolls()
+	{
+		return new List<MonsterType> { MonsterType.CaveTroll, MonsterType.HillTroll, MonsterType.Oliver };
+	}
+
+	public static List<MonsterType> Vargs()
+	{
+		return new List<MonsterType> { MonsterType.HungryVarg, MonsterType.VargRider, MonsterType.Chartooth };
+	}
+
+	public static List<MonsterType> Spiders()
+	{
+		return new List<MonsterType> { MonsterType.GiantSpider, MonsterType.SpawnOfUglygiant };
+	}
+
+	public static List<MonsterType> Flying()
+    {
+		return new List<MonsterType> { MonsterType.Balerock, MonsterType.FoulBeast, MonsterType.LichKing };
+	}
+
+	public static List<MonsterType> OtherBeasts()
+	{
+		return new List<MonsterType> { MonsterType.WarElephant, MonsterType.AnonymousThing };
+	}
+
+	public static List<MonsterType> AllBeasts()
+	{
+		List<MonsterType> monsterList = new List<MonsterType>();
+		monsterList.AddRange(Trolls());
+		monsterList.AddRange(Vargs());
+		monsterList.AddRange(Spiders());
+		monsterList.AddRange(Flying());
+		monsterList.AddRange(OtherBeasts());
+		return monsterList;
+	}
+
+	public static List<MonsterType> Humanoid()
+	{
+		List<MonsterType> monsterList = new List<MonsterType>();
+		monsterList.AddRange(Goblins());
+		monsterList.AddRange(Orcs());
+		monsterList.AddRange(Humans());
+		return monsterList;
 	}
 
 	//returns true if this monster can appear in current difficulty
@@ -146,26 +276,81 @@ public class Monster
 		int f = total - d;
 		if ( d == 0 && f == 0 )
 			d = 1;
+
+		//If isFearsome is true, the Fear should always be greater than the damage
 		if ( isFearsome )
 		{
-			int temp = d;
-			if ( f > d )
-			{
-				d = f;
-				f = temp;
-			}
-		}
-		else
-		{
 			int temp = f;
-			if ( d > f )
+			if (d > f)
 			{
 				f = d;
 				d = temp;
 			}
 		}
+		//Otherwise, make damage greater than fear
+		else
+		{
+			int temp = d;
+			if (f > d)
+			{
+				d = f;
+				f = temp;
+			}
+		}
 
 		return new Tuple<int, int>( f, d );
+	}
+
+	public static string MonsterName(Monster m, int count)
+	{
+		string monsterKey = m.enumName;
+        if (String.IsNullOrWhiteSpace(monsterKey)) { monsterKey = m.dataName; }
+		if (count == 1)
+		{
+			return Translate("monster.single.name." + m.enumName, m.dataName);
+		}
+		else
+		{
+			return Translate("monster.plural.name." + m.enumName, m.dataName + "(s)");
+		}
+	}
+
+	public static string MonsterNameAttacker(Monster m, int count)
+	{
+		//Get the custom name from the in-scenario translation for scripted enemies
+		string customName = Interpret("event.enemy." + m.interaction.dataName + ".monster." + m.index + ".name", "");
+		if (!String.IsNullOrEmpty(customName)) { return customName; }
+
+		//Otherwise get the translation for the standard monster name
+		string monsterKey = m.enumName;
+		if (String.IsNullOrWhiteSpace(monsterKey)) { monsterKey = m.dataName; }
+		if (count == 1)
+		{
+			return Translate("monster.single.attacker." + monsterKey, "A(n) " + m.dataName);
+		}
+		else
+		{
+			return Translate("monster.plural.attacker." + monsterKey, "The " + m.dataName + "(s)");
+		}
+	}
+
+	public static string MonsterNameObject(Monster m, int count)
+	{
+		//Get the custom name from the in-scenario translation for scripted enemies
+		string customName = Interpret("event.enemy." + m.interaction.dataName + ".monster." + m.index + ".name", "");
+		if (!String.IsNullOrEmpty(customName)) { return customName; }
+
+		//Otherwise get the translation for the standard monster name
+		string monsterKey = m.enumName;
+		if (String.IsNullOrWhiteSpace(monsterKey)) { monsterKey = m.dataName; }
+		if (count == 1)
+		{
+			return Translate("monster.single.object." + monsterKey, Translate("monster.single.name." + monsterKey, m.dataName));
+		}
+		else
+		{
+			return Translate("monster.plural.object." + monsterKey, Translate("monster.plural.name." + monsterKey, m.dataName + "(s)"));
+		}
 	}
 
 	public static Monster MonsterFactory( MonsterType mType )
@@ -174,7 +359,10 @@ public class Monster
 		int mId, mHealth = 0, mArmor = 0, mSorcery = 0, mMoveA = 0, mMoveB = 0, mGroupLimit = 0, mFigureLimit = 0, mDamage = 0, mSpeed = 0;
 		int[] mCost = new int[] { 1000, 0, 0 };
 		bool mRanged = false, mFearsome = false;
-		string mEnumName, mDataName = "";
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
+		string mEnumName = "";
+		string mDataName = "";
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
 		string[] mMoveSpecial, mTag, mSpecial = new string[0];
 
 		switch (mType)
@@ -252,7 +440,7 @@ public class Monster
 				mMoveSpecial = new string[] { };
 				mRanged = false;
 				mGroupLimit = 3;
-				mFigureLimit = 6;
+				mFigureLimit = 3;
 				mCost = new int[] { 9, 17, 25 };
 				mTag = new string[] { "Orc", "Slow" };
 				mSpeed = 1;
@@ -260,10 +448,10 @@ public class Monster
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.HungryWarg:
+			case MonsterType.HungryVarg:
 				mId = 4;
-				mEnumName = "HungryWarg";
-				mDataName = "Hungry Warg";
+				mEnumName = "HungryVarg";
+				mDataName = "Hungry Varg";
 				mHealth = 8;
 				mArmor = 1;
 				mSorcery = 0;
@@ -322,10 +510,10 @@ public class Monster
 				break;
 
 			//Villains of Eriador
-			case MonsterType.Atarin:
+			case MonsterType.Atari:
 				mId = 7;
-				mEnumName = "Atarin";
-				mDataName = "Atarin";
+				mEnumName = "Atari";
+				mDataName = "Atari";
 				mHealth = 8;
 				mArmor = 1;
 				mSorcery = 1;
@@ -335,17 +523,17 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Powerful", "Small" };
 				mSpeed = 2;
 				mDamage = 4;
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.Gulgotar:
+			case MonsterType.Gargletarg:
 				mId = 8;
-				mEnumName = "Gulgotar";
-				mDataName = "Gulgotar";
+				mEnumName = "Gargletarg";
+				mDataName = "Gargletarg";
 				mHealth = 8;
 				mArmor = 2;
 				mSorcery = 0;
@@ -355,17 +543,17 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Orc", "Powerful" };
 				mSpeed = 1;
 				mDamage = 4;
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.Coalfang:
+			case MonsterType.Chartooth:
 				mId = 9;
-				mEnumName = "Coalfang";
-				mDataName = "Coalfang";
+				mEnumName = "Chartooth";
+				mDataName = "Chartooth";
 				mHealth = 8;
 				mArmor = 1;
 				mSorcery = 0;
@@ -375,7 +563,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Fast" };
 				mSpeed = 3;
 				mDamage = 4;
@@ -464,10 +652,10 @@ public class Monster
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.NamelessThing:
+			case MonsterType.AnonymousThing:
 				mId = 14;
-				mEnumName = "NamelessThing";
-				mDataName = "Nameless Thing";
+				mEnumName = "AnonymousThing";
+				mDataName = "Anonymous Thing";
 				mHealth = 20;
 				mArmor = 0;
 				mSorcery = 0;
@@ -504,10 +692,10 @@ public class Monster
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.Balrog:
+			case MonsterType.Balerock:
 				mId = 16;
-				mEnumName = "Balrog";
-				mDataName = "Balrog";
+				mEnumName = "Balerock";
+				mDataName = "Balerock";
 				mHealth = 18;
 				mArmor = 2;
 				mSorcery = 2;
@@ -515,19 +703,19 @@ public class Monster
 				mMoveB = 2;
 				mMoveSpecial = new string[] { };
 				mRanged = false;
-				mGroupLimit = 3;
-				mFigureLimit = 3;
-				mCost = new int[] { 1000, 0, 0 };
+				mGroupLimit = 1;
+				mFigureLimit = 1;
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Powerful", "Large", "Slow" };
 				mSpeed = 1;
 				mDamage = 4;
 				mFearsome = false;
 				mSpecial = new string[] { "Cleave" };
 				break;
-			case MonsterType.SpawnOfUngoliant:
+			case MonsterType.SpawnOfUglygiant:
 				mId = 17;
-				mEnumName = "SpawnOfUngoliant";
-				mDataName = "Spawn of Ungoliant";
+				mEnumName = "SpawnOfUglygiant";
+				mDataName = "Spawn of Uglygiant";
 				mHealth = 18;
 				mArmor = 2;
 				mSorcery = 0;
@@ -537,7 +725,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Powerful", "Large" };
 				mSpeed = 2;
 				mDamage = 4;
@@ -546,10 +734,10 @@ public class Monster
 				break;
 
 			//Dwellers in Darkness
-			case MonsterType.SupplicantOfMorgoth:
+			case MonsterType.SupplicantOfMoreGoth:
 				mId = 18;
-				mEnumName = "SupplicantOfMorgoth";
-				mDataName = "Supplicant of Morgoth";
+				mEnumName = "SupplicantOfMoreGoth";
+				mDataName = "Supplicant of More-Goth";
 				mHealth = 9;
 				mArmor = 2;
 				mSorcery = 0;
@@ -559,17 +747,17 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Orc", "Powerful", "Slow" };
 				mSpeed = 1;
 				mDamage = 3;
 				mFearsome = true;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.Ursa:
+			case MonsterType.Ursula:
 				mId = 19;
-				mEnumName = "Ursa";
-				mDataName = "Ursa";
+				mEnumName = "Ursula";
+				mDataName = "Ursula";
 				mHealth = 16;
 				mArmor = 2;
 				mSorcery = 4;
@@ -586,10 +774,10 @@ public class Monster
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.Ollie:
+			case MonsterType.Oliver:
 				mId = 20;
-				mEnumName = "Ollie";
-				mDataName = "Ollie";
+				mEnumName = "Oliver";
+				mDataName = "Oliver";
 				mHealth = 11;
 				mArmor = 0;
 				mSorcery = 1;
@@ -599,7 +787,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Beast", "Large", "Slow" };
 				mSpeed = 1;
 				mDamage = 4;
@@ -608,10 +796,10 @@ public class Monster
 				break;
 
 			//Spreading War
-			case MonsterType.FellBeast:
+			case MonsterType.FoulBeast:
 				mId = 21;
-				mEnumName = "FellBeast";
-				mDataName = "Fell Beast";
+				mEnumName = "FoulBeast";
+				mDataName = "Foul Beast";
 				mHealth = 8;
 				mArmor = 0;
 				mSorcery = 2;
@@ -628,10 +816,10 @@ public class Monster
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.WargRider:
+			case MonsterType.VargRider:
 				mId = 22;
-				mEnumName = "WargRider";
-				mDataName = "Warg Rider";
+				mEnumName = "VargRider";
+				mDataName = "Varg Rider";
 				mHealth = 10;
 				mArmor = 1;
 				mSorcery = 0;
@@ -668,10 +856,10 @@ public class Monster
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.WarOliphaunt:
+			case MonsterType.WarElephant:
 				mId = 24;
-				mEnumName = "WarOliphaunt";
-				mDataName = "War Oliphaunt";
+				mEnumName = "WarElephant";
+				mDataName = "War Elephant";
 				mHealth = 10;
 				mArmor = 4;
 				mSorcery = 0;
@@ -708,10 +896,10 @@ public class Monster
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.UrukWarrior:
+			case MonsterType.HighOrcWarrior:
 				mId = 26;
-				mEnumName = "UrukWarrior";
-				mDataName = "Uruk Warrior";
+				mEnumName = "HighOrcWarrior";
+				mDataName = "High-Orc Warrior";
 				mHealth = 7;
 				mArmor = 2;
 				mSorcery = 0;
@@ -730,10 +918,10 @@ public class Monster
 				break;
 
 			//Scourges of the Wastes
-			case MonsterType.LordAngon:
+			case MonsterType.LordJavelin:
 				mId = 27;
-				mEnumName = "LordAngon";
-				mDataName = "Lord Angon";
+				mEnumName = "LordJavelin";
+				mDataName = "Lord Javelin";
 				mHealth = 12;
 				mArmor = 2;
 				mSorcery = 2;
@@ -743,17 +931,17 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
-				mTag = new string[] { "Humanoid", "Poweful" };
+				mCost = new int[] { 100, 0, 0 };
+				mTag = new string[] { "Humanoid", "Powerful" };
 				mSpeed = 2;
 				mDamage = 3;
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.WitchKingOfAngmar:
+			case MonsterType.LichKing:
 				mId = 28;
-				mEnumName = "WitchKingOfAngmar";
-				mDataName = "Witch-king of Angmar";
+				mEnumName = "LichKing";
+				mDataName = "Lich-King";
 				mHealth = 20;
 				mArmor = 4;
 				mSorcery = 4;
@@ -763,17 +951,17 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Beast", "Powerful", "Fast", "Flying" };
 				mSpeed = 3;
 				mDamage = 4;
 				mFearsome = false;
 				mSpecial = new string[] { };
 				break;
-			case MonsterType.Eadris:
+			case MonsterType.Endris:
 				mId = 29;
-				mEnumName = "Eadris";
-				mDataName = "Eadris";
+				mEnumName = "Endris";
+				mDataName = "Endris";
 				mHealth = 10;
 				mArmor = 1;
 				mSorcery = 0;
@@ -783,7 +971,7 @@ public class Monster
 				mRanged = false;
 				mGroupLimit = 1;
 				mFigureLimit = 1;
-				mCost = new int[] { 1000, 0, 0 };
+				mCost = new int[] { 100, 0, 0 };
 				mTag = new string[] { "Humanoid", "Small" };
 				mSpeed = 2;
 				mDamage = 2;
@@ -817,6 +1005,7 @@ public class Monster
 			id = mId,
 			activationsId = mId,
 			dataName = mDataName,
+			enumName = mEnumName,
 			monsterType = mType,
 			GUID = Guid.NewGuid(),
 			health = mHealth,
@@ -834,7 +1023,7 @@ public class Monster
 			special = mSpecial,
 			isFearsome = mFearsome,
 			triggerName = "None",
-			singlecost = MonsterCost[(int)mType],
+			singlecost = mCost[0],
 			isEasy = true,
 			isNormal = true,
 			isHard = true,

@@ -9,6 +9,7 @@ public class CamControl : MonoBehaviour
 	public float focusDistMin = 1.35f, focusDistMax = 3f;
 	public PostProcessProfile postProcProf;
 	public PartyPanel partyPanel;
+	public ChroniclePanel chroniclePanel;
 
 	CombatPanel combatPanel;
 	Camera cam;
@@ -57,12 +58,22 @@ public class CamControl : MonoBehaviour
 		//dof.focusDistance.value = fp;
 
 		//disable camera control if panels are showing
+		if (uiRoot.childCount > 0) return;
+		else if (combatPanel.gameObject.activeInHierarchy) return;
+		else if (partyPanel.gameObject.activeInHierarchy) return;
+		else if (chroniclePanel.gameObject.activeInHierarchy) return;
+		else if (FindObjectOfType<Engine>().settingsDialog.gameObject.activeInHierarchy) return;
+		else if (FindObjectOfType<ProvokeMessage>().provokeMode) return;
+
+		/*
 		if ( uiRoot.childCount > 0
 			|| combatPanel.gameObject.activeInHierarchy
 			|| partyPanel.gameObject.activeInHierarchy
+			|| chroniclePanel.gameObject.activeInHierarchy
 			|| FindObjectOfType<Engine>().settingsDialog.gameObject.activeInHierarchy
 			|| FindObjectOfType<ProvokeMessage>().provokeMode )
 			return;
+		*/
 
 		HandleDragging();
 		HandleRotation();

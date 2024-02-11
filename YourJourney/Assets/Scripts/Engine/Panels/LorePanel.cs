@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using System.Collections.Generic;
+using static LanguageManager;
 
 public class LorePanel : MonoBehaviour
 {
@@ -28,7 +30,22 @@ public class LorePanel : MonoBehaviour
 		else
 			threatacc = threatamount;
 
-		threatText.text = "Threat Increased By\r\n" + threatacc;
+		loreText.text = "";
+		xpText.text = "";
+
+
+		if (threatacc > 0)
+		{
+			threatText.text = Translate("reward.text.ThreatIncreased", "Threat Increased By\r\n" + threatacc,
+				new List<string> { threatacc.ToString() });
+		}
+		else if(threatacc < 0)
+        {
+			threatText.text = Translate("reward.text.ThreatReduced", "Threat Reduced By\r\n" + (threatacc * -1),
+				new List<string> { (threatacc * -1).ToString() });
+		}
+
+		Scenario.Chronicle(threatText.text);
 
 		if ( !busy )
 		{
@@ -66,9 +83,23 @@ public class LorePanel : MonoBehaviour
 			xpacc = xpamount;
 			threatacc = threatamount;
 		}
-		loreText.text = "You Have Earned\r\n" + loreacc + " Lore.";
-		xpText.text = "You Have Earned\r\n" + xpacc + " XP.";
-		threatText.text = "Threat Decreased By\r\n" + threatacc;
+		loreText.text = Translate("reward.text.LoreEarned", "You Have Earned\r\n" + loreacc + " Lore.",
+			new List<string> { loreacc.ToString() });
+		xpText.text = Translate("reward.text.XPEarned", "You Have Earned\r\n" + xpacc + " XP.",
+			new List<string> { xpacc.ToString() });
+
+		if (threatacc > 0)
+		{
+			threatText.text = Translate("reward.text.ThreatReduced", "Threat Reduced By\r\n" + threatacc,
+				new List<string> { threatacc.ToString() });
+		}
+		else if(threatacc < 0)
+        {
+			threatText.text = Translate("reward.text.ThreatIncreased", "Threat Increased By\r\n" + (threatacc * -1),
+				new List<string> { (threatacc * -1).ToString() });
+		}
+
+		Scenario.Chronicle(loreText.text + "\n" + xpText.text + "\n" + threatText.text);
 
 		if ( !busy )
 		{

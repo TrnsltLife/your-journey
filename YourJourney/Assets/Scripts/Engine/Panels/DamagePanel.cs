@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using TMPro;
+using static LanguageManager;
 
 public class DamagePanel : MonoBehaviour
 {
@@ -26,13 +27,18 @@ public class DamagePanel : MonoBehaviour
 	bool done = false;
 	FinalStand fStand;
 
-	void Awake()
+	private void CalculatePanelPosition()
 	{
 		rect = GetComponent<RectTransform>();
 		group = GetComponent<CanvasGroup>();
-		gameObject.SetActive( false );
+		gameObject.SetActive(false);
 		sp = transform.position;
 		ap = rect.anchoredPosition;
+	}
+
+	void Awake()
+	{
+		CalculatePanelPosition();
 		root = transform.parent;
 		mainText.alignment = TextAlignmentOptions.Top; //We set this here instead of the editor to make it easier to see mainText and dummy are lined up with each other in the editor
 		dummy.alignment = TextAlignmentOptions.Top;
@@ -40,6 +46,7 @@ public class DamagePanel : MonoBehaviour
 
 	public void ShowCombatCounter( Monster m, Action action = null )
 	{
+		CalculatePanelPosition();
 		done = false;
 		FindObjectOfType<TileManager>().ToggleInput( true );
 
@@ -59,7 +66,7 @@ public class DamagePanel : MonoBehaviour
 		//Debug.Log("ShowCombatCounter: activationsId=" + m.activationsId + " activationsObserver.Count=" + (activationsObserver == null ? "null" : activationsObserver.Count.ToString()));
 		if (m.activationsId >= 0 && activationsObserver != null && activationsObserver.Count > 0)
         {
-			activationItems = activationsObserver.Where(a => a.id == m.activationsId ).First().activations;
+			activationItems = activationsObserver.FirstOrDefault(a => a.id == m.activationsId)?.activations;
         }
 
 		int groupIndex = 0;
@@ -89,21 +96,36 @@ public class DamagePanel : MonoBehaviour
 		if (item != null)
 		{
 			//Debug.Log("item damage=" + item.damage.ToString() + " fear=" + item.fear.ToString() + " negate=" + ((Ability)item.negate));
-			sDamage = item.damage[groupIndex].ToString();
-			sFear = item.fear[groupIndex].ToString();
+			sDamage = (m.CalculateExtraDamage() + item.damage[groupIndex]).ToString();
+			sFear = (m.CalculateExtraFear() + item.fear[groupIndex]).ToString();
 			negatedBy = (Ability)item.negate;
-			sAttack = item.text;
-			sEffect = item.effect;
+			if(negatedBy == Ability.Random) { negatedBy = (Ability)GlowEngine.GenerateRandomNumbers(6)[0]; }
+			string enemyKey = ((MonsterType)m.activationsId).ToString();
+			Debug.Log("Attack: " + "enemy.attack." + enemyKey + "." + item.id);
+			Debug.Log("Effect: " + "enemy.effect." + enemyKey + "." + item.id);
+			sAttack = Translate("enemy.attack." + enemyKey + "." + item.id, item.text);
+			sEffect = Translate("enemy.effect." + enemyKey + "." + item.id, item.effect);
 		}
 		else
 		{
 			//Only apply Default damage if there are no Monster Activations
 			Tuple<int, int> damage = m.CalculateDamage();
-			sFear = damage.Item1.ToString();
-			sDamage = damage.Item2.ToString();
+			sDamage = (m.CalculateExtraDamage() + damage.Item2).ToString();
+			sFear = (m.CalculateExtraFear() + damage.Item1).ToString();
 			negatedBy = m.negatedBy;
 			negatedBy = (Ability)GlowEngine.GenerateRandomNumbers(6)[0]; //Randomize the ability instead of taking it from the monster (which is always Might right now)
-			sAttack = $"A {m.dataName} attacks!";
+
+			//sAttack = $"A {m.dataName} attacks!";
+			int remaining = m.count - m.deathTally;
+			string monsterName = Monster.MonsterNameAttacker(m, remaining);
+			if(remaining == 1)
+            {
+				sAttack = Translate("attack.text.single", $"{monsterName} attacks!", new List<string> { monsterName });
+			}
+			else
+            {
+				sAttack = Translate("attack.text.plural", $"{monsterName} attack!", new List<string> { monsterName });
+			}
 			sEffect = "";
 		}
 
@@ -117,9 +139,22 @@ public class DamagePanel : MonoBehaviour
 		gameObject.SetActive( true );
 		buttonAction = action;
 
-		sNegatedBy = AbilityUtility.ColoredText(negatedBy, 30) + "  " + negatedBy.ToString() + " negates.";
+		//sNegatedBy = AbilityUtility.ColoredText(negatedBy, 30) + "  " + negatedBy.ToString() + " negates.";
+		sNegatedBy = Translate("damage.text.Negates",
+			AbilityUtility.ColoredText(negatedBy, 30) + "  " + negatedBy.ToString() + " negates.",
+			new List<string> {
+				AbilityUtility.ColoredText(negatedBy, 30) + " " +
+				Translate("stat." + negatedBy.ToString(), negatedBy.ToString()) 
+			}
+		);
 
-		SetText(sAttack + "\r\n\r\n" + sNegatedBy + (sEffect == "" ? "" : "\r\n\r\n" + sEffect));
+		string damageString = sAttack + "\r\n\r\n" + sNegatedBy + (sEffect == "" ? "" : "\r\n\r\n" + sEffect);
+		SetText(damageString);
+
+		Scenario.Chronicle(damageString + "\r\n\r\n" +
+			"(<font=\"Icon\">D</font>" + damageText.text + ")" +
+			"(<font=\"Icon\">F</font>" + fearText.text + ")"
+			);
 
         rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
@@ -129,6 +164,7 @@ public class DamagePanel : MonoBehaviour
 
 	public void ShowShadowFear( Action action )
 	{
+		CalculatePanelPosition();
 		FindObjectOfType<TileManager>().ToggleInput( true );
 
 		damageIcon.SetActive( false );
@@ -143,8 +179,22 @@ public class DamagePanel : MonoBehaviour
 		gameObject.SetActive( true );
 		buttonAction = action;
 
-		SetText( "A menacing Darkness spreads across the land, overwhelming the heroes.\r\n\r\nIf a Hero is on a Space with a Darkness Icon or Token, suffer Fear.\r\n\r\n" +
-			AbilityUtility.ColoredText(Ability.Spirit, 30) + " Spirit negates." );
+		//SetText( "A menacing Darkness spreads across the land, overwhelming the heroes.\r\n\r\nIf a Hero is on a Space with a Darkness Icon or Token, suffer Fear.\r\n\r\n" +
+		//	AbilityUtility.ColoredText(Ability.Spirit, 30) + " Spirit negates." );
+
+		string darknessString =
+			Translate("darkness.text.Flavor", "A menacing Darkness spreads across the land, overwhelming the heroes.") + "\r\n\r\n" +
+			Translate("darkness.text.Fear", "If a Hero is on a Space with a Darkness Icon or Token, suffer Fear.") + "\r\n\r\n" +
+			Translate("darkness.text.Negates", AbilityUtility.ColoredText(Ability.Spirit, 30) + " Spirit negates.",
+				new List<string> {
+					AbilityUtility.ColoredText(Ability.Spirit, 30) + " " +
+					Translate("stat." + Ability.Spirit.ToString(), Ability.Spirit.ToString())
+				}
+			);
+		SetText(darknessString);
+		Scenario.Chronicle(darknessString + "\r\n\r\n" +
+			"(<font=\"Icon\">F</font>" + fearText.text + ")"
+		);
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
@@ -154,6 +204,7 @@ public class DamagePanel : MonoBehaviour
 
 	public void ShowFinalStand( int amount, FinalStand finalStand, Action<bool> action )
 	{
+		CalculatePanelPosition();
 		finalstandRoot.SetActive( true );
 		damageRoot.SetActive( false );
 
@@ -178,32 +229,45 @@ public class DamagePanel : MonoBehaviour
 		else
 			test = UnityEngine.Random.Range( 2, 5 );
 
-		string abilityTest = "\r\n\r\nTest " +
-			AbilityUtility.ColoredText((Ability)test, 30) + " " +
-			((Ability)test).ToString() + "; " + amount + ".";
+		//string abilityTest = "\r\n\r\nTest " +
+		//	AbilityUtility.ColoredText((Ability)test, 30) + " " +
+		//	((Ability)test).ToString() + "; " + amount + ".";
+
+		string abilityTest = "\r\n\r\n" +
+			Translate("stand.text.Test",
+				"Test " + AbilityUtility.ColoredText((Ability)test, 30) + " " + ((Ability)test).ToString() + "; " + amount + ".",
+				new List<string> {
+					AbilityUtility.ColoredText((Ability)test, 30) + " " +
+					Translate("stat." + ((Ability)test).ToString(), ((Ability)test).ToString()),
+					amount.ToString()
+				}
+			);
 
 
+		string standString = "";
 		//Might, Agility, Wisdom, Spirit, Wit
 		if ( test == 0 )
 		{
-			SetText( "Strive for life with all your might!" + abilityTest);
+			standString = Translate("stand.flavor.Might", ((Ability)test).ToString());
 		}
 		else if ( test == 1 )
 		{
-			SetText( "Skillful maneuvering can lead to escape!" + abilityTest);
+			standString = Translate("stand.flavor.Agility", ((Ability)test).ToString());
 		}
 		else if ( test == 2 )
 		{
-			SetText( "Put your knowledge of healing and survival to the test!" + abilityTest);
+			standString = Translate("stand.flavor.Wisdom", ((Ability)test).ToString());
 		}
 		else if ( test == 3 )
 		{
-			SetText( "You can still survive, fight the fear!" + abilityTest);
+			standString = Translate("stand.flavor.Spirit", ((Ability)test).ToString());
 		}
 		else if ( test == 4 )
 		{
-			SetText( "Quick thinking can save you!" + abilityTest);
+			standString = Translate("stand.flavor.Wit", ((Ability)test).ToString());
 		}
+		SetText(standString + abilityTest);
+		Scenario.Chronicle(standString + abilityTest);
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		transform.DOMoveY( sp.y, .75f );
@@ -248,9 +312,14 @@ public class DamagePanel : MonoBehaviour
 	{
 		Hide();
 		//string t = fStand == FinalStand.Damage ? "DAMAGE" : "FEAR";
-		string t = fStand == FinalStand.Damage ? "<font=\"Icon\">D</font>" : "<font=\"Icon\">F</font>";
+		string t = fStand == FinalStand.Damage 
+			? "<font=\"Icon\">D</font> " + Translate("damage." + FinalStand.Damage, FinalStand.Damage.ToString())
+			: "<font=\"Icon\">F</font> " + Translate("damage." + FinalStand.Fear, FinalStand.Fear.ToString());
 		var tb = FindObjectOfType<InteractionManager>().GetNewTextPanel();
-		tb.ShowOkContinue( $"Discard all facedown {t} cards and gain 1 inspiration.", ButtonIcon.Continue, () =>
+		tb.ShowOkContinue( 
+			//$"Discard all facedown {t} cards and gain 1 inspiration.", 
+			Translate("stand.text.Success", $"Discard all facedown {t} cards and gain 1 inspiration.", new List<string> { t }),
+			ButtonIcon.Continue, () =>
 		{
 			standAction( true );
 		} );
@@ -260,7 +329,10 @@ public class DamagePanel : MonoBehaviour
 	{
 		Hide();
 		var tb = FindObjectOfType<InteractionManager>().GetNewTextPanel();
-		tb.ShowOkContinue( "Your Hero has fallen! Remove your figure from the board. If any Heroes remain, complete the mission by the next Shadow Phase or fail.", ButtonIcon.Continue, () =>
+		tb.ShowOkContinue( 
+			//"Your Hero has fallen! Remove your figure from the board. If any Heroes remain, complete the mission by the next Shadow Phase or fail.",
+			Translate("stand.text.Failure", "Your Hero has fallen! Remove your figure from the board. If any Heroes remain, complete the mission by the next Shadow Phase or fail."),
+			ButtonIcon.Continue, () =>
 		{
 			standAction( false );
 		} );

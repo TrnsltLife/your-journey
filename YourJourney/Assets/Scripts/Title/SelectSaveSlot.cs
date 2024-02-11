@@ -13,6 +13,7 @@ public class SelectSaveSlot : MonoBehaviour
 	public NameGameDialog nameDialog;
 	public Image finalFader;
 	public TextMeshProUGUI selectedName, selectedDate, warningMsg, headingText, nextText, loadedGameScenario, itemType;
+	public TextTranslation itemTypeTranslation, warningMsgTranslation, headingTextTranslation, nextTextTranslation;
 	public Button nextButton, cancelButton;
 	public Toggle toggle;
 	public GameObject warning, campaignSaveWarning;
@@ -37,20 +38,26 @@ public class SelectSaveSlot : MonoBehaviour
 		else
 			toggle.gameObject.SetActive( true );
 		toggle.isOn = false;
+
+		itemTypeTranslation = itemType.gameObject.GetComponent<TextTranslation>();
+		warningMsgTranslation = warningMsg.gameObject.GetComponent<TextTranslation>();
+		headingTextTranslation = headingText.gameObject.GetComponent<TextTranslation>();
+		nextTextTranslation = nextText.gameObject.GetComponent<TextTranslation>();
+
 		selectedName.text = selectedDate.text = loadedGameScenario.text = itemType.text = "";
 		selectedState = null;
 		selectedIndex = -1;
 
 		if ( titleMetaData.slotMode == 0 )
 		{
-			headingText.text = "New Save Slot";
-			nextText.text = "Next";
+			headingTextTranslation.Change("file.title.New", "New");
+			nextTextTranslation.Change("file.button.Next", "Next");
 			campaignSaveWarning.SetActive( true );
 		}
 		else
 		{
-			headingText.text = "Load A Saved Game";
-			nextText.text = "Begin";
+			headingTextTranslation.Change("file.title.Load", "Load");
+			nextTextTranslation.Change("file.button.Begin", "Begin");
 			campaignSaveWarning.SetActive( false );
 		}
 
@@ -80,6 +87,7 @@ public class SelectSaveSlot : MonoBehaviour
 		selectedIndex = -1;
 		gameName = "";
 		selectedName.text = selectedDate.text = itemType.text = "";
+		itemTypeTranslation.TextKey = "";
 
 		if ( toggle.isOn )//don't save
 		{
@@ -101,6 +109,7 @@ public class SelectSaveSlot : MonoBehaviour
 		selectedIndex = -1;
 		selectedState = null;
 		selectedName.text = selectedDate.text = itemType.text = "";
+		itemTypeTranslation.TextKey = "";
 
 		for ( int i = 0; i < saveSlotButtons.Length; i++ )
 		{
@@ -132,6 +141,7 @@ public class SelectSaveSlot : MonoBehaviour
 				selectedIndex = index;
 				selectedState = null;
 
+				//TextTranslation emptyTranslation = selectedName.gameObject.GetComponent<TextTranslation>();
 				selectedName.text = "Empty Slot";
 				selectedDate.text = itemType.text = "";
 
@@ -177,20 +187,22 @@ public class SelectSaveSlot : MonoBehaviour
 			warning.SetActive( false );
 			selectedName.text = stateItems[index].gameName;
 			selectedDate.text = stateItems[index].gameDate;
-			itemType.text = "This is a Standalone Scenario";
+			itemTypeTranslation.Change("file.text.Standalone", "This is a Standalone Scenario");
+			//itemType.text = "This is a Standalone Scenario";
 
 			Debug.Log( "OnSelectSlot::" + index + "::" + selectedState.projectType );
 			//check file version for standalone scenario
 			if ( selectedState.projectType == ProjectType.Standalone )
 			{
-				nextText.text = "Begin";
+				nextTextTranslation.Change("file.button.Begin", "Begin");
 				Scenario s = Bootstrap.LoadScenarioFromFilename( selectedState.scenarioFilename );
 				if ( s != null )
 				{
 					loadedGameScenario.text = s.scenarioName;
 					if ( s.scenarioGUID != selectedState.stateGUID )
 					{
-						warningMsg.text = "WARNING\r\nThe selected item was saved with a different version of the Scenario than you have.";
+						//warningMsg.text = "WARNING\r\nThe selected item was saved with a different version of the Scenario than you have.";
+						warningMsgTranslation.Change("file.text.VersionWarning", "WARNING\r\nThe selected item was saved with a different version of the Scenario than you have.");
 						warning.SetActive( true );
 					}
 				}
@@ -202,21 +214,27 @@ public class SelectSaveSlot : MonoBehaviour
 					selectedIndex = -1;
 					selectedState = null;
 					nextButton.interactable = false;
-					warningMsg.text = "WARNING\r\nThere was a problem loading the Scenario this item was saved in.";
+					//warningMsg.text = "WARNING\r\nThere was a problem loading the Scenario this item was saved in.";
+					warningMsgTranslation.Change("file.text.LoadingWarning", "WARNING\r\nThere was a problem loading the Scenario this item was saved in.");
 					warning.SetActive( true );
 				}
 			}
 			else//campaign
 			{
-				nextText.text = "Next";
+				nextTextTranslation.Change("file.button.Next", "Next");
+
 				selectedDate.text = selectedState.campaignState.gameDate;
-				itemType.text = "This is a Campaign";
+
+				//itemType.text = "This is a Campaign";
+				itemTypeTranslation.Change("file.text.Campaign", "This is a Campaign");
+
 				loadedGameScenario.text = selectedState.campaignState.campaign.campaignName;
 				Campaign c = FileManager.LoadCampaign( selectedState.campaignState.campaign.campaignGUID.ToString() );
 				//check file version for campaign
 				if ( c.fileVersion != selectedState.fileVersion )
 				{
-					warningMsg.text = "WARNING\r\nThe selected Campaign state was saved with a different version of the Campaign than you have.";
+					//warningMsg.text = "WARNING\r\nThe selected Campaign state was saved with a different version of the Campaign than you have.";
+					warningMsgTranslation.Change("file.text.CampaignWarning", "WARNING\r\nThe selected Campaign state was saved with a different version of the Campaign than you have.");
 					warning.SetActive( true );
 				}
 			}
@@ -329,7 +347,8 @@ public class SelectSaveSlot : MonoBehaviour
 				}
 				else
 				{
-					warningMsg.text = "WARNING\r\nUnexpected DATA for the selected item.";
+					//warningMsg.text = "WARNING\r\nUnexpected DATA for the selected item.";
+					warningMsgTranslation.Change("file.text.DataWarning", "WARNING\r\nUnexpected DATA for the selected item.");
 					warning.SetActive( true );
 				}
 			}

@@ -5,5 +5,8 @@
 	public bool c1Used = false, c2Used = false, c3Used = false, hasActivated = false, isDone = false;
 
 	public override InteractionType interactionType { get { return InteractionType.Dialog; } set { } }
+
+	public override string TranslationKey(string suffix) { return "event.dialog." + dataName + "." + suffix; }
+
 }
 

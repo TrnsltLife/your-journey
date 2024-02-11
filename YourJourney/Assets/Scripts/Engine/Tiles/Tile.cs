@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
+using static LanguageManager;
 
 public class Tile : MonoBehaviour
 {
@@ -319,6 +320,11 @@ public class Tile : MonoBehaviour
 		exploreToken.DOLocalMoveY( .3f, 1 ).SetEase( Ease.OutBounce );
 	}
 
+	public void RevealStartToken()
+    {
+		RevealToken(TokenType.Start);
+    }
+
 	public void RevealInteractiveTokens()
 	{
 		RevealToken( TokenType.Search );
@@ -379,10 +385,11 @@ public class Tile : MonoBehaviour
 	/// </summary>
 	void RevealToken( TokenType ttype )
 	{
-		Debug.Log("RevealToken " + ttype);
 		//var size = tilemesh.GetComponent<MeshRenderer>().bounds.size;
 		var center = tilemesh.GetComponent<MeshRenderer>().bounds.center;
 		Transform[] tf = GetChildren( ttype.ToString() );
+
+		Debug.Log("RevealToken " + ttype + " x " + tf.Count());
 
 		for ( int i = 0; i < tf.Length; i++ )
 		{
@@ -398,9 +405,10 @@ public class Tile : MonoBehaviour
 			//only want FIXED tokens
 			if ( !metaData.isRandom )//&& !metaData.hasBeenReplaced )
 			{
+				Debug.Log("RevealToken " + ttype + " !metaData.isRandmom");
 				string tBy = metaData.triggeredByName;
 				//skip if it's triggeredBy
-				if ( tBy != "None" )
+				if ( tBy != "None")
 				{
 					//if it's not in the list, keep it hidden because it hasn't activated yet, move to next token in loop
 					if ( !tokenTriggerList.Contains( tBy ) )//( tBy != "None" )
@@ -415,6 +423,8 @@ public class Tile : MonoBehaviour
 				//offset = Vector3.Reflect( offset, new Vector3( 0, 0, 1 ) );
 
 				//tf[i].position = new Vector3( center.x + offset.x, 2, center.z + offset.z );
+				Debug.Log("RevealToken " + ttype + " DOLocalMoveY .3f, 1");
+
 				tf[i].gameObject.SetActive( true );
 				tf[i].position = tf[i].position.Y( 2 );
 				tf[i].RotateAround( center, Vector3.up, baseTile.angle );
@@ -425,6 +435,8 @@ public class Tile : MonoBehaviour
 			}
 			else //if ( !metaData.hasBeenReplaced )
 			{
+				Debug.Log("RevealToken " + ttype + " else");
+				Debug.Log("RevealToken " + ttype + " DOLocalMoveY .3f, 1");
 				//random tokens are already placed during tile creation using preset transforms built into the mesh "token attach"
 				tf[i].gameObject.SetActive( true );
 				tf[i].position = tf[i].position.Y( 2 );
@@ -434,10 +446,13 @@ public class Tile : MonoBehaviour
 				tState = tokenStates.Where( x => x.metaData.interactionName == metaData.interactionName ).FirstOr( null );
 			}
 
+			Debug.Log("RevealToken " + ttype + " tState " + tState);
+
 			if ( tState != null )
 			{
 				tState.isActive = true;
 				tState.localPosition = tf[i].localPosition.Y( .3f );
+				Debug.Log("RevealToken " + ttype + " set active and localPosition: " + tState.localPosition);
 			}
 		}
 	}
@@ -551,11 +566,11 @@ public class Tile : MonoBehaviour
 			string tokName = tfmetaData.tokenType.ToString();
 			if(tfmetaData.tokenType == TokenType.Person)
             {
-				tokName = tfmetaData.personType.ToString();
+				tokName = Translate("interaction." + tfmetaData.personType.ToString(), tfmetaData.personType.ToString());
             }
 			else if(tfmetaData.tokenType == TokenType.Terrain)
             {
-				tokName = tfmetaData.terrainType.ToString();
+				tokName = Translate("interaction." + tfmetaData.terrainType.ToString(), tfmetaData.terrainType.ToString());
             }
 			nameList.Add(tokName);
 
@@ -600,6 +615,8 @@ public class Tile : MonoBehaviour
 						Destroy( ob.gameObject );
 					if ( ob.name == "STARTMARKER" )
 						ob.gameObject.SetActive( false );
+					if (ob.name.StartsWith("Start Token"))
+						ob.gameObject.SetActive(false);
 				}
 
 				Tile tile = objectHit.parent.GetComponent<Tile>();
@@ -617,6 +634,10 @@ public class Tile : MonoBehaviour
 							 triggerManager.FireTrigger( tile.chapter.exploreTrigger );
 							 //fire trigger on tile exploration
 							 triggerManager.FireTrigger( tile.baseTile.triggerName );
+							 if(tile.tileGroup.ExploredAllTiles())
+                             {
+								 triggerManager.FireTrigger(tile.chapter.exploredAllTilesTrigger);
+                             }
 							 //objectHit.parent.GetComponent<Tile>().tileGroup.ExploreTile();
 						 } );
 					}
@@ -645,10 +666,10 @@ public class Tile : MonoBehaviour
 
 	void ShowExplorationText( Tile tile, System.Action action )
 	{
-		string flavor = tile.baseTile.flavorBookData.pages.Count > 0 ? tile.baseTile.flavorBookData.pages[0] : "";
-		string instructions = "Discard the exploration token.";
+		string flavor = tile.baseTile.flavorBookData.pages.Count > 0 ? Interpret("tile." + tile.baseTile.idNumber + ".exploredText", tile.baseTile.flavorBookData.pages[0]) : "";
+		string instructions = Translate("dialog.text.DiscardExploration", "Discard the exploration token.");
 		if ( Bootstrap.gameStarter.difficulty != Difficulty.Hard )
-			instructions += " Gain 1 inspiration.";
+			instructions += " " + Translate("dialog.text.GainInspiration", "Gain 1 inspiration.");
 		if ( !string.IsNullOrEmpty( flavor ) )
 			flavor = flavor + "\r\n\r\n" + instructions;
 		else
@@ -669,13 +690,17 @@ public class Tile : MonoBehaviour
 		string objectEventToken = metaData.tokenType.ToString();
 		if (metaData.tokenType == TokenType.Person)
 		{
-			//Set the ->> Interaction button to the type of Person (Human/Hobbit/Dwarf/Elf)
+			//Set the ->> Interaction button to the type of Person (Human/Halfpint/Dwarf/Elf)
 			objectEventToken = metaData.personType.ToString();
 		}
 		else if (metaData.tokenType == TokenType.Terrain)
         {
 			//Set the ->> Interaction button to the type of Terrain(Boulder / Bush / FirePit / etc.)
 			objectEventToken = metaData.terrainType.ToString();
+        }
+		if(!String.IsNullOrWhiteSpace(metaData.tokenInteractionText))
+        {
+			objectEventToken = Interpret(metaData.tokenInteractionKey, metaData.tokenInteractionText);
         }
 
 		Tile tile = objectHit.parent.GetComponent<Tile>();
@@ -696,13 +721,17 @@ public class Tile : MonoBehaviour
 				objectEventToken = delegateInteraction.tokenType.ToString();
 				if (metaData.tokenType == TokenType.Person)
 				{
-					//Set the ->> Interaction button to the type of Person (Human/Hobbit/Dwarf/Elf)
+					//Set the ->> Interaction button to the type of Person (Human/Halfpint/Dwarf/Elf)
 					objectEventToken = metaData.personType.ToString();
 				}
 				else if (metaData.tokenType == TokenType.Terrain)
 				{
 					//Set the ->> Interaction button to the type of Terrain(Boulder / Bush / FirePit / etc.)
 					objectEventToken = metaData.terrainType.ToString();
+				}
+				if (!String.IsNullOrWhiteSpace(metaData.tokenInteractionText))
+				{
+					objectEventToken = Interpret(metaData.tokenInteractionKey, metaData.tokenInteractionText);
 				}
 
 				//make it persistent
@@ -731,7 +760,7 @@ public class Tile : MonoBehaviour
 	} );
 	}
 
-	void CreateToken( TokenState tokenState )
+	void CreateToken( TokenState tokenState, bool createStartToken = true )
 	{
 		GameObject go = null;
 		TileManager tileManager = FindObjectOfType<TileManager>();
@@ -739,6 +768,11 @@ public class Tile : MonoBehaviour
 		if (tokenState.metaData.tokenType == TokenType.None)
 		{
 			go = GameObject.Instantiate(tileManager.noneTokenPrefab, gameObject.transform);
+		}
+		else if (tokenState.metaData.tokenType == TokenType.Start)
+		{
+            if (!createStartToken) { return; } //Special case when loading a saved game. We don't want to create the Start Token again.
+			go = GameObject.Instantiate(tileManager.startTokenPrefab, gameObject.transform);
 		}
 		else if ( tokenState.metaData.tokenType == TokenType.Search )
 		{
@@ -750,7 +784,7 @@ public class Tile : MonoBehaviour
 				go = GameObject.Instantiate( tileManager.humanTokenPrefab, gameObject.transform );
 			else if ( tokenState.metaData.personType == PersonType.Elf )
 				go = GameObject.Instantiate( tileManager.elfTokenPrefab, gameObject.transform );
-			else if ( tokenState.metaData.personType == PersonType.Hobbit )
+			else if ( tokenState.metaData.personType == PersonType.Halfpint )
 				go = GameObject.Instantiate( tileManager.hobbitTokenPrefab, gameObject.transform );
 			else if ( tokenState.metaData.personType == PersonType.Dwarf )
 				go = GameObject.Instantiate( tileManager.dwarfTokenPrefab, gameObject.transform );
@@ -821,6 +855,8 @@ public class Tile : MonoBehaviour
 		newMD.triggerName = tokenState.metaData.triggerName;
 		newMD.interactionName = tokenState.metaData.interactionName;
 		newMD.triggeredByName = tokenState.metaData.triggeredByName;
+		newMD.tokenInteractionText = tokenState.metaData.tokenInteractionText;
+		newMD.tokenInteractionKey = tokenState.metaData.tokenInteractionKey;
 		newMD.tokenType = tokenState.metaData.tokenType;
 		newMD.personType = tokenState.metaData.personType;
 		newMD.terrainType = tokenState.metaData.terrainType;
@@ -892,7 +928,7 @@ public class Tile : MonoBehaviour
 		//recreate tokens
 		foreach ( TokenState ts in singleTileState.tokenStates )
 		{
-			CreateToken( ts );
+			CreateToken( ts, false );
 		}
 
 		//remove any tokens that are created from replaced event

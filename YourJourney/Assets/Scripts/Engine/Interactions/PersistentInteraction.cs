@@ -5,4 +5,7 @@
 	public string alternativeTextTrigger { get; set; }
 
 	public override InteractionType interactionType { get { return InteractionType.Persistent; } set { } }
+
+	public override string TranslationKey(string suffix) { return "event.persistent-token." + dataName + "." + suffix; }
+
 }

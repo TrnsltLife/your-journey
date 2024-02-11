@@ -9,13 +9,16 @@ public class CampaignScreen : MonoBehaviour
 {
 	public SelectSaveSlot selectSaveSlot;
 	public SelectHeroes selectHeroes;
-	public StoryBox storyBox;
+	public CampfireScreen campfireScreen;
+	public StoryBox storyBox; //pop-up window, no longer used
+	public StoryBox storyBoxFormElement;
 	public Image finalFader;
 	public Button continueButton, backButton, continueReplayButton;
 	public GameObject fileItemButtonPrefab;
 	public RectTransform itemContainer;
 	public GameObject replaybox;
 	public TextMeshProUGUI xpLoreText, currentScenarioText, replayText, replayStatusText;
+	public TextTranslation replayStatusTextTranslation;
 
 	TitleManager tm;
 	TitleMetaData titleMetaData;
@@ -45,6 +48,8 @@ public class CampaignScreen : MonoBehaviour
 		tm = FindObjectOfType<TitleManager>();
 		tm.LoadScenarioImage(campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].coverImage);
 
+		OnShowStory();
+
 		bool finishedCampaign = !campaignState.scenarioStatus.Any( x => x == ScenarioStatus.NotPlayed );
 
 		for ( int i = 0; i < campaign.scenarioCollection.Count; i++ )
@@ -54,13 +59,20 @@ public class CampaignScreen : MonoBehaviour
 			go.Init( i, campaign.scenarioCollection[i].scenarioName,
 				"", //TODO collections?
 				ProjectType.Standalone, ( index ) => OnSelectScenario( index ) );
-			if ( campaignState.currentScenarioIndex != i || finishedCampaign )
+			if (campaignState.currentScenarioIndex != i || finishedCampaign)
+			{
 				go.RemoveRing();
+			}
+			if (campaignState.currentScenarioIndex == i)
+            {
+				OnShowStory(i);
+			}
 			go.SetSuccess( campaignState.scenarioStatus[i] );
 			fileItemButtons.Add( go );
 		}
 		itemContainer.sizeDelta = new Vector2( 772, fileItemButtons.Count * 110 );
 
+		replayStatusTextTranslation = replayStatusText.GetComponent<TextTranslation>();
 		CheckCampaignStatus();
 
 		gameObject.SetActive( true );
@@ -85,13 +97,14 @@ public class CampaignScreen : MonoBehaviour
 			continueReplayButton.interactable = false;
 			continueButton.interactable = true;
 
-			replayStatusText.text = "No game is in progress.";
 			//check if campaign is finished
-			if ( !finishedCampaign )
-				replayStatusText.text += "  You may continue the Campaign from the current Scenario with the Continue Campaign button.";
+			if (!finishedCampaign)
+			{
+				replayStatusTextTranslation.Change("campaign.text.NoGameContinue", "No game is in progress.  You may continue the Campaign from the current Scenario with the Continue Campaign button.");
+			}
 			else
 			{
-				replayStatusText.text += "  The campaign has been finished.  Only Scenario Replays are available to play.";
+				replayStatusTextTranslation.Change("campaign.text.NoGameReplay", "No game is in progress.  The campaign has been finished.  Only Scenario Replays are available to play.");
 			}
 		}
 		else//2 or 3 - a game is in progress
@@ -99,22 +112,32 @@ public class CampaignScreen : MonoBehaviour
 			//3 - different scenario than latest
 			if ( gs.campaignState.scenarioPlayingIndex != campaignState.currentScenarioIndex )
 			{
-				replayStatusText.text = "A Replay is in progress.";
 				continueReplayButton.interactable = true;
-				if ( !finishedCampaign )
-					replayStatusText.text += "  You may continue the Replay or forfeit it and continue the Campaign from the current Scenario.";
+				if (!finishedCampaign)
+				{
+					replayStatusTextTranslation.Change("campaign.text.ReplayContinue", "A Replay is in progress.  You may continue the Replay or forfeit it and continue the Campaign from the current Scenario.");
+				}
 				else
-					replayStatusText.text += "  You may continue the Replay, but the Campaign has been finished.";
+				{
+					replayStatusTextTranslation.Change("campaign.text.ReplayFinished", "A Replay is in progress.  You may continue the Replay, but the Campaign has been finished.");
+				}
 			}
 			else//3 - state scenario is same as current scenario, could be a replay or current campaign play. Check its scenarioStatus
 			{
-				if ( gs.campaignState.scenarioStatus[gs.campaignState.scenarioPlayingIndex] == ScenarioStatus.NotPlayed )//2 - current campaign state
-					replayStatusText.text = "A game is in progress.  Continue it with the Continue Campaign button.";
+				if (gs.campaignState.scenarioStatus[gs.campaignState.scenarioPlayingIndex] == ScenarioStatus.NotPlayed)//2 - current campaign state
+				{
+					replayStatusTextTranslation.Change("campaign.text.GameInProgress", "A game is in progress.  Continue it with the Continue Campaign button.");
+				}
 				else//3 - replay
 				{
-					replayStatusText.text = "A Replay is in progress.  Continue it with the Continue Replay button.";
-					if ( campaignState.scenarioStatus.Any( x => x == ScenarioStatus.NotPlayed ) )
-						replayStatusText.text += "  The campaign has been finished.";
+					if (campaignState.scenarioStatus.Any(x => x == ScenarioStatus.NotPlayed))
+                    {
+						replayStatusTextTranslation.Change("campaign.text.ReplayInProgress", "A Replay is in progress.  Continue it with the Continue Replay button.");
+					}
+                    else 
+					{
+						replayStatusTextTranslation.Change("campaign.text.ReplayInProgressFinished", "A Replay is in progress.  Continue it with the Continue Replay button." + "  The campaign has been finished.");
+					}
 				}
 			}
 		}
@@ -151,7 +174,15 @@ public class CampaignScreen : MonoBehaviour
 			replayText.text = "";
 			//show haven't played message
 		}
+
+		OnShowStory(selectedIndex);
 	}
+
+	public void LoadCampfireScreen(CampfireState campfireState)
+    {
+		gameObject.SetActive( false );
+		campfireScreen.ActivateScreen(titleMetaData, campfireState);
+    }
 
 	public void StartGame()
     {
@@ -179,28 +210,36 @@ public class CampaignScreen : MonoBehaviour
 		Bootstrap.campaignState = campaignState;
 		Bootstrap.gameStarter = gameStarter;
 
+		CampfireState campfireState = (sIndex == 0 ? CampfireState.SETUP : CampfireState.UPGRADE);
+
 		//check for a saved state
 		GameState gs = GameState.LoadState( campaignState.saveStateIndex );
 		if ( gs.partyState == null )//no saved state
 		{
 			gameStarter.isNewGame = true;//start scenario fresh
-			Debug.Log( "NEW GAME" );
+			Debug.Log("CONTINUE CAMPAIGN - NEW GAME - CAMPFIRE " + campfireState.ToString() );
+			LoadCampfireScreen(campfireState);
+			return;
 		}
 		else//saved state found, is it current scenario or replay?
 		{
 			if ( gs.partyState.scenarioFileName == gameStarter.scenarioFileName )//it's the current scenario
 			{
 				gameStarter.isNewGame = false;//otherwise start scenario fresh
-				Debug.Log( "CONTINUING SAVED GAME" );
+				Debug.Log( "CONTINUE CAMPAIGN - CONTINUING SAVED GAME - CAMPFIRE VIEW" );
+				LoadCampfireScreen(CampfireState.VIEW);
+				return;
 			}
 			else//it's just a replay, toast it and start fresh
 			{
 				gameStarter.isNewGame = true;
-				Debug.Log( "NEW GAME" );
+				Debug.Log( "CONTINUE CAMPAIGN - REPLAY - NEW GAME - CAMPFIRE " + campfireState.ToString());
+				LoadCampfireScreen(campfireState);
+				return;
 			}
 		}
 
-		StartGame();
+		//StartGame();
 	}
 
 	public void OnReplayScenario()
@@ -223,17 +262,23 @@ public class CampaignScreen : MonoBehaviour
 
 		var scenario = FileManager.LoadScenario( FileManager.GetFullPathWithCampaign( gameStarter.scenarioFileName, campaign.campaignGUID.ToString() ) );
 
+		CampfireState campfireState = selectedIndex == 0 ? CampfireState.SETUP : CampfireState.UPGRADE;
+		Debug.Log("REPLAY SCENARIO - CAMPFIRE " + campfireState.ToString());
+		LoadCampfireScreen(campfireState);
+
+		/*
 		if ( !string.IsNullOrEmpty( scenario.specialInstructions ) )
 		{
 			storyBox.Show( scenario.specialInstructions, () =>
 			{
-				StartGame();
+				LoadCampfireScreen(campfireState);
 			});
 		}
 		else
 		{
-			StartGame();
+			LoadCampfireScreen(campfireState);
 		}
+		*/
 	}
 
 	public void OnContinueReplay()
@@ -256,7 +301,8 @@ public class CampaignScreen : MonoBehaviour
 		Bootstrap.campaignState = campaignState;
 		Bootstrap.gameStarter = gameStarter;
 
-		StartGame();
+		Debug.Log("CONTINUE REPLAY - CAMPFIRE VIEW");
+		LoadCampfireScreen(CampfireState.VIEW);
 	}
 
 	public void OnBack()
@@ -282,6 +328,12 @@ public class CampaignScreen : MonoBehaviour
 
 	public void OnShowStory()
 	{
-		storyBox.Show( campaignState.campaign.storyText, null );
+		storyBoxFormElement.storyText.text = campaignState.campaign.storyText;
+		//storyBox.Show( campaignState.campaign.storyText, null );
+	}
+
+	public void OnShowStory(int scenarioIndex)
+    {
+		storyBoxFormElement.storyText.text = campaign.scenarioCollection[scenarioIndex].specialInstructions;
 	}
 }

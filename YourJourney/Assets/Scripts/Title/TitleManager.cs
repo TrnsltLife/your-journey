@@ -28,6 +28,8 @@ public class TitleManager : MonoBehaviour
 	public Vector2 scenarioImageSize = new Vector2(1024, 512);
 	public GameObject scenarioOverlayText;
 	public TextMeshProUGUI loadingText;
+	public TextMeshProUGUI newButtonText;
+	public TextMeshProUGUI loadButtonText;
 
 	public void ClearScenarioImage()
     {
@@ -39,6 +41,8 @@ public class TitleManager : MonoBehaviour
 		if (base64Image == null || base64Image.Length == 0)
 		{
 			scenarioOverlay.GetComponent<Image>().sprite = null;
+			Image image = scenarioOverlay.GetComponent<Image>();
+			image.color = Color.black;
 			scenarioOverlay.SetActive(false);
 		}
 		else
@@ -48,12 +52,15 @@ public class TitleManager : MonoBehaviour
 			texture.LoadImage(bytes);
 			scenarioSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width / 2, texture.height / 2));
 			scenarioOverlay.GetComponent<Image>().sprite = scenarioSprite;
+			Image image = scenarioOverlay.GetComponent<Image>();
+			image.color = Color.white;
 			scenarioOverlay.SetActive(true);
 		}
 	}
 
 	public void LoadScenario()
     {
+		scenarioOverlay.SetActive(true);
 		gameTitle.SetActive(false);
 		gameTitleFlash.SetActive(false);
 		settingsButton.SetActive(false);
@@ -86,6 +93,10 @@ public class TitleManager : MonoBehaviour
 	private void Start()
 	{
 		var settings = Bootstrap.LoadSettings();
+
+		LanguageManager.LoadLanguage(LanguageManager.currentLanguage);
+		LanguageManager.CallSubscribers();
+
 		Vignette v;
 		ColorGrading cg;
 		if ( volume.profile.TryGetSettings( out v ) )
@@ -130,6 +141,8 @@ public class TitleManager : MonoBehaviour
 
 	public void ResetScreen()
 	{
+		LanguageManager.CallSubscribers();
+
 		finalFader.DOFade( 0, .5f );
 
 		newBcg.DOFade( 1, .25f );
@@ -179,7 +192,15 @@ public class TitleManager : MonoBehaviour
 
 	public void OnSettings()
 	{
-		settings.Show( "Quit App" );
+		settings.Show( "settings.QuitApp", "Quit App", OnLanguageUpdate );
+	}
+
+	public void OnLanguageUpdate(string languageName)
+	{
+		//Debug.Log("Engine.OnLanguageUpdate(" + languageName + ")");
+		LanguageManager.LoadLanguage(languageName);
+		LanguageManager.UpdateCurrentLanguage(languageName);
+		LanguageManager.CallSubscribers();
 	}
 
 	void SkipIntro()

@@ -18,6 +18,7 @@ So now, with the new options, you can just select all the root objects of a scen
 Ideal for upgrading whole scenes quickly.
 */
 
+/*
 public class TextToTextMeshPro : Editor
 {
     public class TextMeshProSettings
@@ -201,3 +202,4 @@ public class TextToTextMeshPro : Editor
         return TextAlignmentOptions.TopLeft;
     }
 }
+*/

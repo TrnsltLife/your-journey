@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static LanguageManager;
 
 public class ChapterManager : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class ChapterManager : MonoBehaviour
 	List<string> tokenTriggerQueue = new List<string>();
 	List<string> darknessTiles = new List<string>();
 	List<string> difficultTiles = new List<string>();
+	List<string> fortifiedTiles = new List<string>();
 
 	public void Init( Scenario s )
 	{
@@ -25,13 +27,26 @@ public class ChapterManager : MonoBehaviour
 				//Shadowed Paths
 				"212A", "215A", "216A", "219A", "221A", "310A",
 				"102B", "210B", "211B", "212B", "213B", "214B", "215B", "216B", "217B", "218B", 
-				"309B", "310B", "311B", "312B", "401B", "402B"
-			} );
+				"309B", "310B", "311B", "312B", "401B", "402B",
+				//Spreading War
+				"227A", "404A", 
+				"224B", "225B", "227B", "314B", "316B", "318B", "319B", "320B", "404B", 
+
+		});
 		difficultTiles.AddRange(new string[] {
 				//Shadowed Paths
 				"210A", "214A", "220A", "311A", "313A", "401A", "402A",
 				"214B", "220B", "313B", 
-			} );
+				//Spreading War
+				"104A", "222A", "314A", "403A", "500A", 
+				"224B", "226B", 
+		});
+		fortifiedTiles.AddRange(new string[]
+		{
+				//Spreading War
+				"222A", "226A", "317A", "319A", "403A", 
+				"104B", "222B", "223B", "225B", "227B", "316B", "318B", "320B", "403B", "404B", "500B", 
+		});
 		//Debug.Log( $"Chapter Manager: {chapterList.Count} Chapters Found" );
 	}
 
@@ -128,21 +143,21 @@ public class ChapterManager : MonoBehaviour
 
 	void FinishChapterTrigger( Chapter c, bool firstChapter )
 	{
-		string s = "Prepare the following tiles:\r\n\r\n";
+		Debug.Log("FinishChapterTrigger chapter " + c.dataName + " firstChapter? " + firstChapter);
+		string s = Translate("dialog.text.PrepareTiles", "Prepare the following tiles:") + "\r\n\r\n";
 		foreach (BaseTile bt in c.tileObserver)
 		{
 			Debug.Log(bt.ToString());
 			if (bt.tileType == TileType.Hex)
 			{
-				s += bt.idNumber + " " + bt.tileSide
-					+ " <font=\"Icon\">" + Collection.FromTileNumber(bt.idNumber).FontCharacter + "</font>" //Add the Collection symbol.
+				s += bt.idNumber + bt.tileSide
+					+ "<font=\"Icon\">" + Collection.FromTileNumber(bt.idNumber).FontCharacter + "</font>" //Add the Collection symbol.
 					+ ", ";
 			}
 			else if (bt.tileType == TileType.Square)
             {
-				s += "Battle Map Tile"
-					+ (bt.tileSide == "A" ? " (Grass)" : " (Dirt)")
-					+ " <font=\"Icon\">" + Collection.FromTileNumber(bt.idNumber).FontCharacter + "</font>" //Add the Collection symbol.
+				s += Translate(bt.tileSide == "A" ? "dialog.text.BattleTileGrass" : "BattleTileDirt",
+						"Battle Map Tile " + (bt.tileSide == "A" ? " (Grass)" : " (Dirt)"))
 					+ ", ";
 			}
 		}
@@ -211,6 +226,11 @@ public class ChapterManager : MonoBehaviour
 				tg.Colorize();
 				tg.isExplored = true;
 			}
+			else if (firstChapter)
+            {
+				//Starting tile group unexplored, but we still need to colorize the starting tile
+				tg.Colorize(true);
+            }
 
 			FindObjectOfType<CamControl>().MoveTo( tg.groupCenter );
 
@@ -235,7 +255,7 @@ public class ChapterManager : MonoBehaviour
 						tg.isExplored = true;
 					}
 				} );
-				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue( "Place your Heroes in the indicated position.", ButtonIcon.Continue );
+				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("dialog.text.PlaceHeroes", "Place your Heroes in the indicated position."), ButtonIcon.Continue );
 			}
 		} );
 	}

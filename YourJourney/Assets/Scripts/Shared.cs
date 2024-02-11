@@ -3,21 +3,22 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public enum ScenarioType { Journey, Battle }
-public enum InteractionType { Text, Threat, StatTest, Decision, Branch, Darkness, MultiEvent, Persistent, Conditional, Dialog, Replace, Reward }
-public enum MonsterType { Ruffian, GoblinScout, OrcHunter, OrcMarauder, HungryWarg, HillTroll, Wight, 
-						Atarin, Gulgotar, Coalfang,
-						GiantSpider, PitGoblin, OrcTaskmaster, Shadowman, NamelessThing, CaveTroll, Balrog, SpawnOfUngoliant,
-						SupplicantOfMorgoth, Ursa, Ollie,
-						FellBeast, WargRider, SiegeEngine, WarOliphaunt, Soldier, UrukWarrior,
-						LordAngon, WitchKingOfAngmar, Eadris }
+public enum InteractionType { Text, Threat, StatTest, Decision, Branch, Darkness, MultiEvent, Persistent, Conditional, Dialog, Replace, Reward, Item, Title, Start }
+public enum MonsterType { Ruffian, GoblinScout, OrcHunter, OrcMarauder, HungryVarg, HillTroll, Wight, 
+						Atari, Gargletarg, Chartooth,
+						GiantSpider, PitGoblin, OrcTaskmaster, Shadowman, AnonymousThing, CaveTroll, Balerock, SpawnOfUglygiant,
+						SupplicantOfMoreGoth, Ursula, Oliver,
+						FoulBeast, VargRider, SiegeEngine, WarElephant, Soldier, HighOrcWarrior,
+						LordJavelin, LichKing, Endris }
+public enum MonsterModifierGroup { None, Basic, Extended, Named, Custom }
 public enum CombatModifier { None, Pierce, Smite, Sunder, Cleave, Lethal, Stun }
 public enum TileType { Hex, Battle, Square }
 public enum ProjectType { Standalone, Campaign }
 public enum Ability { Might, Agility, Wisdom, Spirit, Wit, Wild, Random, None }
 public enum TerrainToken { None, Pit, Mist, Barrels, Table, FirePit, Statue }
 public enum ButtonIcon { None, Action, OK, Continue, Next }
-public enum TokenType { Search, Person, Threat, Darkness, DifficultGround, Fortified, Terrain, None }
-public enum PersonType { Human, Elf, Hobbit, Dwarf, None }
+public enum TokenType { Search, Person, Threat, Darkness, DifficultGround, Fortified, Terrain, None, Start }
+public enum PersonType { Human, Elf, Halfpint, Dwarf, None }
 public enum TerrainType {
 	None, Barrels, Boulder, Bush, FirePit, Mist, Pit, Statue, Stream, Table, Wall, //Core Set
 	Elevation, Log, Rubble, Web, //Shadowed Paths
@@ -36,7 +37,7 @@ public class AbilityUtility
 	//This is used to return a bolded HTML string with optional size and color, to display an ability icon from a font.
 	//The LoTR-JiME-Icons font has been renamed as Harrington in the harringtonBold font. The <font=\"Icon\"></font> tags switch to this icon font and display the icon.
 	// Might, Agility, Wisdom, Spirit, Wit, Wild
-	public static readonly string[] testColors = new string[] { "ff0000", "55cc00", "bb00bb", "0088ff", "ffff00", "ffffff" };
+	public static readonly string[] testColors = new string[] { "ff0000", "55cc00", "bb00bb", "0088ff", "ffff00", "ffffff", "ffffff", "cccccc" };
 	public static readonly string[] testChars = new string[] { "M", "A", "Z", "S", "W", "X" }; //In the LoTR-JiME-Icons font
 
 	public static string Text(Ability ability)
@@ -88,6 +89,7 @@ public interface IInteraction
 	bool isTokenInteraction { get; set; }
 	string triggerName { get; set; }
 	string triggerAfterName { get; set; }
+	string tokenInteractionText { get; set; }
 	TextBookData textBookData { get; set; }
 	TextBookData eventBookData { get; set; }
 	TokenType tokenType { get; set; }
@@ -97,6 +99,9 @@ public interface IInteraction
 	PersonType personType { get; set; }
 	TerrainType terrainType { get; set; }
 	bool isPersistent { get; set; }
+	bool isPlaced { get; set; } //whether a grouped event has already had its token place on a tile group
+	bool isReusable { get; set; } //whether a grouped event can be used on more than one tile group
+	string TranslationKey(string suffix);
 }
 
 public interface ICommonData
@@ -116,10 +121,23 @@ public class ProjectItem
 	public string fileName { get; set; }
 	public string fileVersion { get; set; }
 	public List<int> collections { get; set; }
+	public Dictionary<string, Dictionary<string, string>> translations { get; set; }
 	public string campaignGUID { get; set; }
 	public string campaignStory { get; set; }
 	public string campaignDescription { get; set; }
 	public string coverImage { get; set; }
+
+	public string Translated(string key, string defaultValue)
+	{
+		if (translations.ContainsKey(LanguageManager.currentLanguageCode))
+		{
+			if (translations[LanguageManager.currentLanguageCode].ContainsKey(key))
+			{
+				return translations[LanguageManager.currentLanguageCode][key];
+			}
+		}
+		return defaultValue;
+	}
 }
 
 public class CampaignItem
@@ -132,6 +150,7 @@ public class CampaignItem
 	//TODO collections in CampaignScreen?
 	public List<int> collections { get; set; }
 	public string coverImage { get; set; }
+	public string specialInstructions { get; set; }
 }
 
 public class StateItem

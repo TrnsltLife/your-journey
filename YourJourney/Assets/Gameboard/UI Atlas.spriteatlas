@@ -35,7 +35,7 @@ SpriteAtlas:
     - {fileID: 102900000, guid: 8d242c989899e954eaaf392790d9ad1c, type: 3}
     - {fileID: 102900000, guid: c80935fd8efbc4b4abb7edc027a64235, type: 3}
     - {fileID: 102900000, guid: ddca5c03c60fd6145b5dcad61a41bf74, type: 3}
-    totalSpriteSurfaceArea: 6342250
+    totalSpriteSurfaceArea: 10172653
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
@@ -219,7 +219,7 @@ SpriteAtlas:
   - frame_18_delay-0.11s
   - eye mask
   - PortraitBoxLeft
-  - m-eadris
+  - m-endris
   - party button
   - b1
   - frame_02_delay-0.1s
@@ -229,10 +229,10 @@ SpriteAtlas:
   - frame_04_delay-0.1s
   - small button
   - frame_12_delay-0.11s
-  - m-war-oliphaunt
+  - m-war-elephant
   - end turn tick
   - ranged
-  - m-balrog
+  - m-balerock
   - text panel clear
   - be2
   - be1
@@ -246,10 +246,10 @@ SpriteAtlas:
   - frame_13_delay-0.11s
   - monster circle -elite
   - frame_14_delay-0.11s
-  - m-warg
+  - m-varg
   - frame_01_delay-0.11s
   - m-cave-troll
-  - m-fell-beast
+  - m-foul-beast
   - frame_23_delay-0.1s
   - might
   - frame_28_delay-0.12s
@@ -271,7 +271,7 @@ SpriteAtlas:
   - m-ollie
   - m-ursa
   - groupindicator
-  - m-gulgotar
+  - m-gargletarg
   - m-shadowman
   - frame_26_delay-0.11s
   - frame_24_delay-0.1s
@@ -282,11 +282,11 @@ SpriteAtlas:
   - be6
   - threat meter
   - frame_09_delay-0.1s
-  - m-supplicant-of-morgoth
+  - m-supplicant-of-more-goth
   - TextBoxOpenLeft
-  - m-nameless-thing
+  - m-anonymous-thing
   - frame_15_delay-0.1s
-  - m-coalfang
+  - m-chartooth
   - frame_23_delay-0.11s
   - wisdom
   - frame_16_delay-0.1s
@@ -317,16 +317,16 @@ SpriteAtlas:
   - monsterbar
   - hero panel
   - frame_24_delay-0.11s
-  - m-warg-rider
+  - m-varg-rider
   - frame_17_delay-0.1s
   - m-troll
   - m-soldier
   - spirit
   - provoke
-  - m-atarin
-  - m-spawn-of-ungoliant
-  - m-lord-angon
-  - m-uruk-warrior
+  - m-atari
+  - m-spawn-of-ugly-giant
+  - m-lord-javelin
+  - m-high-orc-warrior
   - frame_29_delay-0.11s
   - frame_17_delay-0.11s
   - m-wraith
@@ -338,7 +338,7 @@ SpriteAtlas:
   - frame_01_delay-0.1s
   - shadow
   - frame_06_delay-0.1s
-  - m-witch-king
+  - m-lich-king
   - frame_06_delay-0.11s
   - party button pressed
   - resizeable standard

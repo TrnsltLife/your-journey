@@ -36,6 +36,15 @@ public class TileGroup
 		return chapter;
 	}
 
+	public bool ExploredAllTiles()
+    {
+		foreach(Tile tile in tileList)
+        {
+            if (!tile.isExplored) { return false; }
+        }
+		return true;
+    }
+
 	public static TileGroup CreateFixedGroup( Chapter c )
 	{
 		TileGroup tg = new TileGroup( c.GUID );
@@ -111,7 +120,15 @@ tile.gameObject.SetActive(true);
 
 			if (tileroot.isStartTile )
 			{
-				startPosition = tile.GetChildren( "token attach" )[0].position.Y( SpawnMarker.SPAWN_HEIGHT );
+				//Check for a Start token. If it exists, it was taken care of by the AddFixedToken and RevealStartToken methods elsewhere in this file.
+				Token startToken = tileroot.tokenList.Where(it => it.tokenType == TokenType.Start).FirstOrDefault();
+				TokenState startTokenState = tile.tokenStates.Where(it => it.metaData.tokenType == TokenType.Start).FirstOrDefault();
+
+				//Default Starting Position
+				if(startTokenState == null)
+				{
+					startPosition = tile.GetChildren("token attach")[0].position.Y(SpawnMarker.SPAWN_HEIGHT);
+				}
 				tile.isExplored = true;
 			}
 		}
@@ -140,7 +157,7 @@ tile.gameObject.SetActive(true);
 
 		for ( int i = 0; i < c.tileObserver.Count; i++ )
 		{
-			//Debug.Log( chapter.tileObserver[i].idNumber );
+			//Debug.Log( ((BaseTile)chapter.tileObserver[i]).idNumber );
 
 			BaseTile bt = chapter.tileObserver[i] as BaseTile;
 			containerObject.name += " " + bt.idNumber.ToString();
@@ -160,6 +177,8 @@ tile.gameObject.SetActive(true);
 //Show ball/sphere/marker for anchor and connection points for debugging
 tile.gameObject.SetActive(true);
 //tile.RevealAllAnchorConnectorTokens();
+
+			//Set the tile position/coordinates
 			if ( i > 0 )
 			{
 				Vector3 convertedSpace = Vector3.zero;
@@ -189,16 +208,25 @@ tile.gameObject.SetActive(true);
 			if ( tile.baseTile.tokenList.Count > 0 )
 				usedPositions.AddRange( AddFixedToken( tile ) );
 
-			//find starting position if applicable
+			//find starting position if applicable and add the player spawn marker
 			if ( bt.isStartTile )
 			{
+				//Check for a Start token. If it exists, it was taken care of by the AddFixedToken and RevealStartToken methods elsewhere in this file.
+				Token startToken = bt.tokenList.Where(it => it.tokenType == TokenType.Start).FirstOrDefault();
+				TokenState startTokenState = tile.tokenStates.Where(it => it.metaData.tokenType == TokenType.Start).FirstOrDefault();
+
+				//Default Starting Position
+				if (startTokenState == null)
+				{
+					startPosition = tile.GetChildren("token attach")[0].position.Y(SpawnMarker.SPAWN_HEIGHT);
+				}
 				tile.isExplored = true;
-				startPosition = tile.GetChildren( "token attach" )[0].position.Y( SpawnMarker.SPAWN_HEIGHT );
 			}
 		}
 
 		//add random tokens
-		if ( c.usesRandomGroups && usedPositions.Count > 0 )
+		//if ( c.usesRandomGroups && usedPositions.Count > 0 ) // <-- This code was blocking random events from occurring *unless* there was at least one fixed token
+		if ( c.usesRandomGroups )
 			AddRandomTokens( usedPositions.ToArray() );
 
 		GenerateGroupCenter();
@@ -249,7 +277,7 @@ tile.gameObject.SetActive(true);
 		Vector3 tilefix = Vector3.zero;
 		//convert the string to vector2
 		string[] s = tile.baseTile.hexRoot.Split(',');
-		Debug.Log("pathRoot::" + tile.baseTile.idNumber + "::" + tile.baseTile.pathRoot);
+		//Debug.Log("pathRoot::" + tile.baseTile.idNumber + "::" + tile.baseTile.pathRoot);
 		Vector2 p = new Vector2(float.Parse(s[0]), float.Parse(s[1]));
 		if (p.y != 1)
 		{
@@ -269,11 +297,13 @@ tile.gameObject.SetActive(true);
 	{
 		if ( chapter.randomInteractionGroup == "None" )
 			return;
+		//Debug.Log("Add events to " + (chapter.isRandomTiles ? "random" : "fixed") + " tile group.");
 		//usedPositions = wonky user placed token position
 		InteractionManager im = GlowEngine.FindObjectOfType<InteractionManager>();
-		//get array of interactions that are in the interaction group
+		//get array of interactions that are in the interaction group; don't include interactions that have already been placed (unless isReusable is set to indicate they can be used more than once)
 		IInteraction[] interactionGroupArray = im.randomTokenInteractions
-			.Where( x => x.dataName.EndsWith( chapter.randomInteractionGroup ) ).ToArray();
+			.Where( x => x.dataName.EndsWith( chapter.randomInteractionGroup ) && (!x.isPlaced || x.isReusable)).ToArray();
+		interactionGroupArray = GlowEngine.ShuffleArray(interactionGroupArray); //randomize the order so every time we play it's different
 		//Debug.Log( "EVENTS IN GROUP [" + chapter.randomInteractionGroup + "]: " + interactionGroupArray.Length );
 
 		//get all the possible token spawn locations that are NOT near FIXED tokens already placed
@@ -306,7 +336,7 @@ tile.gameObject.SetActive(true);
 
 		//recreate opentfs as hash with UNIQUE items, no dupes
 		var openhash = new HashSet<Transform>( finalOpenTFS );
-		finalOpenTFS = openhash.Select( x => x ).ToList();
+		finalOpenTFS = GlowEngine.ShuffleArray(openhash.Select( x => x ).ToArray()).ToList(); //grab the array and then shuffle it so it's different every time
 		//Debug.Log( "REQUESTED EVENTS: " + chapter.randomInteractionGroupCount );
 		//Debug.Log( "USED POSITIONS: " + usedPositions.Length );
 		//Debug.Log( "FOUND POSSIBLE POSITIONS: " + attachtfs.Count );
@@ -351,7 +381,7 @@ tile.gameObject.SetActive(true);
 					go = Object.Instantiate( tileManager.humanTokenPrefab, tile.transform );
 				else if ( igs[i].personType == PersonType.Elf )
 					go = Object.Instantiate( tileManager.elfTokenPrefab, tile.transform );
-				else if ( igs[i].personType == PersonType.Hobbit )
+				else if ( igs[i].personType == PersonType.Halfpint )
 					go = Object.Instantiate( tileManager.hobbitTokenPrefab, tile.transform );
 				else if ( igs[i].personType == PersonType.Dwarf )
 					go = Object.Instantiate( tileManager.dwarfTokenPrefab, tile.transform );
@@ -426,11 +456,18 @@ tile.gameObject.SetActive(true);
 			go.GetComponent<MetaData>().terrainType = igs[i].terrainType;
 			go.GetComponent<MetaData>().triggeredByName = "None";
 			go.GetComponent<MetaData>().triggerName = "None";
+			go.GetComponent<MetaData>().tokenInteractionText = igs[i].tokenInteractionText;
+			go.GetComponent<MetaData>().tokenInteractionKey = igs[i].TranslationKey("tokenText");
 			go.GetComponent<MetaData>().interactionName = igs[i].dataName;
 			go.GetComponent<MetaData>().GUID = System.Guid.NewGuid();
 			go.GetComponent<MetaData>().isRandom = true;
 			//go.GetComponent<MetaData>().isCreatedFromReplaced = false;
 			//go.GetComponent<MetaData>().hasBeenReplaced = false;
+
+			//Mark the event from this group as having been placed on the map; that way if the same event group is used on another TileGroup, the same event won't come out more than once.
+			igs[i].isPlaced = true;
+
+
 
 			tile.tokenStates.Add( new TokenState()
 			{
@@ -445,6 +482,7 @@ tile.gameObject.SetActive(true);
 
 	Transform[] AddFixedToken( Tile tile )
 	{
+		//Debug.Log("AddFixedTokens(" + tile.baseTile.idNumber + ")");
 		List<Transform> usedPositions = new List<Transform>();
 		//List<Vector3> openPositions = new List<Vector3>();
 		//openPositions.AddRange( tile.GetChildren( "token attach" ).Select( x => x.position ) );
@@ -463,6 +501,10 @@ tile.gameObject.SetActive(true);
 			{
 				go = Object.Instantiate(tileManager.noneTokenPrefab, tile.transform);
 			}
+			else if (t.tokenType == TokenType.Start)
+            {
+				go = Object.Instantiate(tileManager.startTokenPrefab, tile.transform);
+            }
 			else if ( t.tokenType == TokenType.Search )
 			{
 				go = Object.Instantiate( tileManager.searchTokenPrefab, tile.transform );
@@ -473,7 +515,7 @@ tile.gameObject.SetActive(true);
 					go = Object.Instantiate( tileManager.humanTokenPrefab, tile.transform );
 				else if ( t.personType == PersonType.Elf )
 					go = Object.Instantiate( tileManager.elfTokenPrefab, tile.transform );
-				else if ( t.personType == PersonType.Hobbit )
+				else if ( t.personType == PersonType.Halfpint )
 					go = Object.Instantiate( tileManager.hobbitTokenPrefab, tile.transform );
 				else if ( t.personType == PersonType.Dwarf )
 					go = Object.Instantiate( tileManager.dwarfTokenPrefab, tile.transform );
@@ -550,6 +592,11 @@ tile.gameObject.SetActive(true);
 			go.GetComponent<MetaData>().triggeredByName = t.triggeredByName;
 			go.GetComponent<MetaData>().interactionName = t.triggerName;
 			go.GetComponent<MetaData>().GUID = t.GUID;
+			//Get custom tokenInteractionText if there is any
+			IInteraction inter = Engine.currentScenario.interactionObserver.Find(interact => t.triggerName == interact.dataName);
+			go.GetComponent<MetaData>().tokenInteractionText = inter?.tokenInteractionText;
+			go.GetComponent<MetaData>().tokenInteractionKey = inter?.TranslationKey("tokenText");
+
 
 			//Offset to token in EDITOR coords. [256,256] is the center point since the editor board is 512x512.
 			go.GetComponent<MetaData>().offset = t.vposition - new Vector3( 256, 0, 256) + new Vector3(25, 0, 25);
@@ -587,7 +634,7 @@ tile.gameObject.SetActive(true);
 				else if (new List<TerrainType>() { TerrainType.Fountain, TerrainType.Mist, TerrainType.Pit, TerrainType.Pond }.Contains(goMetaData.terrainType))
 				{
 					//75mm x 75mm rounded rectangle
-					Debug.Log("Large Round Terrain Type " + goMetaData.terrainType);
+					//Debug.Log("Large Round Terrain Type " + goMetaData.terrainType);
 					go.GetComponent<MetaData>().offset = t.vposition - new Vector3(256, 0, 256) + new Vector3(15, 0, 15); // + new Vector3(135, 0, 100);
 				}
 			}
@@ -615,7 +662,11 @@ tile.gameObject.SetActive(true);
 			var tokenPos = new Vector3( center.x + offset.x, 2, center.z + offset.z );
 			go.transform.position = tokenPos.Y( 0 );
 
-			usedPositions.Add( go.transform );
+			if (t.tokenType != TokenType.Start)
+			{
+				//Store the used position, but not for a Start token which isn't a normal token
+				usedPositions.Add(go.transform);
+			}
 
 			//Rotate terrain tokens for square map
 			Vector3 rotateCenter = Vector3.zero;
@@ -626,7 +677,6 @@ tile.gameObject.SetActive(true);
 
 				rotateCenter = tokenPos + new Vector3(tokenSizeX / 2, 0, -tokenSizeZ / 2);
 				go.transform.RotateAround(rotateCenter, Vector3.up, (float)t.angle);
-				Debug.Log("rotate token with size [" + tokenSizeX + ", " + tokenSizeZ + "] " + t.angle + " degrees around " + rotateCenter + " vs tokenPos " + tokenPos);
 			}
 
 			tile.tokenStates.Add( new TokenState()
@@ -663,7 +713,7 @@ tile.gameObject.SetActive(true);
 				go = Object.Instantiate( tileManager.humanTokenPrefab, tile.transform );
 			else if ( sourceEvent.personType == PersonType.Elf )
 				go = Object.Instantiate( tileManager.elfTokenPrefab, tile.transform );
-			else if ( sourceEvent.personType == PersonType.Hobbit )
+			else if ( sourceEvent.personType == PersonType.Halfpint )
 				go = Object.Instantiate( tileManager.hobbitTokenPrefab, tile.transform );
 			else if ( sourceEvent.personType == PersonType.Dwarf )
 				go = Object.Instantiate( tileManager.dwarfTokenPrefab, tile.transform );
@@ -738,6 +788,8 @@ tile.gameObject.SetActive(true);
 		newMD.terrainType = sourceEvent.terrainType;
 		newMD.triggeredByName = oldMD.triggeredByName;
 		newMD.interactionName = sourceEvent.dataName;
+		newMD.tokenInteractionText = sourceEvent.tokenInteractionText;
+		newMD.tokenInteractionKey = sourceEvent.TranslationKey("tokenText");
 		newMD.GUID = sourceEvent.GUID;//oldMD.GUID;
 		newMD.offset = oldMD.offset;
 		newMD.isRandom = false;
@@ -772,6 +824,7 @@ tile.gameObject.SetActive(true);
 	TokenType HandlePersistentTokenSwap( string eventName )
 	{
 		IInteraction persEvent = GlowEngine.FindObjectOfType<InteractionManager>().GetInteractionByName( eventName );
+		if(persEvent == null) { return TokenType.None; }
 
 		if ( persEvent is PersistentInteraction )
 		{
@@ -1037,7 +1090,7 @@ tile.gameObject.SetActive(true);
 	public Vector3[] GetOpenConnectors()
 	{
 		var bar = from tile in tileList from c in tile.GetChildren("connector") select c.name;
-		Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
+		//Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
 		var foo = from tile in tileList from c in tile.GetChildren( "connector" ) select c.position;
 		return foo.ToArray();
 	}
@@ -1089,7 +1142,7 @@ tile.gameObject.SetActive(true);
 	public Vector3[] GetOpenAnchors()
 	{
 		var bar = from tile in tileList from c in tile.GetChildren("anchor") select c.name;
-		Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
+		//Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
 		var allAnchors = from tile in tileList from tf in tile.GetChildren( "anchor" ) select tf.position;
 		return allAnchors.ToArray();
 	}
@@ -1123,11 +1176,17 @@ tile.gameObject.SetActive(true);
 	public void RevealInteractiveTokens( bool startTileOnly = false )
 	{
 		//Debug.Log( "RevealInteractiveTokens" );
-		foreach ( Tile t in tileList )
-			if ( startTileOnly && t.baseTile.isStartTile )
+		foreach (Tile t in tileList)
+			if (startTileOnly && t.baseTile.isStartTile)
+			{
+				t.RevealStartToken();
 				t.RevealInteractiveTokens();
-			else if ( !startTileOnly )
+			}
+			else if (!startTileOnly)
+			{
+				t.RevealStartToken();
 				t.RevealInteractiveTokens();
+			}
 	}
 
 	/// <summary>
@@ -1135,7 +1194,7 @@ tile.gameObject.SetActive(true);
 	/// </summary>
 	public void Colorize( bool onlyStart = false )
 	{
-		Debug.Log( "EXPLORING GROUP isExplored?::" + isExplored );
+		//Debug.Log( "EXPLORING GROUP isExplored?::" + isExplored );
 
 		if ( isExplored )
 			return;

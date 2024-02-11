@@ -15,6 +15,9 @@
 
 	public override InteractionType interactionType { get { return InteractionType.StatTest; } set { } }
 
+	public override string TranslationKey(string suffix) { return "event.stat-test." + dataName + "." + suffix; }
+
+
 	public int accumulatedValue = -1;
 
 	/// <summary>

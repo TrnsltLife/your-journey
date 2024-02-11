@@ -10,4 +10,5 @@ public class ReplaceTokenInteraction : InteractionBase
 	public bool hasActivated = false;
 
 	public override InteractionType interactionType { get { return InteractionType.Replace; } set { } }
+	public override string TranslationKey(string suffix) { return "event.replace-token." + dataName + "." + suffix; }
 }

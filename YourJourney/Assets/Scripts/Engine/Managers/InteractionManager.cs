@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
+using static LanguageManager;
 
 /// <summary>
 /// Keeps track of all Interactions in the game, creating specific interactions based on their type (Threat,Text etc), randomness, and whether they are token interactions
@@ -21,7 +22,7 @@ public class InteractionManager : MonoBehaviour
 		get => uiRoot.childCount > 0;
 	}
 
-	public GameObject textPanelPrefab, decisionPanelPrefab, statPanelPrefab, spawnMarkerPrefab, damagePanelPrefab, dialogPanelPrefab;
+	public GameObject textPanelPrefab, decisionPanelPrefab, statPanelPrefab, spawnMarkerPrefab, damagePanelPrefab, dialogPanelPrefab, heroSelectionPanelPrefab;
 	public Transform uiRoot;
 
 	[HideInInspector]
@@ -100,36 +101,44 @@ public class InteractionManager : MonoBehaviour
 	/// </summary>
 	IInteraction CreateInteraction( IInteraction interaction )
 	{
-		if ( interaction.interactionType == InteractionType.Text )
+		if (interaction.interactionType == InteractionType.Text)
 			return (TextInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Threat )
+		else if (interaction.interactionType == InteractionType.Threat)
 			return (ThreatInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.StatTest )
+		else if (interaction.interactionType == InteractionType.StatTest)
 			return (StatTestInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Decision )
+		else if (interaction.interactionType == InteractionType.Decision)
 			return (DecisionInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Branch )
+		else if (interaction.interactionType == InteractionType.Branch)
 			return (BranchInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Darkness )
+		else if (interaction.interactionType == InteractionType.Darkness)
 			return (DarknessInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.MultiEvent )
+		else if (interaction.interactionType == InteractionType.MultiEvent)
 			return (MultiEventInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Persistent )
+		else if (interaction.interactionType == InteractionType.Persistent)
 			return (PersistentInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Conditional )
+		else if (interaction.interactionType == InteractionType.Conditional)
 			return (ConditionalInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Dialog )
+		else if (interaction.interactionType == InteractionType.Dialog)
 			return (DialogInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Replace )
+		else if (interaction.interactionType == InteractionType.Replace)
 			return (ReplaceTokenInteraction)interaction;
-		else if ( interaction.interactionType == InteractionType.Reward )
+		else if (interaction.interactionType == InteractionType.Reward)
 			return (RewardInteraction)interaction;
+		else if (interaction.interactionType == InteractionType.Item)
+			return (ItemInteraction)interaction;
+		else if (interaction.interactionType == InteractionType.Title)
+			return (TitleInteraction)interaction;
+		else if (interaction.interactionType == InteractionType.Start)
+			return (StartInteraction)interaction;
 
 		throw new Exception( "Couldn't create Interaction from: " + interaction.dataName );
 	}
 
 	public IInteraction GetInteractionByName( string name )
 	{
+		if (name == "None")
+			return null;
 		if ( allInteractions.Any( x => x.dataName == name ) )
 			return allInteractions.Where( x => x.dataName == name ).First();
 		else
@@ -151,6 +160,11 @@ public class InteractionManager : MonoBehaviour
 		return Instantiate( statPanelPrefab, uiRoot ).transform.Find( "StatTestPanel" ).GetComponent<StatTestPanel>();
 	}
 
+	public HeroSelectionPanel GetNewHeroSelectionPanel()
+	{
+		return Instantiate(heroSelectionPanelPrefab, uiRoot).transform.Find("HeroSelectionPanel").GetComponent<HeroSelectionPanel>();
+	}
+
 	public DamagePanel GetNewDamagePanel()
 	{
 		return Instantiate( damagePanelPrefab, uiRoot ).transform.Find( "DamagePanel" ).GetComponent<DamagePanel>();
@@ -167,7 +181,8 @@ public class InteractionManager : MonoBehaviour
 	/// </summary>
 	public void QueryTokenInteraction( string name, string btnText, Action<InteractionResult> callback )
 	{
-		//Debug.Log( "QueryTokenInteraction: " + name );
+		string translatedButtonText = Translate("interaction." + btnText, btnText);
+
 		//remove any MARKERS
 		var objs = FindObjectsOfType<SpawnMarker>();
 		foreach ( var ob in objs )
@@ -176,6 +191,8 @@ public class InteractionManager : MonoBehaviour
 				Destroy( ob.gameObject );
 			if ( ob.name == "STARTMARKER" )
 				ob.gameObject.SetActive( false );
+			if (ob.name.StartsWith("Start Token"))
+				ob.gameObject.SetActive(false);
 		}
 
 		if ( tokenInteractions.Count > 0 )
@@ -187,7 +204,7 @@ public class InteractionManager : MonoBehaviour
 				//special case for persistent events
 				if ( it.interactionType == InteractionType.Persistent && FindObjectOfType<TriggerManager>().IsTriggered( ( (PersistentInteraction)it ).alternativeTextTrigger ) )
 				{
-					GetNewTextPanel().ShowOkContinue( ( (PersistentInteraction)it ).alternativeBookData.pages[0], ButtonIcon.Continue );
+					GetNewTextPanel().ShowOkContinue(Interpret(it.TranslationKey("altText"), ((PersistentInteraction)it).alternativeBookData.pages[0]), ButtonIcon.Continue );
 				}
 				else if ( it.interactionType == InteractionType.Dialog )
 				{
@@ -204,7 +221,7 @@ public class InteractionManager : MonoBehaviour
 					}
 					else
 					{
-						GetNewTextPanel().ShowQueryInteraction( it, btnText, ( res ) =>
+						GetNewTextPanel().ShowQueryInteraction( it, translatedButtonText, ( res ) =>
 						{
 							res.interaction = it;
 							callback?.Invoke( res );
@@ -213,7 +230,7 @@ public class InteractionManager : MonoBehaviour
 				}
 				else
 				{
-					GetNewTextPanel().ShowQueryInteraction( it, btnText, ( res ) =>
+					GetNewTextPanel().ShowQueryInteraction( it, translatedButtonText, ( res ) =>
 					{
 						res.interaction = it;
 
@@ -281,7 +298,7 @@ public class InteractionManager : MonoBehaviour
 		if ( engine.scenario.resolutionObserver.Any( x => x.triggerName == name ) )
 		{
 			var text = engine.scenario.resolutionObserver.Where( x => x.triggerName == name ).First();
-			GetNewTextPanel().ShowOkContinue( text.pages[0], ButtonIcon.Continue );
+			GetNewTextPanel().ShowOkContinue(Interpret("resolution." + text.dataName + ".text", text.pages[0]), ButtonIcon.Continue );
 			//handle end game
 			engine.triggerManager.TriggerEndGame( text.dataName );
 			return true;
@@ -336,6 +353,18 @@ public class InteractionManager : MonoBehaviour
 		{
 			HandleReward( it, action );
 		}
+		else if ( it.interactionType == InteractionType.Item )
+        {
+			HandleItem(it, action);
+        }
+		else if ( it.interactionType == InteractionType.Title )
+        {
+			HandleTitle(it, action);
+        }
+		else if ( it.interactionType == InteractionType.Start )
+        {
+			//Do nothing
+        }
 		else
 			GetNewTextPanel().ShowOkContinue( $"Data Error (ShowInteraction)\r\nCould not find Interaction with type '{it.interactionType}'.", ButtonIcon.Continue );
 	}
@@ -381,11 +410,13 @@ public class InteractionManager : MonoBehaviour
 	{
 		List<Vector3> positions = new List<Vector3>();
 
+		((ThreatInteraction)it).RemoveUnavailableScriptedMonsters();
+
 		//generate the encounter using Pool System
-		List<Monster> poolList = ( (ThreatInteraction)it ).GenerateEncounter();
+		List <Monster> poolList = ( (ThreatInteraction)it ).GenerateEncounter();
 
 		//get VALID (correct difficulty) monsters, both pooled and scripted
-		var allMonsters = poolList.Concat( ( (ThreatInteraction)it ).monsterCollection.Where( m => m.IsValid() ) );
+		var allMonsters = poolList.Concat( ( (ThreatInteraction)it ).monsterCollection.Where( m => m.IsValid() && m.count > 0 ) );
 
 		//int groupCount = ( (ThreatInteraction)it ).monsterCollection.Where( m => m.IsValid() ).Count();
 		int groupCount = allMonsters.Count();
@@ -483,7 +514,7 @@ public class InteractionManager : MonoBehaviour
 
 			if ( b.success )//show success textbox
 			{
-				GetNewTextPanel().ShowOkContinue( sti.passBookData.pages[0], ButtonIcon.Continue, () =>
+				GetNewTextPanel().ShowOkContinue(Interpret(sti.TranslationKey("passText"), sti.passBookData.pages[0]), ButtonIcon.Continue, () =>
 				{
 					action?.Invoke( new InteractionResult() { removeToken = true } );
 				} );
@@ -493,7 +524,7 @@ public class InteractionManager : MonoBehaviour
 			}
 			else if ( !b.btn4 && !b.success )//show fail textbox
 			{
-				GetNewTextPanel().ShowOkContinue( sti.failBookData.pages[0], ButtonIcon.Continue, () =>
+				GetNewTextPanel().ShowOkContinue(Interpret(sti.TranslationKey("failText"), sti.failBookData.pages[0]), ButtonIcon.Continue, () =>
 				{
 					action?.Invoke( new InteractionResult() { removeToken = true } );
 				} );
@@ -506,7 +537,7 @@ public class InteractionManager : MonoBehaviour
 				bool success = ( (StatTestInteraction)it ).ResolveCumulative( b.value );
 				if ( success )//success
 				{
-					GetNewTextPanel().ShowOkContinue( sti.passBookData.pages[0], ButtonIcon.Continue, () =>
+					GetNewTextPanel().ShowOkContinue(Interpret(sti.TranslationKey("passText"), sti.passBookData.pages[0]), ButtonIcon.Continue, () =>
 					{
 						action?.Invoke( new InteractionResult() { removeToken = true } );
 					} );
@@ -516,7 +547,7 @@ public class InteractionManager : MonoBehaviour
 				}
 				else//progressive fail
 				{
-					GetNewTextPanel().ShowOkContinue( sti.progressBookData.pages[0], ButtonIcon.Continue, () =>
+					GetNewTextPanel().ShowOkContinue(Interpret(sti.TranslationKey("progressText"), sti.progressBookData.pages[0]), ButtonIcon.Continue, () =>
 					 {
 						 action?.Invoke( new InteractionResult() { removeToken = false } );
 					 } );
@@ -525,6 +556,191 @@ public class InteractionManager : MonoBehaviour
 		} );
 		//event reward right after event fired, before test shown
 		FindObjectOfType<LorePanel>().AddReward( it.loreReward, it.xpReward, it.threatReward );
+	}
+
+	void HandleItem(IInteraction it, Action<InteractionResult> action = null)
+	{
+		ItemInteraction ii = (ItemInteraction)it;
+		int giveCount = ii.randomizedItemsCount;
+		if(giveCount <= 0) { giveCount = 1; } //Sometimes randomizedItemCount from the editor might be 0; but always give at least one item.
+		List<Item> giveItems = new List<Item>();
+		int missingItems = 0;
+
+		//Get a list of items we're trying to give that aren't already owned by the party
+		List<int> giveableItems = new List<int>(ii.itemList);
+		if (Bootstrap.campaignState != null)
+		{
+			int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+			giveableItems = Items.ListGiveableItemsFromIds(giveableItems, Bootstrap.campaignState.currentTrinkets[scenarioIndex], Bootstrap.campaignState.currentMounts[scenarioIndex]);
+		}
+
+		//Loop until we've given selected the items we're supposed to (a random assortment out of the list of possible items)
+		for (int i=0; i<giveCount; i++)
+		{
+			if (giveableItems.Count > 0)
+			{
+				//Get a random item
+				int itemIndex = Bootstrap.random.Next(giveableItems.Count);
+
+				Item item = Items.FromID(giveableItems[itemIndex]);
+				if (Bootstrap.campaignState != null)
+				{
+					//Add the item to the party's list of owned trinkets for the current scenario; also to the giveItems list which will be used in the dialogs
+					int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+					Bootstrap.campaignState.currentTrinkets[scenarioIndex].Add(item.id);
+				}
+				giveItems.Add(item);
+
+				//Remove the item we just gave from the giveable list so we don't try to give it again
+				giveableItems.Remove(item.id);
+			}
+			else
+            {
+				missingItems++;
+			}
+		}
+
+		GetNewTextPanel().ShowTextInteraction(it, () =>
+		{
+			ItemFollowup(ii, giveItems, missingItems, action);
+		});
+	}
+
+	public void ItemFollowup(ItemInteraction ii, List<Item> giveItems, int missingItems, Action<InteractionResult> originalAction)
+    {
+		if (giveItems.Count > 0)
+		{
+			Item item = giveItems[0];
+			giveItems.RemoveAt(0);
+			//Ask the players which hero to assign that item to for the current scenario
+			//GetNewHeroSelctionPanel will call this method ItemFollowup when it's done
+			GetNewHeroSelectionPanel().Show(ii, giveItems, missingItems, item, originalAction, (b) =>
+			{
+				//engine.triggerManager.FireTrigger(ii.triggerAfterName);
+
+				int selectedHero = b.value;
+
+				if (Bootstrap.campaignState != null)
+				{
+					//Overwrite whatever the current trinket was for that hero with the trinket that's just been given
+					int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+					Bootstrap.campaignState.currentCharacterSheets[scenarioIndex][selectedHero].trinketId = item.id;
+				}
+			});
+		}
+		else
+        {
+			//No more items to give. Give final lore.
+			int fallbackLore = 0;
+			int fallbackXP = 0;
+			int fallbackThreat = 0;
+			if (missingItems > 0 && (missingItems < ii.randomizedItemsCount || ii.fallbackTrigger == "None"))
+			{
+				//Add additional lore when some items were given; or no items were given but there's no fallback trigger
+				fallbackLore = ii.loreFallback * missingItems;
+				fallbackXP = ii.xpFallback * missingItems;
+				fallbackThreat = ii.threatFallback * missingItems;
+			}
+			else if(missingItems > 0 && missingItems == ii.randomizedItemsCount && ii.fallbackTrigger != "None")
+            {
+				engine.triggerManager.FireTrigger(ii.fallbackTrigger); //trigger fallback trigger if there is one
+			}
+
+			originalAction?.Invoke(new InteractionResult() { removeToken = true }); //cause Tile to remove token
+			engine.triggerManager.FireTrigger(ii.triggerAfterName);
+			//Give rewards, including extra rewards for missing items (if any)
+			FindObjectOfType<LorePanel>().AddReward(ii.loreReward + fallbackLore, ii.xpReward + fallbackXP, ii.threatReward + fallbackThreat);
+		}
+	}
+
+	void HandleTitle(IInteraction it, Action<InteractionResult> action = null)
+	{
+		//TODO
+		TitleInteraction ti = (TitleInteraction)it;
+		int giveCount = ti.randomizedTitlesCount;
+		if (giveCount <= 0) { giveCount = 1; } //Sometimes randomizedItemCount from the editor might be 0; but always give at least one title.
+		List<Title> giveTitles = new List<Title>();
+		int missingTitles = 0;
+
+		//Get a list of titles we're trying to give that aren't already owned by the party
+		List<int> giveableTitles = new List<int>(ti.titleList);
+		if (Bootstrap.campaignState != null)
+		{
+			int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+			giveableTitles = Titles.ListGiveableTitlesFromIds(giveableTitles, Bootstrap.campaignState.currentCharacterSheets[scenarioIndex]);
+		}
+
+		//Loop until we've given selected the items we're supposed to ( random assortment out of the list of possible titles)
+		for (int i = 0; i < giveCount; i++)
+		{
+			if (giveableTitles.Count > 0)
+			{
+				//Get a random title
+				int titleIndex = Bootstrap.random.Next(giveableTitles.Count);
+
+				Title title = Titles.FromID(giveableTitles[titleIndex]);
+				giveTitles.Add(title);
+
+				//Remove the title we just gave from the giveable list so we don't try to give it again
+				giveableTitles.Remove(title.id);
+			}
+			else
+			{
+				missingTitles++;
+			}
+		}
+
+		GetNewTextPanel().ShowTextInteraction(it, () =>
+		{
+			TitleFollowup(ti, giveTitles, missingTitles, action);
+		});
+	}
+
+	public void TitleFollowup(TitleInteraction ti, List<Title> giveTitles, int missingTitles, Action<InteractionResult> originalAction)
+	{
+		if (giveTitles.Count > 0)
+		{
+			Title title = giveTitles[0];
+			giveTitles.RemoveAt(0);
+			//Ask the players which hero to assign that title to (permanently)
+			//GetNewHeroSelctionPanel will call this method TitleFollowup when it's done
+			GetNewHeroSelectionPanel().Show(ti, giveTitles, missingTitles, title, originalAction, (b) =>
+			{
+				//engine.triggerManager.FireTrigger(ii.triggerAfterName);
+
+				int selectedHero = b.value;
+
+				if (Bootstrap.campaignState != null)
+				{
+					//Add the new title to the titles list for the selected hero
+					int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+					Bootstrap.campaignState.currentCharacterSheets[scenarioIndex][selectedHero].titles.Add(title.id);
+				}
+			});
+		}
+		else
+		{
+			//No more items to give. Give final lore.
+			int fallbackLore = 0;
+			int fallbackXP = 0;
+			int fallbackThreat = 0;
+			if (missingTitles > 0 && (missingTitles < ti.randomizedTitlesCount || ti.fallbackTrigger == "None"))
+			{
+				//Add additional lore when some items were given; or no items were given but there's no fallback trigger
+				fallbackLore = ti.loreFallback * missingTitles;
+				fallbackXP = ti.xpFallback * missingTitles;
+				fallbackThreat = ti.threatFallback * missingTitles;
+			}
+			else if (missingTitles > 0 && missingTitles == ti.randomizedTitlesCount && ti.fallbackTrigger != "None")
+			{
+				engine.triggerManager.FireTrigger(ti.fallbackTrigger); //trigger fallback trigger if there is one
+			}
+
+			originalAction?.Invoke(new InteractionResult() { removeToken = true }); //cause Tile to remove token
+			engine.triggerManager.FireTrigger(ti.triggerAfterName);
+			//Give rewards, including extra rewards for missing titles (if any)
+			FindObjectOfType<LorePanel>().AddReward(ti.loreReward + fallbackLore, ti.xpReward + fallbackXP, ti.threatReward + fallbackThreat);
+		}
 	}
 
 	void HandleMultiEvent( IInteraction it, Action<InteractionResult> action )
@@ -590,7 +806,7 @@ public class InteractionManager : MonoBehaviour
 
 			if ( res.btn1 )
 			{
-				GetNewTextPanel().ShowOkContinue( di.c1Text, ButtonIcon.Continue, () =>
+				GetNewTextPanel().ShowOkContinue(Interpret(di.TranslationKey("text1"), di.c1Text), ButtonIcon.Continue, () =>
 				{
 					engine.triggerManager.FireTrigger( di.c1Trigger );
 					action?.Invoke( new InteractionResult() { removeToken = remove } );
@@ -598,7 +814,7 @@ public class InteractionManager : MonoBehaviour
 			}
 			else if ( res.btn2 )
 			{
-				GetNewTextPanel().ShowOkContinue( di.c2Text, ButtonIcon.Continue, () =>
+				GetNewTextPanel().ShowOkContinue(Interpret(di.TranslationKey("text2"), di.c2Text), ButtonIcon.Continue, () =>
 				{
 					engine.triggerManager.FireTrigger( di.c2Trigger );
 					action?.Invoke( new InteractionResult() { removeToken = remove } );
@@ -606,7 +822,7 @@ public class InteractionManager : MonoBehaviour
 			}
 			else if ( res.btn3 )
 			{
-				GetNewTextPanel().ShowOkContinue( di.c3Text, ButtonIcon.Continue, () =>
+				GetNewTextPanel().ShowOkContinue(Interpret(di.TranslationKey("text3"), di.c3Text), ButtonIcon.Continue, () =>
 				{
 					engine.triggerManager.FireTrigger( di.c3Trigger );
 					action?.Invoke( new InteractionResult() { removeToken = remove } );
@@ -700,7 +916,7 @@ public class InteractionManager : MonoBehaviour
                                 {
 									replaceWith = repwith.terrainType.ToString();
                                 }
-								GetNewTextPanel().ShowOkContinue( "Replace the Token with a " + replaceWith + " Token.", ButtonIcon.Continue, () =>
+								GetNewTextPanel().ShowOkContinue( Translate("dialog.text.ReplaceToken", "Replace the Token with a {0} Token.", new List<string> { replaceWith }), ButtonIcon.Continue, () =>
 										{
 											//instantiate new prefab, fill in its data
 											tgs[i].ReplaceToken( repwith, oldmd, tile );
@@ -754,8 +970,11 @@ public class InteractionManager : MonoBehaviour
 			//add monster group to bar, one at a time
 			FindObjectOfType<MonsterManager>().AddMonsterGroup( m, it as ThreatInteraction );
 
+			string monsterName = Monster.MonsterNameObject(m, m.count);
+			string dialogText = Translate("dialog.text.PlaceMonsters", $"Place {m.count} {m.dataName}(s) in the indicated position.", new List<string>{ m.count.ToString(), monsterName });
+
 			TextPanel p = FindObjectOfType<InteractionManager>().GetNewTextPanel();
-			p.ShowOkContinue( $"Place {m.count} {m.dataName}(s) in the indicated position.", ButtonIcon.Continue, () => waiting = false );
+			p.ShowOkContinue( dialogText, ButtonIcon.Continue, () => waiting = false );
 			while ( waiting )
 				yield return null;
 		}

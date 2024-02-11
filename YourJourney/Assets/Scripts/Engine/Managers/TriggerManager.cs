@@ -117,8 +117,19 @@ public class TriggerManager : MonoBehaviour
 				if ( con.triggerList.Count > 0 )
 				{
 					bool containsAll = con.triggerList.All( x => firedTriggersList.Keys.Contains( x ) );
-					if ( containsAll )
-						FireTrigger( con.finishedTrigger );
+					if (containsAll)
+					{
+						FireTrigger(con.finishedTrigger);
+					}
+					else if (con.triggersRequiredCount > 0)
+					{
+						bool containsEnough = con.triggerList.Count(x => firedTriggersList.Keys.Contains(x)) >= con.triggersRequiredCount;
+						if (containsEnough)
+						{
+							FireTrigger(con.finishedTrigger);
+						}
+					}
+
 				}
 			}
 
@@ -199,7 +210,7 @@ public class TriggerManager : MonoBehaviour
 			}
 			yield return WaitUntilFinished();
 
-			if ( trigger.dataName == endTriggerGUID )
+			if ( trigger.dataName == endTriggerGUID && !string.IsNullOrEmpty(endTriggerGUID))
 			{
 				Debug.Log( "Triggering End Scenario" );
 				engine.EndScenario( trigger.triggerName );

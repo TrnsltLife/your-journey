@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
-
+using static LanguageManager;
 public class HeroItem : MonoBehaviour
 {
 	public int heroIndex;
@@ -20,28 +21,50 @@ public class HeroItem : MonoBehaviour
 
 	public void OnDamageFinalStand()
 	{
-		pPanel.ToggleVisible( false );
-		FindObjectOfType<InteractionManager>().GetNewDamagePanel().ShowFinalStand( Bootstrap.lastStandCounter[heroIndex], FinalStand.Damage, ( pass ) =>
+		pPanel.ToggleVisible(false);
+		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowYesNo(Translate("stand.text.ConfirmStand", "{0}: Do you wish to perform a Last Stand against {1}?",
+			new List<string> { Bootstrap.gameStarter.heroes[heroIndex], "<font=\"Icon\">D</font> " + Translate("damage." + FinalStand.Damage.ToString(), FinalStand.Damage.ToString()) }), res =>
 		{
-			Bootstrap.lastStandCounter[heroIndex]++;
-			if ( !pass )
-				Bootstrap.isDead[heroIndex] = true;
-			UpdateUI();
-			pPanel.ToggleVisible( true );
-		} );
+			if (res.btn1)
+			{
+				FindObjectOfType<InteractionManager>().GetNewDamagePanel().ShowFinalStand(Bootstrap.lastStandCounter[heroIndex], FinalStand.Damage, (pass) =>
+				{
+					Bootstrap.lastStandCounter[heroIndex]++;
+					if (!pass)
+						Bootstrap.isDead[heroIndex] = true;
+					UpdateUI();
+					pPanel.ToggleVisible(true);
+				});
+			}
+			else
+            {
+				pPanel.ToggleVisible(true);
+			}
+		});
 	}
 
 	public void OnFearFinalStand()
 	{
-		pPanel.ToggleVisible( false );
-		FindObjectOfType<InteractionManager>().GetNewDamagePanel().ShowFinalStand( Bootstrap.lastStandCounter[heroIndex], FinalStand.Fear, ( pass ) =>
+		pPanel.ToggleVisible(false);
+		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowYesNo(Translate("stand.text.ConfirmStand", "{0}: Do you wish to perform a Last Stand against {1}?",
+			new List<string> { Bootstrap.gameStarter.heroes[heroIndex], "<font=\"Icon\">F</font> " + Translate("damage." + FinalStand.Fear.ToString(), FinalStand.Fear.ToString()) }), res =>
 		{
-			Bootstrap.lastStandCounter[heroIndex]++;
-			if ( !pass )
-				Bootstrap.isDead[heroIndex] = true;
-			UpdateUI();
-			pPanel.ToggleVisible( true );
-		} );
+			if (res.btn1)
+			{
+				FindObjectOfType<InteractionManager>().GetNewDamagePanel().ShowFinalStand( Bootstrap.lastStandCounter[heroIndex], FinalStand.Fear, ( pass ) =>
+				{
+					Bootstrap.lastStandCounter[heroIndex]++;
+					if ( !pass )
+						Bootstrap.isDead[heroIndex] = true;
+					UpdateUI();
+					pPanel.ToggleVisible( true );
+				} );
+			}
+			else
+            {
+				pPanel.ToggleVisible(true);
+			}
+		});
 	}
 
 	public void UpdateUI()

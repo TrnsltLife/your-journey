@@ -13,9 +13,14 @@ public abstract class InteractionBase : IInteraction
 	public TerrainType terrainType { get; set; }
 	public TextBookData textBookData { get; set; }
 	public TextBookData eventBookData { get; set; }
+	public string tokenInteractionText { get; set; }
 	public int loreReward { get; set; }
 	abstract public InteractionType interactionType { get; set; }
 	public int xpReward { get; set; }
 	public int threatReward { get; set; }
 	public bool isPersistent { get; set; }
+	public bool isPlaced { get; set; }
+	public bool isReusable { get; set; }
+
+	abstract public string TranslationKey(string suffix);
 }

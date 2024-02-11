@@ -85,7 +85,7 @@ GameObject:
   - component: {fileID: 6192103447929756018}
   - component: {fileID: 4119719345913822078}
   m_Layer: 5
-  m_Name: warg-rider
+  m_Name: varg-rider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -108,7 +108,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6192103447929756018
 CanvasRenderer:
@@ -181,7 +181,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5181462635543009138
 CanvasRenderer:
@@ -254,7 +254,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5318765641643069718
 CanvasRenderer:
@@ -377,7 +377,7 @@ GameObject:
   - component: {fileID: 3774549610620293400}
   - component: {fileID: 4366381057697521952}
   m_Layer: 5
-  m_Name: supplicant-of-morgoth
+  m_Name: supplicant-of-more-goth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -400,7 +400,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3774549610620293400
 CanvasRenderer:
@@ -473,7 +473,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5729733721525802056
 CanvasRenderer:
@@ -619,8 +619,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5, y: 12}
-  m_SizeDelta: {x: 158, y: 182}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6780831525731411832
 CanvasRenderer:
@@ -692,8 +692,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1.4000015, y: 12}
-  m_SizeDelta: {x: 210, y: 210}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8522890419687011118
 CanvasRenderer:
@@ -743,7 +743,7 @@ GameObject:
   - component: {fileID: 2402912390765543616}
   - component: {fileID: 3158351975742336386}
   m_Layer: 5
-  m_Name: fell-beast
+  m_Name: foul-beast
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -766,7 +766,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2402912390765543616
 CanvasRenderer:
@@ -944,7 +944,7 @@ GameObject:
   - component: {fileID: 7339340108423658984}
   - component: {fileID: 7121744787486267323}
   m_Layer: 5
-  m_Name: atarin
+  m_Name: atari
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -966,8 +966,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.5999985, y: -2.1}
-  m_SizeDelta: {x: 170, y: 170}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7339340108423658984
 CanvasRenderer:
@@ -1039,8 +1039,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 4, y: 0}
-  m_SizeDelta: {x: 165, y: 158}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8881832867806969695
 CanvasRenderer:
@@ -1090,7 +1090,7 @@ GameObject:
   - component: {fileID: 6025920477383233228}
   - component: {fileID: 9115499352591847005}
   m_Layer: 5
-  m_Name: balrog
+  m_Name: balerock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1112,8 +1112,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 9.7, y: 3.099998}
-  m_SizeDelta: {x: 400, y: 400}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6025920477383233228
 CanvasRenderer:
@@ -1186,7 +1186,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5641424105621228927
 CanvasRenderer:
@@ -1331,8 +1331,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -15.5, y: 0}
-  m_SizeDelta: {x: 190, y: 158}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8478699233275868256
 CanvasRenderer:
@@ -1404,8 +1404,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.40000153, y: 0}
-  m_SizeDelta: {x: 158, y: 158}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6288351839532610062
 CanvasRenderer:
@@ -1455,7 +1455,7 @@ GameObject:
   - component: {fileID: 1039713856391792754}
   - component: {fileID: 1468891391379444552}
   m_Layer: 5
-  m_Name: witch-king
+  m_Name: lich-king
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1550,8 +1550,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 11.5, y: 0}
-  m_SizeDelta: {x: 178, y: 178}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1328716450586590595
 CanvasRenderer:
@@ -1601,7 +1601,7 @@ GameObject:
   - component: {fileID: 4876376082028048676}
   - component: {fileID: 4421602878985666514}
   m_Layer: 5
-  m_Name: lord-angon
+  m_Name: lord-javelin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1624,7 +1624,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4876376082028048676
 CanvasRenderer:
@@ -1674,7 +1674,7 @@ GameObject:
   - component: {fileID: 8630324388246930178}
   - component: {fileID: 6593709664238515913}
   m_Layer: 5
-  m_Name: eadris
+  m_Name: endris
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1697,7 +1697,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8630324388246930178
 CanvasRenderer:
@@ -1747,7 +1747,7 @@ GameObject:
   - component: {fileID: 5879945987662135524}
   - component: {fileID: 5351287949997722052}
   m_Layer: 5
-  m_Name: warg
+  m_Name: varg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1769,8 +1769,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5, y: 0}
-  m_SizeDelta: {x: 158, y: 158}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5879945987662135524
 CanvasRenderer:
@@ -1948,7 +1948,7 @@ GameObject:
   - component: {fileID: 296670861582394466}
   - component: {fileID: 98327450511926841}
   m_Layer: 5
-  m_Name: spawn-of-ungoliant
+  m_Name: spawn-of-ugly-giant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1970,8 +1970,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5, y: 0}
-  m_SizeDelta: {x: 158, y: 158}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &296670861582394466
 CanvasRenderer:
@@ -2021,7 +2021,7 @@ GameObject:
   - component: {fileID: 3093280088619312917}
   - component: {fileID: 2852547981012284385}
   m_Layer: 5
-  m_Name: gulgotar
+  m_Name: gargletarg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2043,8 +2043,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.4, y: 3.1}
-  m_SizeDelta: {x: 220, y: 220}
+  m_AnchoredPosition: {x: 2.699997, y: 3.1}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3093280088619312917
 CanvasRenderer:
@@ -2117,7 +2117,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3744769656835561850
 CanvasRenderer:
@@ -2167,7 +2167,7 @@ GameObject:
   - component: {fileID: 4069027023201809233}
   - component: {fileID: 8140072442649168096}
   m_Layer: 5
-  m_Name: coalfang
+  m_Name: chartooth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2189,8 +2189,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 6.9000015, y: -1.5}
-  m_SizeDelta: {x: 169, y: 169}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4069027023201809233
 CanvasRenderer:
@@ -2263,7 +2263,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &285343719328137276
 CanvasRenderer:
@@ -2336,7 +2336,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8099902548654636289
 CanvasRenderer:
@@ -2479,7 +2479,7 @@ GameObject:
   - component: {fileID: 1304482837937260887}
   - component: {fileID: 6717748329462201263}
   m_Layer: 5
-  m_Name: nameless-thing
+  m_Name: anonymous-thing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2502,7 +2502,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.0999985}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1304482837937260887
 CanvasRenderer:
@@ -2574,8 +2574,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.5, y: 0}
-  m_SizeDelta: {x: 158, y: 158}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1989860863199934242
 CanvasRenderer:
@@ -2625,7 +2625,7 @@ GameObject:
   - component: {fileID: 5211567919153195773}
   - component: {fileID: 4597818959068712568}
   m_Layer: 5
-  m_Name: war-oliphaunt
+  m_Name: war-elephant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2648,7 +2648,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5211567919153195773
 CanvasRenderer:
@@ -2720,8 +2720,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -12, y: 0}
-  m_SizeDelta: {x: 183, y: 158}
+  m_AnchoredPosition: {x: 2.699997, y: 3.099998}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &37820388667823313
 CanvasRenderer:
@@ -2771,7 +2771,7 @@ GameObject:
   - component: {fileID: 4747071973410012750}
   - component: {fileID: 9032486423500109400}
   m_Layer: 5
-  m_Name: uruk-warrior
+  m_Name: high-orc-warrior
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2794,7 +2794,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.699997, y: 3.099998}
-  m_SizeDelta: {x: 220, y: 220}
+  m_SizeDelta: {x: 420, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4747071973410012750
 CanvasRenderer:

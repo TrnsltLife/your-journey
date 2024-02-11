@@ -12,17 +12,21 @@ public class SelectJourney : MonoBehaviour
 	public List<FileItemButton> fileItemButtons = new List<FileItemButton>();
 	public Image finalFader;
 	public TextMeshProUGUI nameText, collectionsText, versionText, fileText, appVersion, engineVersion;
+	TextTranslation appVersionTranslation, engineVersionTranslation, versionTextTranslation;
 	ProjectItem[] projectItems;
 	public GameObject fileItemPrefab, warningPanel;
 	public RectTransform itemContainer;
 	public Button nextButton, cancelButton;
 	public GameObject campaignWarning;
+	public int selectedIndex = -1;
 
 	TitleMetaData titleMetaData;
 	TitleManager tm;
 
 	public void ActivateScreen( TitleMetaData metaData )
 	{
+		LanguageManager.AddSubscriber(onUpdateTranslation);
+
 		titleMetaData = metaData;
 
 		tm = FindObjectOfType<TitleManager>();
@@ -35,8 +39,14 @@ public class SelectJourney : MonoBehaviour
 		for ( int i = 0; i < fileItemButtons.Count; i++ )
 			fileItemButtons[i].ResetColor();
 
-		appVersion.text = "App Version: " + Bootstrap.AppVersion;
-		engineVersion.text = "Scenario Format Version: " + Bootstrap.FormatVersion;
+		appVersionTranslation = appVersion.gameObject.GetComponent<TextTranslation>();
+		appVersionTranslation.Change("journey.text.AppVersion", "App Version: " + Bootstrap.AppVersion, new List<string>{ Bootstrap.AppVersion });
+		engineVersionTranslation = engineVersion.gameObject.GetComponent<TextTranslation>();
+		engineVersionTranslation.Change("journey.text.FormatVersion", "Scenario Format Version: " + Bootstrap.FormatVersion, new List<string>{Bootstrap.FormatVersion});
+		versionTextTranslation = versionText.gameObject.GetComponent<TextTranslation>();
+
+		//appVersion.text = "App Version: " + Bootstrap.AppVersion;
+		//engineVersion.text = "Scenario Format Version: " + Bootstrap.FormatVersion;
 		nameText.text = "";
 		fileText.text = "";
 		versionText.text = "";
@@ -49,14 +59,14 @@ public class SelectJourney : MonoBehaviour
 	{
 		var scenarios = FileManager.GetProjects().ToArray();
 		var campaigns = FileManager.GetCampaigns().ToArray();
-		projectItems = campaigns.Concat( scenarios ).ToArray();
+		projectItems = campaigns.Concat(scenarios).ToArray();
 
-		for ( int i = 0; i < projectItems.Length; i++ )
+		for (int i = 0; i < projectItems.Length; i++)
 		{
-			var go = Instantiate( fileItemPrefab, itemContainer ).GetComponent<FileItemButton>();
-			go.transform.localPosition = new Vector3( 0, ( -110 * i ) );
-			//TODO collections
-			go.Init( i, projectItems[i].Title,
+			var go = Instantiate(fileItemPrefab, itemContainer).GetComponent<FileItemButton>();
+			go.transform.localPosition = new Vector3(0, (-110 * i));
+
+			go.Init( i, projectItems[i].Translated("scenario.scenarioName", projectItems[i].Title),
 				string.Join(" ", projectItems[i].collections.Select(c => Collection.FromID(c).FontCharacter)), 
 				projectItems[i].projectType, ( index ) => OnSelectQuest( index ) );
 			fileItemButtons.Add( go );
@@ -64,8 +74,30 @@ public class SelectJourney : MonoBehaviour
 		itemContainer.sizeDelta = new Vector2( 772, fileItemButtons.Count * 110 );
 	}
 
+	public void UpdateScenarioPrefabsAndSelectedQuest()
+	{
+		//Update the titles on the buttons
+		for (int i = 0; i < projectItems.Length; i++)
+		{
+			FileItemButton go = fileItemButtons[i];
+			go.title.text = projectItems[i].Translated("scenario.scenarioName", projectItems[i].Title);
+		}
+
+		//Update the title in the panel for the selected quest
+		if(selectedIndex >= 0)
+        {
+			nameText.text = projectItems[selectedIndex].Translated("scenario.scenarioName", projectItems[selectedIndex].Title);
+		}
+	}
+
+	public void onUpdateTranslation()
+    {
+		UpdateScenarioPrefabsAndSelectedQuest();
+    }
+
 	public void OnSelectQuest( int index )
 	{
+		selectedIndex = index;
 		warningPanel.SetActive( false );
 		campaignWarning.SetActive( false );
 
@@ -76,14 +108,15 @@ public class SelectJourney : MonoBehaviour
 		}
 
 		//fill in file info
-		nameText.text = projectItems[index].Title;
+		nameText.text = projectItems[index].Translated("scenario.scenarioName", projectItems[index].Title);
 		if ( projectItems[index].projectType == ProjectType.Standalone )
 			fileText.text = projectItems[index].fileName;
 		else
 			fileText.text = projectItems[index].campaignDescription;
 		collectionsText.text = string.Join(" ", projectItems[index].collections.Select(c => Collection.FromID(c).FontCharacter));
 		//projectItems[index].collections;
-		versionText.text = "File Version: " + projectItems[index].fileVersion;
+		//versionText.text = "File Version: " + projectItems[index].fileVersion;
+		versionTextTranslation.Change("journey.text.FileVersion", "File Version: " + projectItems[index].fileVersion, new List<string> { projectItems[index].fileVersion });
 
 		//check version
 		if ( projectItems[index].fileVersion != Bootstrap.FormatVersion )
