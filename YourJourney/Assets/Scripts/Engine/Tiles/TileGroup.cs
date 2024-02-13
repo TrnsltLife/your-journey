@@ -100,8 +100,11 @@ public class TileGroup
 			tile.baseTile = tileroot;
 			tile.tileGroup = this;
 			tile.chapter = c;
-tile.gameObject.SetActive(true);
+
+//Show ball/sphere/marker for anchor and connection points for debugging
+//tile.gameObject.SetActive(true);
 //tile.RevealAllAnchorConnectorTokens();
+
 			//rotate go object
 			tile.transform.parent.localRotation = Quaternion.Euler( 0, tileroot.angle, 0 );
 			//set go's parent
@@ -113,6 +116,11 @@ tile.gameObject.SetActive(true);
 			}
 			tileList.Add( tile );
 			previous = tile;
+
+//Show ball/sphere/marker for anchor and connection points for debugging
+tile.gameObject.SetActive(true);
+tile.RevealAllAnchorConnectorTokens();
+tile.GenerateConnectorGrid(false);
 
 			//add fixed tokens
 			if ( tile.baseTile.tokenList.Count > 0 )
@@ -139,6 +147,8 @@ tile.gameObject.SetActive(true);
 
 		GenerateGroupCenter();
 	}
+
+
 
 	//Build fixed group from editor Chapter
 	void BuildFixedFromChapter( Chapter c )
@@ -174,8 +184,9 @@ tile.gameObject.SetActive(true);
 			tile.chapter = c;
 			tile.baseTile = bt;
 			tile.tileGroup = this;
+
 //Show ball/sphere/marker for anchor and connection points for debugging
-tile.gameObject.SetActive(true);
+//tile.gameObject.SetActive(true);
 //tile.RevealAllAnchorConnectorTokens();
 
 			//Set the tile position/coordinates
@@ -203,6 +214,12 @@ tile.gameObject.SetActive(true);
 			tileList.Add( tile );
 			//set parent of goc 
 			tile.transform.parent.transform.parent = containerObject;
+
+//Show ball/sphere/marker for anchor and connection points for debugging
+tile.gameObject.SetActive(true);
+tile.RevealAllAnchorConnectorTokens();
+tile.GenerateConnectorGrid(false);
+
 			//add a token, if there is one
 			//if ( !c.usesRandomGroups )
 			if ( tile.baseTile.tokenList.Count > 0 )
