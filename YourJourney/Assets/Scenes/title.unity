@@ -9049,6 +9049,10 @@ MonoBehaviour:
     languageName: "Espa\xF1ol"
     internalFile: {fileID: 4900000, guid: 997c157885e0dec4b9ec8ae0d970806a, type: 3}
     externalFile: 
+  - languageCode: el
+    languageName: "\u0395\u03BB\u03BB\u03B7\u03BD\u03B9\u03BA\u03AC"
+    internalFile: {fileID: 4900000, guid: 61a9a015b50ee0649a7e2f11dfaf8eda, type: 3}
+    externalFile: 
 --- !u!1 &270939961
 GameObject:
   m_ObjectHideFlags: 0
