@@ -57,11 +57,20 @@ public  class Items
 		//With the initial itemList which contains tier-1 trinkets and/or tier-? mounts, and the currentTrinkets and currentMounts owned by the party (unknown tier),
 		//what tier-1 trinkets, and what mounts, can actually be given to the party? (Exclude items they already have a version of. Exclude trinkets if they have a higher tier.)
 
-		//Convert the current list of trinkets at whatever upgraded tier they are, to a list of the tier 1 trinket ids
+		//Convert the current list of trinkets at whatever upgraded tier they are, to a list of the tier 0 or tier 1 trinket ids
 		List<int> starterTrinkets = new List<int>();
 		foreach(int itemId in currentTrinkets)
         {
-			starterTrinkets.Add(Items.FromSeriesIDAndTier(Items.FromID(itemId).seriesId, 1).id);
+			if(Items.FromID(itemId).tier == 0)
+            {
+				//special trinkets like Crown of Shadows
+				starterTrinkets.Add(itemId);
+            }
+			else
+            {
+				//regular trinkets
+				starterTrinkets.Add(Items.FromSeriesIDAndTier(Items.FromID(itemId).seriesId, 1).id);
+			}
         }
 
 		//We don't need to convert the mounts because there are no upgrades for mounts
