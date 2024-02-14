@@ -5,6 +5,7 @@ using System;
 using System.Text.RegularExpressions;
 using TMPro;
 using static LanguageManager;
+using System.Collections.Generic;
 
 public class TextPanel : MonoBehaviour
 {
@@ -92,6 +93,12 @@ public class TextPanel : MonoBehaviour
 	{
 		Show( s, Translate("dialog.button.Yes", "Yes"), Translate("dialog.button.No", "No"), ButtonIcon.None, actions );
 	}
+
+	public void ShowScoutX(int scoutAmount, Action action = null)
+    {
+		ShowOkContinue(Translate("dialog.text.EachResetScoutX", "Each Hero resets their deck and Scouts {0}.", new List<string> { scoutAmount.ToString() }), ButtonIcon.Continue, action);
+	}
+
 
 	public void ShowOkContinue( string s, ButtonIcon icon, Action action = null )
 	{

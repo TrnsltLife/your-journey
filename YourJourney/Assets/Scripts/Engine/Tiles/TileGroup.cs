@@ -1073,15 +1073,9 @@ public class TileGroup
 	{
 		//Debug.Log( "RevealInteractiveTokens" );
 		foreach (Tile t in tileList)
-			if (startTileOnly && t.baseTile.isStartTile)
+			if (!startTileOnly || (startTileOnly && t.baseTile.isStartTile))
 			{
-				t.RevealStartToken();
-				t.RevealInteractiveTokens();
-			}
-			else if (!startTileOnly)
-			{
-				t.RevealStartToken();
-				t.RevealInteractiveTokens();
+				t.RevealStartTokenAndThenInteractiveTokens();
 			}
 	}
 
