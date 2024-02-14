@@ -255,7 +255,14 @@ public class ChapterManager : MonoBehaviour
 						tg.isExplored = true;
 					}
 				} );
-				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("dialog.text.PlaceHeroes", "Place your Heroes in the indicated position."), ButtonIcon.Continue );
+				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("dialog.text.PlaceHeroes", "Place your Heroes in the indicated position."), ButtonIcon.Continue, () =>
+                {
+					int scoutAmount = Engine.currentScenario.initialScout;
+					if (scoutAmount > 0)
+					{
+						FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowScoutX(scoutAmount);
+					}
+				});
 			}
 		} );
 	}

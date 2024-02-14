@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -320,20 +321,54 @@ public class Tile : MonoBehaviour
 		exploreToken.DOLocalMoveY( .3f, 1 ).SetEase( Ease.OutBounce );
 	}
 
-	public void RevealStartToken()
+	public void RevealStartTokenAndThenInteractiveTokens()
+	{
+		if (RevealToken(TokenType.Start))
+		{
+			FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("dialog.text.PlaceHeroes", "Place your Heroes in the indicated position."), ButtonIcon.Continue, () => {
+				//Things inside the lambda only happen once the user clicks Continue
+				RevealInteractiveTokensAndShowInitialScoutDialog();
+			});
+		}
+		else
+        {
+			RevealInteractiveTokens();
+        }
+	}
+
+	public void RevealInteractiveTokensAndShowInitialScoutDialog()
     {
-		RevealToken(TokenType.Start);
-    }
+		RevealInteractiveTokens();
+
+		StartCoroutine(DisplayInitialScoutDialog());
+	}
 
 	public void RevealInteractiveTokens()
 	{
-		RevealToken( TokenType.Search );
-		RevealToken( TokenType.Person );
-		RevealToken( TokenType.Threat );
-		RevealToken( TokenType.Darkness );
+		RevealToken(TokenType.Search);
+		RevealToken(TokenType.Person);
+		RevealToken(TokenType.Threat);
+		RevealToken(TokenType.Darkness);
 		RevealToken(TokenType.DifficultGround);
 		RevealToken(TokenType.Fortified);
 		RevealToken(TokenType.Terrain);
+	}
+
+
+	IEnumerator DisplayInitialScoutDialog()
+	{
+		int scoutAmount = Engine.currentScenario.initialScout;
+		if (scoutAmount > 0)
+		{
+			bool waiting = true;
+			interactionManager.GetNewTextPanel().ShowScoutX(scoutAmount, () =>
+			{
+				waiting = false;
+			});
+
+			while (waiting)
+				yield return null;
+		}
 	}
 
 	/// <summary>
@@ -383,13 +418,15 @@ public class Tile : MonoBehaviour
 	/// <summary>
 	/// reveal/drop token of specified type onto the tile ONLY if it's not a triggered Token (TriggeredBy)
 	/// </summary>
-	void RevealToken( TokenType ttype )
+	bool RevealToken( TokenType ttype )
 	{
 		//var size = tilemesh.GetComponent<MeshRenderer>().bounds.size;
 		var center = tilemesh.GetComponent<MeshRenderer>().bounds.center;
 		Transform[] tf = GetChildren( ttype.ToString() );
 
 		Debug.Log("RevealToken " + ttype + " x " + tf.Count());
+
+		bool placedToken = false;
 
 		for ( int i = 0; i < tf.Length; i++ )
 		{
@@ -452,9 +489,12 @@ public class Tile : MonoBehaviour
 			{
 				tState.isActive = true;
 				tState.localPosition = tf[i].localPosition.Y( .3f );
+				placedToken = true;
 				Debug.Log("RevealToken " + ttype + " set active and localPosition: " + tState.localPosition);
 			}
 		}
+
+		return placedToken;
 	}
 
 	public void RevealAllAnchorConnectorTokens()

@@ -11,8 +11,8 @@ public class SelectJourney : MonoBehaviour
 	public SelectSaveSlot selectSaveSlot;
 	public List<FileItemButton> fileItemButtons = new List<FileItemButton>();
 	public Image finalFader;
-	public TextMeshProUGUI nameText, collectionsText, versionText, fileText, appVersion, engineVersion;
-	TextTranslation appVersionTranslation, engineVersionTranslation, versionTextTranslation;
+	public TextMeshProUGUI nameText, collectionsText, scenarioVersionText, versionText, fileText, appVersion, engineVersion;
+	TextTranslation appVersionTranslation, engineVersionTranslation, versionTextTranslation, scenarioVersionTextTranslation;
 	ProjectItem[] projectItems;
 	public GameObject fileItemPrefab, warningPanel;
 	public RectTransform itemContainer;
@@ -44,10 +44,12 @@ public class SelectJourney : MonoBehaviour
 		engineVersionTranslation = engineVersion.gameObject.GetComponent<TextTranslation>();
 		engineVersionTranslation.Change("journey.text.FormatVersion", "Scenario Format Version: " + Bootstrap.FormatVersion, new List<string>{Bootstrap.FormatVersion});
 		versionTextTranslation = versionText.gameObject.GetComponent<TextTranslation>();
+		scenarioVersionTextTranslation = scenarioVersionText.gameObject.GetComponent<TextTranslation>();
 
 		//appVersion.text = "App Version: " + Bootstrap.AppVersion;
 		//engineVersion.text = "Scenario Format Version: " + Bootstrap.FormatVersion;
 		nameText.text = "";
+		scenarioVersionText.text = "";
 		fileText.text = "";
 		versionText.text = "";
 		collectionsText.text = "";
@@ -117,6 +119,7 @@ public class SelectJourney : MonoBehaviour
 		//projectItems[index].collections;
 		//versionText.text = "File Version: " + projectItems[index].fileVersion;
 		versionTextTranslation.Change("journey.text.FileVersion", "File Version: " + projectItems[index].fileVersion, new List<string> { projectItems[index].fileVersion });
+		scenarioVersionTextTranslation.Change("journey.text.ScenarioVersion", "Scenario Version: " + projectItems[index].scenarioVersion, new List<string> { projectItems[index].scenarioVersion });
 
 		//check version
 		if ( projectItems[index].fileVersion != Bootstrap.FormatVersion )

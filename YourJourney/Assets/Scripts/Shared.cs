@@ -115,6 +115,7 @@ public interface ICommonData
 public class ProjectItem
 {
 	public string Title { get; set; }
+	public string scenarioVersion { get; set; }
 	public string Date { get; set; }
 	public string Description { get; set; }
 	public ProjectType projectType { get; set; }
@@ -143,6 +144,7 @@ public class ProjectItem
 public class CampaignItem
 {
 	public string scenarioName { get; set; }
+	public string scenarioVersion { get; set; }
 	/// <summary>
 	/// file NAME only, NOT the full path
 	/// </summary>
@@ -155,7 +157,7 @@ public class CampaignItem
 
 public class StateItem
 {
-	public string gameName, scenarioFilename, gameDate, heroes, fullSavePath, fileVersion, coverImage;
+	public string gameName, scenarioVersion, scenarioFilename, gameDate, heroes, fullSavePath, fileVersion, coverImage;
 	public string[] heroArray;
 	public int[] heroIndexArray;
 	public Guid stateGUID;
