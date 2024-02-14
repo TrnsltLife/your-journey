@@ -17,10 +17,13 @@ public class Scenario
 	public bool scenarioTypeJourney { get; set; }
 	//public string fileName { get; set; }
 	public string scenarioName { get; set; }
+	public string scenarioVersion { get; set; }
 	/// <summary>
 	/// First Objective, if set in the editor
 	/// </summary>
 	public string objectiveName { get; set; }
+	public int initialScout { get; set; }
+	public int subsequentScout { get; set; }
 	public int threatMax { get; set; }
 	public bool threatNotUsed { get; set; }
 	public ProjectType projectType { get; set; }
@@ -57,6 +60,7 @@ public class Scenario
 		s.loreStartValue = fm.loreStartValue;
 		s.xpStartValue = fm.xpStartValue;
 		s.scenarioName = fm.scenarioName;
+		s.scenarioVersion = fm.scenarioVersion;
 		s.fileVersion = fm.fileVersion;
 		//s.fileName = fm.fileName;
 
@@ -114,6 +118,8 @@ public class Scenario
 		s.scenarioEndStatus = new Dictionary<string, bool>( fm.scenarioEndStatus );
 		//s.fileName = fm.fileName;
 		s.introBookData = fm.introBookData;
+		s.initialScout = fm.initialScout;
+		s.subsequentScout = fm.subsequentScout;
 		s.threatMax = fm.threatMax;
 		s.threatNotUsed = fm.threatNotUsed;
 		s.scenarioTypeJourney = fm.scenarioTypeJourney;

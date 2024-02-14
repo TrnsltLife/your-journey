@@ -7,6 +7,7 @@ public class Campaign
 {
 	public Guid campaignGUID { get; set; }
 	public string campaignName { get; set; }
+	public string campaignVersion { get; set; }
 	public string coverImage { get; set; }
 	public string fileVersion { get; set; }
 	public string storyText { get; set; }

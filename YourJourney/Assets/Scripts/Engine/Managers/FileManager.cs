@@ -41,7 +41,10 @@ public class FileManager
 	public TextBookData introBookData { get; set; }
 	public ProjectType projectType { get; set; }
 	public string scenarioName { get; set; }
+	public string scenarioVersion { get; set; }
 	public string objectiveName { get; set; }
+	public int initialScout { get; set; }
+	public int subsequentScout { get; set; }
 	public int threatMax { get; set; }
 	public bool threatNotUsed { get; set; }
 	public bool scenarioTypeJourney { get; set; }
@@ -76,7 +79,10 @@ public class FileManager
 		introBookData = source.introBookData;
 		projectType = source.projectType;
 		scenarioName = source.scenarioName;
+		scenarioVersion = source.scenarioVersion;
 		objectiveName = source.objectiveName;
+		initialScout = source.initialScout;
+		subsequentScout = source.subsequentScout;
 		threatMax = source.threatMax;
 		threatNotUsed = source.threatNotUsed;
 		scenarioTypeJourney = source.scenarioTypeJourney;
@@ -160,6 +166,7 @@ public class FileManager
 				items.Add( new ProjectItem()
 				{
 					Title = s.scenarioName,
+					scenarioVersion = s.scenarioVersion,
 					translations = s.TranslationForTitleScreens(),
 					projectType = s.projectType,
 					Date = s.saveDate,
@@ -194,6 +201,7 @@ public class FileManager
 				pi.projectType = ProjectType.Campaign;
 				pi.Date = fi.LastWriteTime.ToString( "M/d/yyyy" );
 				pi.Title = c.campaignName;
+				pi.scenarioVersion = c.campaignVersion;
 				pi.translations = new Dictionary<string, Dictionary<string, string>>(); //TODO Load info in from the campaign once it has Campaign Translation data
 				pi.campaignDescription = c.description;
 				pi.campaignGUID = dInfo.Name;
@@ -210,7 +218,8 @@ public class FileManager
 					var scenario = FileManager.LoadScenario(FileManager.GetFullPathWithCampaign(item.fileName, pi.campaignGUID.ToString()));
 					item.collections = scenario.collectionObserver.ToList();
 					item.coverImage = scenario.coverImage;
-					Debug.Log("setting coverImage for " + scenario.scenarioName + " " + item.coverImage);
+					item.scenarioVersion = scenario.scenarioVersion;
+					Debug.Log("setting version for " + scenario.scenarioName + " " + item.scenarioVersion);
 					foreach ( int col in scenario.collectionObserver )
                     {
 						if(!pi.collections.Contains( col)) { pi.collections.Add( col ); }
@@ -251,6 +260,7 @@ public class FileManager
 				var scenario = FileManager.LoadScenario(FileManager.GetFullPathWithCampaign(item.fileName, c.campaignGUID.ToString()));
 				item.collections = scenario.collectionObserver.ToList();
 				item.coverImage = scenario.coverImage;
+				item.scenarioVersion = scenario.scenarioVersion;
 				item.specialInstructions = scenario.specialInstructions;
 				Debug.Log("setting coverImage for " + scenario.scenarioName + " " + item.coverImage);
 			}
