@@ -136,6 +136,7 @@
 	"dialog.text.FellowshipPrepared":"L'espoir perdure bien que l'ombre s'épaississe.",
 	"dialog.text.EachGainInspiration":"Chaque héros gagne 1 inspiration.",
 	"dialog.text.EachResetScout2":"Chaque héros réinitialise son paquet et fait ensuite une Reconnaissance 2.",
+	"dialog.text.EachResetScoutX":"Chaque héros réinitialise son paquet et fait ensuite une Reconnaissance {0}.",
 	"dialog.text.Provoke":"Sélectionnez le groupe ennemi que vous avez provoqué.",
 	"dialog.button.CancelProvoke":"Annuler",
 

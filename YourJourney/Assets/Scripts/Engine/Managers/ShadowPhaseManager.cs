@@ -338,14 +338,18 @@ public class ShadowPhaseManager : MonoBehaviour
 		phaseNotification.Show( Translate("dialog.text.RallyPhase", "Rally Phase") );
 		yield return new WaitForSeconds( 3 );
 
-		bool waiting = true;
-		im.GetNewTextPanel().ShowOkContinue( Translate("dialog.text.EachResetScout2", "Each Hero resets their deck and Scouts 2."), ButtonIcon.Continue, () =>
+		int scoutAmount = Engine.currentScenario.subsequentScout;
+		if (scoutAmount > 0)
 		{
-			waiting = false;
-		} );
+			bool waiting = true;
+			im.GetNewTextPanel().ShowOkContinue(Translate("dialog.text.EachResetScoutX", "Each Hero resets their deck and Scouts {0}.", new List<string> { scoutAmount.ToString() }), ButtonIcon.Continue, () =>
+			{
+				waiting = false;
+			});
 
-		while ( waiting )
-			yield return null;
+			while (waiting)
+				yield return null;
+		}
 
 		FindObjectOfType<MonsterManager>().ReadyAll();
 		//ACTION PHASE announcement

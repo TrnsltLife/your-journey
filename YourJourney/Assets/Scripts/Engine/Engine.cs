@@ -206,50 +206,20 @@ public class Engine : MonoBehaviour
 
 	public void StartNewGame()
 	{
-		MonsterManager.InitMonsterPool(); //Reset monster pool very time a new game is started so last game's monster pool doesn't persist to the new game.
+		MonsterManager.InitMonsterPool(); //Reset monster pool every time a new game is started so last game's monster pool doesn't persist to the new game.
 		if ( !debug )
 		{
 			//only show intro text if it's not empty
 			if ( !string.IsNullOrEmpty( scenario.introBookData.pages[0] ) )
 			{
 				interactionManager.GetNewTextPanel().ShowOkContinue(Interpret("scenario.introduction", scenario.introBookData.pages[0]), ButtonIcon.Continue, () =>
-					{
-						uiControl.interactable = true;
-
-						if ( objectiveManager.Exists( scenario.objectiveName ) )
-							objectiveManager.TrySetFirstObjective( scenario.objectiveName, () =>
-							 {
-								 chapterManager.TryTriggerChapter( "Start", true );
-							 } );
-						else
-							chapterManager.TryTriggerChapter( "Start", true );
-
-						//fire any campaign triggers
-						if ( Bootstrap.campaignState != null )
-						{
-							foreach ( var t in Bootstrap.campaignState.campaignTriggerState )
-								triggerManager.FireTrigger( t );
-						}
-					} );
+				{
+					StartNewGame_Inner_Block();
+				});
 			}
 			else
 			{
-				uiControl.interactable = true;
-
-				if ( objectiveManager.Exists( scenario.objectiveName ) )
-					objectiveManager.TrySetFirstObjective( scenario.objectiveName, () =>
-					{
-						chapterManager.TryTriggerChapter( "Start", true );
-					} );
-				else
-					chapterManager.TryTriggerChapter( "Start", true );
-
-				//fire any campaign triggers
-				if ( Bootstrap.campaignState != null )
-				{
-					foreach ( var t in Bootstrap.campaignState.campaignTriggerState )
-						triggerManager.FireTrigger( t );
-				}
+				StartNewGame_Inner_Block();
 			}
 		}
 		else
@@ -261,6 +231,28 @@ public class Engine : MonoBehaviour
 		}
 		scenarioOverlay.SetActive(false); //hide the cover image
 	}
+
+
+	public void StartNewGame_Inner_Block()
+	{
+		uiControl.interactable = true;
+
+		if (objectiveManager.Exists(scenario.objectiveName))
+			objectiveManager.TrySetFirstObjective(scenario.objectiveName, () =>
+			{
+				chapterManager.TryTriggerChapter("Start", true);
+			});
+		else
+			chapterManager.TryTriggerChapter("Start", true);
+
+		//fire any campaign triggers
+		if (Bootstrap.campaignState != null)
+		{
+			foreach (var t in Bootstrap.campaignState.campaignTriggerState)
+				triggerManager.FireTrigger(t);
+		}
+	}
+
 
 	public void RestoreGame( bool fromTemp = false )
 	{

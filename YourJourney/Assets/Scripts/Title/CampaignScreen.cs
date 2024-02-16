@@ -17,7 +17,7 @@ public class CampaignScreen : MonoBehaviour
 	public GameObject fileItemButtonPrefab;
 	public RectTransform itemContainer;
 	public GameObject replaybox;
-	public TextMeshProUGUI xpLoreText, currentScenarioText, replayText, replayStatusText;
+	public TextMeshProUGUI xpLoreText, currentScenarioText, scenarioVersionText, replayText, replayStatusText;
 	public TextTranslation replayStatusTextTranslation;
 
 	TitleManager tm;
@@ -44,6 +44,8 @@ public class CampaignScreen : MonoBehaviour
 		xpLoreText.text = lore + " / " + xp;
 		replayText.text = "";
 		currentScenarioText.text = campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].scenarioName;
+		scenarioVersionText.text = campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].scenarioVersion;
+		Debug.Log("scenarioVersion: " + campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].scenarioVersion);
 
 		tm = FindObjectOfType<TitleManager>();
 		tm.LoadScenarioImage(campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].coverImage);
@@ -73,6 +75,7 @@ public class CampaignScreen : MonoBehaviour
 		itemContainer.sizeDelta = new Vector2( 772, fileItemButtons.Count * 110 );
 
 		replayStatusTextTranslation = replayStatusText.GetComponent<TextTranslation>();
+
 		CheckCampaignStatus();
 
 		gameObject.SetActive( true );
@@ -161,6 +164,10 @@ public class CampaignScreen : MonoBehaviour
 
 		coverImage = campaign.scenarioCollection[selectedIndex].coverImage ?? campaign.coverImage; //scenario image, or campaign image as a fallback
 		tm.LoadScenarioImage(coverImage);
+
+		scenarioVersionText.text = campaignState.campaign.scenarioCollection[selectedIndex].scenarioVersion;
+		Debug.Log("update scenarioName: " + campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].scenarioName +
+			", scenarioVersion: " + campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].scenarioVersion);
 
 		//if selected scenario has been played (fail or success) activated replay option
 		if ( campaignState.scenarioStatus[index] != ScenarioStatus.NotPlayed )

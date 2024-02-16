@@ -134,6 +134,7 @@
 	"dialog.text.FellowshipPrepared":"Your fellowship is prepared to face the shadow.",
 	"dialog.text.EachGainInspiration":"Each hero gain 1 inspiration.",
 	"dialog.text.EachResetScout2":"Each Hero resets their deck and Scouts 2.",
+	"dialog.text.EachResetScoutX":"Each Hero resets their deck and Scouts {0}.",
 	"dialog.text.Provoke":"Select the Enemy Group that you provoked.",
 	"dialog.button.CancelProvoke":"Cancel",
 
