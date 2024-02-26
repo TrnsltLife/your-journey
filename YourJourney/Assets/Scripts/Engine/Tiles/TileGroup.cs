@@ -20,6 +20,8 @@ public class TileGroup
 	[HideInInspector]
 	public System.Guid GUID { get; set; }//same as chapter GUID
 
+	ConnectorGrid grid = new ConnectorGrid();
+
 	private static float RandomAngle()
 	{
 		int[] a = { 0, 60, 120, 180, 240, -60, -120, -180, -240 };
@@ -119,7 +121,7 @@ public class TileGroup
 
 //Show ball/sphere/marker for anchor and connection points for debugging
 tile.gameObject.SetActive(true);
-tile.RevealAllAnchorConnectorTokens();
+//tile.RevealAllAnchorConnectorTokens();
 tile.GenerateConnectorGrid(false);
 
 			//add fixed tokens
@@ -143,7 +145,7 @@ tile.GenerateConnectorGrid(false);
 
 		//add random tokens
 		if ( c.usesRandomGroups )
-			AddRandomTokens( usedPositions.ToArray() );
+			AddRandomTokens( usedPositions );
 
 		GenerateGroupCenter();
 	}
@@ -165,8 +167,12 @@ tile.GenerateConnectorGrid(false);
 		containerObject = new GameObject().transform;
 		containerObject.name = "TILEGROUP: ";
 
+		grid.AllocateTileGroupGridSize();
+
+		int tileMarker = 0;
 		for ( int i = 0; i < c.tileObserver.Count; i++ )
 		{
+			tileMarker++;
 			//Debug.Log( ((BaseTile)chapter.tileObserver[i]).idNumber );
 
 			BaseTile bt = chapter.tileObserver[i] as BaseTile;
@@ -217,8 +223,9 @@ tile.GenerateConnectorGrid(false);
 
 //Show ball/sphere/marker for anchor and connection points for debugging
 tile.gameObject.SetActive(true);
-tile.RevealAllAnchorConnectorTokens();
-tile.GenerateConnectorGrid(false);
+//tile.RevealAllAnchorConnectorTokens();
+ConnectorGrid tileGrid = tile.GenerateConnectorGrid(false);
+grid.CopyTileToTileGroup(tileGrid, tileMarker);
 
 			//add a token, if there is one
 			//if ( !c.usesRandomGroups )
@@ -241,10 +248,13 @@ tile.GenerateConnectorGrid(false);
 			}
 		}
 
+		Debug.Log("Display TileGroup:\r\n" + grid.TileGroupToString());
+
+
 		//add random tokens
 		//if ( c.usesRandomGroups && usedPositions.Count > 0 ) // <-- This code was blocking random events from occurring *unless* there was at least one fixed token
 		if ( c.usesRandomGroups )
-			AddRandomTokens( usedPositions.ToArray() );
+			AddRandomTokens( usedPositions );
 
 		GenerateGroupCenter();
 	}
@@ -310,7 +320,7 @@ tile.GenerateConnectorGrid(false);
 		return tilefix;
 	}
 
-	void AddRandomTokens( Transform[] usedPositions )
+	void AddRandomTokens(List<Transform> usedPositions )
 	{
 		if ( chapter.randomInteractionGroup == "None" )
 			return;
@@ -344,8 +354,10 @@ tile.GenerateConnectorGrid(false);
 					if ( d < minD )
 						minD = d;
 				}
-				if ( minD > 1.1f )
-					opentfs.Add( tf );
+				if (minD > 1.1f)
+				{
+					opentfs.Add(tf);
+				}
 			}
 
 			finalOpenTFS.AddRange( opentfs );

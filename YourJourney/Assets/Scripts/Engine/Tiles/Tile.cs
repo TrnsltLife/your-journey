@@ -504,32 +504,9 @@ public class Tile : MonoBehaviour
     {
 		Debug.Log("GenerateConnectorGrid for tile " + this.ToString());
 		ConnectorGrid grid = new ConnectorGrid();
-
-		//Loop through first to establish the min and max positions
-		for (int i = 0; i < transform.childCount; i++)
-		{
-			Transform t = transform.GetChild(i);
-			if (t.name.Contains("anchor") || t.name.Contains("connector"))
-			{
-				if (t.position.x < grid.minX) { grid.minX = t.position.x; }
-				if (t.position.x > grid.maxX) { grid.maxX = t.position.x; }
-				if (t.position.z < grid.minZ) { grid.minZ = t.position.z; }
-				if (t.position.z > grid.maxZ) { grid.maxZ = t.position.z; }
-			}
-		}
-		Debug.Log("minX: " + grid.minX + " / maxX: " + grid.maxX);
-		Debug.Log("minZ: " + grid.minZ + " / maxZ: " + grid.maxZ);
-
-		//Offset will help to align the leftmost and topmost markers with the start of the array
-		grid.offsetX = 0 - grid.minX;
-		grid.offsetZ = 0 - grid.minZ;
-		Debug.Log("offsetX: " + grid.offsetX + " / offsetZ: " + grid.offsetZ);
-
+		grid.EstablishMinMaxFromTransformChildren(transform);
+		grid.EstablishOffsetToTranslateToZero();
 		grid.AllocateGridSize();
-
-		Debug.Log("gridX: " + grid.gridX + " / gridZ: " + grid.gridZ);
-		Debug.Log("Create grid array size of [" + grid.gridX + "," + grid.gridZ + "]");
-
 
 		for (int i=0; i<transform.childCount; i++)
 		{
@@ -537,25 +514,26 @@ public class Tile : MonoBehaviour
 			int value = 0;
 			if (t.name.Contains("anchor")) //(anchors are OUTside the bounds of the tile)
 			{
-				value = alreadyPlaced ? 2 : -1;
+				//value = alreadyPlaced ? 2 : -1;
+				value = -1;
 			}
 			else if (t.name.Contains("connector")) //(connectors are INside the bounds of the tile)
 			{
-				value = alreadyPlaced ? -2 : 1;
+				//value = alreadyPlaced ? -2 : 1;
+				value = 1;
 			}
 
 			//Convert the connector's tile position to its position in the array
-			GridPosition gridPos = grid.CalculateGridPosition(t.position.x, t.position.z);
+			GridPosition gridPos = grid.CalculateGridPosition(t.position.x, t.position.z, t);
+			grid.transformPositionList.Add(gridPos);
 
 			if (value != 0)
 			{
-				Debug.Log("Place value " + value + " at [" + gridPos.x + "," + gridPos.z + "]");
 				if (gridPos.x >= grid.gridX || gridPos.z >= grid.gridZ || gridPos.x < 0 || gridPos.z < 0)
 				{
 					Debug.Log("Oops. Out of bounds. pos[" + gridPos.x + "," + gridPos.z + "] vs gridSize[" + grid.gridX + "," + grid.gridZ + "]");
 				}
 				grid.grid[gridPos.x, gridPos.z] = value;
-				Debug.Log("Confirm " + grid.grid[gridPos.x, gridPos.z] + " at [" + gridPos.x + "," + gridPos.z + "]");
 
 			}
 			else
@@ -564,7 +542,7 @@ public class Tile : MonoBehaviour
             }
 		}
 
-		Debug.Log("Grid Output " + this.ToString() + "\r\n" + grid.ToString());
+		Debug.Log("Grid Output " + this.ToString() + " " + this.transform.rotation + "*\r\n" + grid.ToString());
 
 		return grid;
 	}

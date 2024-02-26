@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 public class GridPosition
 {
 	public int x;
 	public int z;
+	public Transform t; //transform stored related to this GridPosition
 }
 
 public class ConnectorGrid
@@ -24,6 +26,62 @@ public class ConnectorGrid
 	public int gridX;
 	public int gridZ;
 	public int[,] grid;
+	public List<GridPosition> transformPositionList = new List<GridPosition>();
+
+	public void AllocateTileGroupGridSize()
+    {
+		//prebuild a rectangular area of hopefully sufficient size to arrange a group of tiles in
+		minX = 0;
+		minZ = 0;
+		maxX = 0;
+		maxZ = 0;
+		offsetX = 64 * distanceX;
+		offsetZ = 64 * distanceZ;
+		gridX = 128;
+		gridZ = 128;
+		grid = new int[gridX, gridZ];
+	}
+
+	public void CopyTileToTileGroup(ConnectorGrid tileGrid, int tileMarker)
+    {
+		GridPosition offsetPos = CalculateGroupOffsetFromTileOffset(tileGrid);
+		foreach (GridPosition pos in tileGrid.transformPositionList)
+        {
+			Debug.Log("tile [" + pos.x + "," + pos.z + "] => tileGroup [" + offsetPos.x + "," + offsetPos.z + "]");
+			int tileValue = tileGrid.grid[pos.x, pos.z];
+			Debug.Log("tileValue: " + tileValue);
+			int tileGroupValue = grid[offsetPos.x + pos.x, offsetPos.z + pos.z];
+			Debug.Log("tileGroupValue: " + tileGroupValue);
+
+			if(tileGroupValue <= 0 && tileValue > 0)
+            {
+				grid[offsetPos.x + pos.x, offsetPos.z + pos.z] = tileMarker;
+            }
+		}
+	}
+
+	public void EstablishMinMaxFromTransformChildren(Transform transform)
+    {
+		//Loop through first to establish the min and max positions
+		for (int i = 0; i < transform.childCount; i++)
+		{
+			Transform t = transform.GetChild(i);
+			if (t.name.Contains("anchor") || t.name.Contains("connector"))
+			{
+				if (t.position.x < minX) { minX = t.position.x; }
+				if (t.position.x > maxX) { maxX = t.position.x; }
+				if (t.position.z < minZ) { minZ = t.position.z; }
+				if (t.position.z > maxZ) { maxZ = t.position.z; }
+			}
+		}
+	}
+
+	public void EstablishOffsetToTranslateToZero()
+    {
+		//Offset will help to align the leftmost and topmost markers with the start of the array
+		offsetX = 0 - minX;
+		offsetZ = 0 - minZ;
+	}
 
 	public void AllocateGridSize()
     {
@@ -32,12 +90,25 @@ public class ConnectorGrid
 		grid = new int[gridX, gridZ];
 	}
 
-	public GridPosition CalculateGridPosition(float x, float z)
+	public GridPosition CalculateGridPosition(float x, float z, Transform t = null)
     {
 		int posX = (int)((x + offsetX + wiggleRoom) / distanceX);
 		int posZ = (int)((z + offsetZ + wiggleRoom) / distanceZ);
-		return new GridPosition() { x=posX, z=posZ };
+		return new GridPosition() { x=posX, z=posZ, t= t };
 	}
+
+	public Vector3 ReverseGridPosition(float x, float z)
+    {
+		Vector3 v = new Vector3(x / distanceX - offsetX, 0, z / distanceZ - offsetZ);
+		return v;
+    }
+
+	public GridPosition CalculateGroupOffsetFromTileOffset(ConnectorGrid tileGrid)
+    {
+		int newX = (int)((tileGrid.offsetX + offsetX + wiggleRoom) / distanceX);
+		int newZ = (int)((tileGrid.offsetZ + offsetZ + wiggleRoom) / distanceZ);
+		return new GridPosition() { x = newX, z = newZ };
+    }
 
 	/*
 	Given an int[,] grid which is an array representation of a hex map, print the grid.
@@ -86,6 +157,37 @@ public class ConnectorGrid
 				{
 					gridDisplay += " ";
 				}
+				else
+				{
+					gridDisplay += "?";
+				}
+			}
+			gridDisplay += "|\r\n|";
+		}
+
+		return gridDisplay;
+	}
+
+	public string TileGroupToString()
+	{
+		string gridDisplay = "|";
+		for (int z = 0; z < gridZ; z++)
+		{
+			for (int x = 0; x < gridX; x++)
+			{
+				int value = grid[x, z];
+				if (value < 0) //anchor OUTside tile
+				{
+					gridDisplay += ".";
+				}
+				else if (value == 0)
+				{
+					gridDisplay += " ";
+				}
+				else if (value >= 1 && value <= 9)
+                {
+					gridDisplay += value.ToString();
+                }
 				else
 				{
 					gridDisplay += "?";
