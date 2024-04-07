@@ -404,9 +404,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7816621635786267062}
   m_Layer: 0
-  m_Name: connector2 (4)
+  m_Name: connector-exclude2 (4)
   m_TagString: Untagged
-  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -554,9 +554,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8863069384560978131}
   m_Layer: 0
-  m_Name: connector4 (5)
+  m_Name: connector-exclude4 (5)
   m_TagString: Untagged
-  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -794,9 +794,9 @@ GameObject:
   m_Component:
   - component: {fileID: 458793096322172891}
   m_Layer: 0
-  m_Name: connector2 (3)
+  m_Name: connector-exclude2 (3)
   m_TagString: Untagged
-  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -944,9 +944,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4787789588393207148}
   m_Layer: 0
-  m_Name: connector4 (4)
+  m_Name: connector-exclude4 (4)
   m_TagString: Untagged
-  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

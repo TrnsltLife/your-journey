@@ -346,7 +346,7 @@ public class TileManager : MonoBehaviour
 									 from tile in tg.tileList
 									 where tile.isExplored
 									 select tile;
-		Debug.Log( "GetAvailableSpawnPositions::explored: " + explored.Count() );
+		//Debug.Log( "GetAvailableSpawnPositions::explored: " + explored.Count() );
 		List<Transform> tkattach = new List<Transform>();
 		foreach ( Tile t in explored )
 		{
@@ -487,7 +487,7 @@ public class TileManager : MonoBehaviour
 		//iterate the tiles and either reveal the token or queue it to show when its tile gets explored
 		if ( explored.Count() > 0 )
 		{
-			Debug.Log( "TryTriggerToken() FOUND: " + name );
+			//Debug.Log( "TryTriggerToken() FOUND: " + name );
 			//Debug.Log( "Found " + explored.Count() + " matching EXPLORED tiles" );
 			List<Tuple<int, string, Vector3[], string[]>> tokpos = new List<Tuple<int, string, Vector3[], string[]>>();
 			foreach ( Tile t in explored )
@@ -512,12 +512,12 @@ public class TileManager : MonoBehaviour
 
 	IEnumerator TokenPlacementPrompt( IEnumerable<Tuple<int, string, Vector3[], string[]>> explored )
 	{
-		Debug.Log( "**START TokenPlacementPrompt" );
+		//Debug.Log( "**START TokenPlacementPrompt" );
 
 		foreach ( Tuple<int, string, Vector3[], string[]> t in explored )//each tile...
 		{
 			bool waiting = true;
-			Debug.Log( $"Tokens in tile {t.Item1}: {t.Item3.Length}" );
+			//Debug.Log( $"Tokens in tile {t.Item1}: {t.Item3.Length}" );
 
 			//foreach ( Vector3 v in t.Item3 )//each token...
 			for(int i=0; i<t.Item3.Length; i++)
@@ -547,7 +547,7 @@ public class TileManager : MonoBehaviour
 			}
 		}
 
-		Debug.Log( "**END TokenPlacementPrompt" );
+		//Debug.Log( "**END TokenPlacementPrompt" );
 	}
 
 	/// <summary>
@@ -651,7 +651,7 @@ public class TileManager : MonoBehaviour
 			int innerCount = 1;
 			foreach ( TileGroup tilegroup in TGList.Where( x => !x.GetChapter().isDynamic && x.GUID != tg.GUID ) )//every non-dynamic
 			{
-				Debug.Log("Attach TileGroups " + tg.ToString() + " to " + tilegroup.ToString());
+				Debug.Log("Attach TileGroups " + tg.GetChapter().dataName + " " + tg.ToString() + " to " + tilegroup.GetChapter().dataName + " " + tilegroup.ToString());
 				Debug.Log("Attach TileGroups outerLoop " + outerCount + " of " + nonDynamicNonStart + ", innerLoop " + innerCount + " of " + nonDynamic);
 				bool success = tg.AttachTo( tilegroup );
 				if ( success )
@@ -669,6 +669,94 @@ public class TileManager : MonoBehaviour
 			outerCount++;
 		}
 		Debug.Log("BuildScenario Complete");
+	}
+
+	public IEnumerator BuildScenarioCoroutine()
+	{
+		Debug.Log("BuildScenarioCoroutine()");
+		ChapterManager cm = FindObjectOfType<ChapterManager>();
+		List<TileGroup> TGList = new List<TileGroup>();
+		Engine engine = Engine.FindEngine();
+
+		//build ALL chapter tilegroups
+		foreach (Chapter c in cm.chapterList)
+		{
+			engine.SetLoadingText("Scouting Region " + TGList.Count);
+			yield return null;
+			Debug.Log("Building Tile Group " + TGList.Count + " of " + cm.chapterList.Count + "...");
+			//build the tiles in the tg
+			TileGroup tg = c.tileGroup = CreateGroupFromChapter(c);
+			if (tg == null)
+			{
+				Debug.Log("WARNING::BuildScenario::Chapter has no tiles: " + c.dataName);
+				yield break;
+			}
+
+			TGList.Add(tg);
+			Debug.Log("Built");
+		}
+
+		//Connect all non-dynamic tiles excluding start
+		int nonDynamicNonStart = TGList.Where(x => !x.GetChapter().isDynamic && x.GetChapter().dataName != "Start").Count();
+		int outerCount = 1;
+		foreach (TileGroup tg in TGList.Where(x => !x.GetChapter().isDynamic && x.GetChapter().dataName != "Start"))
+		{
+			//try attaching tg to oldest tg already on board
+			int nonDynamic = TGList.Where(x => !x.GetChapter().isDynamic && x.GUID != tg.GUID).Count();
+			int innerCount = 1;
+			foreach (TileGroup tilegroup in TGList.Where(x => !x.GetChapter().isDynamic && x.GUID != tg.GUID))//every non-dynamic
+			{
+				Debug.Log("Attach TileGroups " + tg.GetChapter().dataName + " " + tg.ToString() + " to " + tilegroup.GetChapter().dataName + " " + tilegroup.ToString());
+				Debug.Log("Attach TileGroups outerLoop " + outerCount + " of " + nonDynamicNonStart + ", innerLoop " + innerCount + " of " + nonDynamic);
+
+				//original code
+				//bool success = tg.AttachTo(tilegroup);
+
+				//coroutine code
+				engine.SetLoadingText("Triangulating Region (" + outerCount + " of " + nonDynamicNonStart + ") from Neighbor " + innerCount);
+
+				if (engine.mapDebug)
+				{
+					tg.Visible(true);
+					tilegroup.Visible(true);
+					tg.Sepia(false);
+					tilegroup.Sepia(false);
+				}
+
+				yield return StartCoroutine(tg.AttachToCoroutine(tilegroup));
+				bool success = tg.attachToCoroutineResult;
+
+				if (engine.mapDebug)
+				{
+					tg.Sepia(true);
+					tilegroup.Sepia(true);
+				}
+
+				if (success)
+				{
+					Debug.Log("***ATTACHING " + tg.GetChapter().dataName + " to " + tilegroup.GetChapter().dataName);
+					GameObject fog = Instantiate(fogPrefab, transform);
+					FogData fg = fog.GetComponent<FogData>();
+					fg.chapterName = tg.GetChapter().dataName;
+					fog.transform.position = tg.groupCenter.Y(.5f);
+					Debug.Log("Attached");
+
+					if (engine.mapDebug)
+					{
+						//tg.Visible(false);
+						//tilegroup.Visible(false);
+					}
+
+					break;
+				}
+				innerCount++;
+				yield return null;
+			}
+			outerCount++;
+		}
+		Debug.Log("BuildScenario Complete");
+
+		yield break;
 	}
 
 	public TileState GetState()

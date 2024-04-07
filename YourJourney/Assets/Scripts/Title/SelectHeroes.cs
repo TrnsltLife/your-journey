@@ -235,7 +235,7 @@ public class SelectHeroes : MonoBehaviour
 
 		foreach(CharacterSheet cs in characterSheets)
         {
-			Debug.Log(cs.name + ": " + Items.FromID(cs.armorId).dataName + " / " + Items.FromID(cs.hand1Id).dataName + " / " + Items.FromID(cs.hand2Id).dataName + " / " + Items.FromID(cs.mountId).dataName);
+			//Debug.Log(cs.name + ": " + Items.FromID(cs.armorId).dataName + " / " + Items.FromID(cs.hand1Id).dataName + " / " + Items.FromID(cs.hand2Id).dataName + " / " + Items.FromID(cs.mountId).dataName);
         }
 
 		finalFader.DOFade( 1, .5f ).OnComplete( () =>

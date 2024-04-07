@@ -46,7 +46,7 @@ public class CollectionListConverter : JsonConverter
 
 		foreach (var item in jsonObject)
 		{
-			Debug.Log("CollectionConverter ReadJson <= " + item);
+			//Debug.Log("CollectionConverter ReadJson <= " + item);
 			collection = Collection.FromID(item.Value<int>());
 			collectionList.Add(collection);
 		}

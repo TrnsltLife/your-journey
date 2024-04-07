@@ -291,13 +291,15 @@ public class GlowEngine : MonoBehaviour
 
 	void Start()
 	{
-		if ( mainCamera != null )
+		if (mainCamera != null)
 		{
-			Debug.Log( "::GlowEngine:: Aspect ratio enforcement: ON" );
+			//Debug.Log( "::GlowEngine:: Aspect ratio enforcement: ON" );
 			SetupCameraAspectRatio();
 		}
 		else
-			Debug.Log( "::GlowEngine:: Aspect ratio enforcement: OFF" );
+		{
+			//Debug.Log("::GlowEngine:: Aspect ratio enforcement: OFF");
+		}
 	}
 
 	void SetupCameraAspectRatio()

@@ -18,6 +18,7 @@ public class ConnectorGrid
 	public readonly float distanceZ = 0.4330127f;
 	public float minX = 100_000;
 	public float minZ = 100_000;
+	public float leftmostMinZ = 100_000;
 	public float maxX = -100_000;
 	public float maxZ = -100_000;
 	public float offsetX = 0;
@@ -33,6 +34,7 @@ public class ConnectorGrid
 		//prebuild a rectangular area of hopefully sufficient size to arrange a group of tiles in
 		minX = 0;
 		minZ = 0;
+		leftmostMinZ = 0;
 		maxX = 0;
 		maxZ = 0;
 		offsetX = 64 * distanceX;
@@ -47,11 +49,11 @@ public class ConnectorGrid
 		GridPosition offsetPos = CalculateGroupOffsetFromTileOffset(tileGrid);
 		foreach (GridPosition pos in tileGrid.transformPositionList)
         {
-			Debug.Log("tile [" + pos.x + "," + pos.z + "] => tileGroup [" + offsetPos.x + "," + offsetPos.z + "]");
+			//Debug.Log("tile [" + pos.x + "," + pos.z + "] => tileGroup [" + offsetPos.x + "," + offsetPos.z + "]");
 			int tileValue = tileGrid.grid[pos.x, pos.z];
-			Debug.Log("tileValue: " + tileValue);
+			//Debug.Log("tileValue: " + tileValue);
 			int tileGroupValue = grid[offsetPos.x + pos.x, offsetPos.z + pos.z];
-			Debug.Log("tileGroupValue: " + tileGroupValue);
+			//Debug.Log("tileGroupValue: " + tileGroupValue);
 
 			if(tileGroupValue <= 0 && tileValue > 0)
             {
@@ -72,6 +74,10 @@ public class ConnectorGrid
 				if (t.position.x > maxX) { maxX = t.position.x; }
 				if (t.position.z < minZ) { minZ = t.position.z; }
 				if (t.position.z > maxZ) { maxZ = t.position.z; }
+				if (t.position.x > minX - 0.1 && t.position.x < minX + 0.1)
+                {
+					if (t.position.z < leftmostMinZ) { leftmostMinZ = t.position.z; }
+				}
 			}
 		}
 	}
@@ -139,30 +145,32 @@ public class ConnectorGrid
 	*/
 	public override string ToString()
 	{
-		string gridDisplay = "|";
+		string gridDisplay = "";
 		for (int z = 0; z < gridZ; z++)
 		{
+			string lineDisplay = "|";
 			for (int x = 0; x < gridX; x++)
 			{
 				int value = grid[x, z];
 				if (value == 2 || value == -1) //anchor OUTside tile
 				{
-					gridDisplay += ".";
+					lineDisplay += ".";
 				}
 				else if (value == -2 || value == 1) //connector INside tile
 				{
-					gridDisplay += "O";
+					lineDisplay += "O";
 				}
 				else if (value == 0)
 				{
-					gridDisplay += " ";
+					lineDisplay += " ";
 				}
 				else
 				{
-					gridDisplay += "?";
+					lineDisplay += "?";
 				}
 			}
-			gridDisplay += "|\r\n|";
+			//gridDisplay += "|\r\n|";
+			gridDisplay = lineDisplay + "|\r\n" + gridDisplay;
 		}
 
 		return gridDisplay;
@@ -170,30 +178,32 @@ public class ConnectorGrid
 
 	public string TileGroupToString()
 	{
-		string gridDisplay = "|";
+		string gridDisplay = "";
 		for (int z = 0; z < gridZ; z++)
 		{
+			string lineDisplay = "|";
 			for (int x = 0; x < gridX; x++)
 			{
 				int value = grid[x, z];
 				if (value < 0) //anchor OUTside tile
 				{
-					gridDisplay += ".";
+					lineDisplay += ".";
 				}
 				else if (value == 0)
 				{
-					gridDisplay += " ";
+					lineDisplay += " ";
 				}
 				else if (value >= 1 && value <= 9)
                 {
-					gridDisplay += value.ToString();
+					lineDisplay += value.ToString();
                 }
 				else
 				{
-					gridDisplay += "?";
+					lineDisplay += "?";
 				}
 			}
-			gridDisplay += "|\r\n|";
+			//gridDisplay += "|\r\n|";
+			gridDisplay = lineDisplay + "|\r\n" + gridDisplay;
 		}
 
 		return gridDisplay;

@@ -218,7 +218,7 @@ public class Tile : MonoBehaviour
 		//Debug.Log( "SetConnector()::connectorCount=" + connectorCount );
 		if ( idx >= connectorCount )
 		{
-			Debug.Log( "SetConnector()::idx >= SetConnector" );
+			//Debug.Log( "SetConnector()::idx >= SetConnector" );
 			return;
 		}
 		currentConnectorID = idx;
@@ -243,7 +243,7 @@ public class Tile : MonoBehaviour
 		//Debug.Log( "SetAnchor()::anchorCount=" + anchorCount );
 		if ( idx >= anchorCount )
 		{
-			Debug.Log( "SetAnchor()::idx >= anchorCount" );
+			//Debug.Log( "SetAnchor()::idx >= anchorCount" );
 			return;
 		}
 		Transform[] anchors = GetChildren( "anchor" );
@@ -424,7 +424,7 @@ public class Tile : MonoBehaviour
 		var center = tilemesh.GetComponent<MeshRenderer>().bounds.center;
 		Transform[] tf = GetChildren( ttype.ToString() );
 
-		Debug.Log("RevealToken " + ttype + " x " + tf.Count());
+		//Debug.Log("RevealToken " + ttype + " x " + tf.Count());
 
 		bool placedToken = false;
 
@@ -442,7 +442,7 @@ public class Tile : MonoBehaviour
 			//only want FIXED tokens
 			if ( !metaData.isRandom )//&& !metaData.hasBeenReplaced )
 			{
-				Debug.Log("RevealToken " + ttype + " !metaData.isRandmom");
+				//Debug.Log("RevealToken " + ttype + " !metaData.isRandmom");
 				string tBy = metaData.triggeredByName;
 				//skip if it's triggeredBy
 				if ( tBy != "None")
@@ -460,7 +460,7 @@ public class Tile : MonoBehaviour
 				//offset = Vector3.Reflect( offset, new Vector3( 0, 0, 1 ) );
 
 				//tf[i].position = new Vector3( center.x + offset.x, 2, center.z + offset.z );
-				Debug.Log("RevealToken " + ttype + " DOLocalMoveY .3f, 1");
+				//Debug.Log("RevealToken " + ttype + " DOLocalMoveY .3f, 1");
 
 				tf[i].gameObject.SetActive( true );
 				tf[i].position = tf[i].position.Y( 2 );
@@ -472,8 +472,8 @@ public class Tile : MonoBehaviour
 			}
 			else //if ( !metaData.hasBeenReplaced )
 			{
-				Debug.Log("RevealToken " + ttype + " else");
-				Debug.Log("RevealToken " + ttype + " DOLocalMoveY .3f, 1");
+				//Debug.Log("RevealToken " + ttype + " else");
+				//Debug.Log("RevealToken " + ttype + " DOLocalMoveY .3f, 1");
 				//random tokens are already placed during tile creation using preset transforms built into the mesh "token attach"
 				tf[i].gameObject.SetActive( true );
 				tf[i].position = tf[i].position.Y( 2 );
@@ -483,14 +483,14 @@ public class Tile : MonoBehaviour
 				tState = tokenStates.Where( x => x.metaData.interactionName == metaData.interactionName ).FirstOr( null );
 			}
 
-			Debug.Log("RevealToken " + ttype + " tState " + tState);
+			//Debug.Log("RevealToken " + ttype + " tState " + tState);
 
 			if ( tState != null )
 			{
 				tState.isActive = true;
 				tState.localPosition = tf[i].localPosition.Y( .3f );
 				placedToken = true;
-				Debug.Log("RevealToken " + ttype + " set active and localPosition: " + tState.localPosition);
+				//Debug.Log("RevealToken " + ttype + " set active and localPosition: " + tState.localPosition);
 			}
 		}
 
@@ -538,7 +538,7 @@ public class Tile : MonoBehaviour
 			}
 			else
             {
-				Debug.Log("Skipping " + t.name + " at pos[" + gridPos.x + "," + gridPos.z + "]");
+				//Debug.Log("Skipping " + t.name + " at pos[" + gridPos.x + "," + gridPos.z + "]");
             }
 		}
 
@@ -550,7 +550,7 @@ public class Tile : MonoBehaviour
 
 	public void RevealAllAnchorConnectorTokens()
     {
-		Debug.Log("RevealAllAnchorConnectorTokens for tile " + this.ToString());
+		//Debug.Log("RevealAllAnchorConnectorTokens for tile " + this.ToString());
 		for (int i = 0; i < transform.childCount; i++)
 		{
 			Transform child = transform.GetChild(i);
@@ -576,35 +576,21 @@ public class Tile : MonoBehaviour
 		GameObject token = null;
 		if(tokenName == "anchor")
         {
-			//token = Instantiate(anchorSphere, new Vector3(t.localPosition.x + center.x, t.localPosition.y + center.y, t.localPosition.z + center.z), t.localRotation);
 			token = Instantiate(anchorSphere, new Vector3(t.position.x, t.position.y, t.position.z), t.rotation);
-			//token = Instantiate(anchorSphere, new Vector3(t.localPosition.x, t.localPosition.y, t.localPosition.z), t.localRotation);
-			//token = Instantiate(anchorSphere, new Vector3(t.position.x + center.x, t.position.y + center.y, t.position.z + center.z), t.rotation);
-			//Debug.Log("anchor at " + t.localPosition);
 		}
 		else if(tokenName == "connector")
         {
-			//token = Instantiate(connectorSphere, new Vector3(t.localPosition.x + center.x, t.localPosition.y + center.y, t.localPosition.z + center.z), t.localRotation);
 			token = Instantiate(connectorSphere, new Vector3(t.position.x, t.position.y, t.position.z), t.rotation);
-			//token = Instantiate(connectorSphere, new Vector3(t.localPosition.x, t.localPosition.y, t.localPosition.z), t.localRotation);
-			//token = Instantiate(connectorSphere, new Vector3(t.position.x + center.x, t.position.y + center.y, t.position.z + center.z), t.rotation);
-			//Debug.Log("connector at " + t.localPosition);
 		}
 		else if (tokenName == "special")
 		{
-			//token = Instantiate(specialSphere, new Vector3(t.localPosition.x + center.x, t.localPosition.y + center.y, t.localPosition.z + center.z), t.localRotation);
 			token = Instantiate(specialSphere, new Vector3(t.position.x, t.position.y, t.position.z), t.rotation);
-			//token = Instantiate(specialSphere, new Vector3(t.localPosition.x, t.localPosition.y, t.localPosition.z), t.localRotation);
-			//token = Instantiate(specialSphere, new Vector3(t.position.x + center.x, t.position.y + center.y, t.position.z + center.z), t.rotation);
-			//Debug.Log("special at " + t.localPosition);
 		}
 		if (token != null)
 		{
 			token.transform.parent = transform;
 			token.SetActive(true);
-			Debug.Log(tokenName + " loc[" + token.transform.position.x + "," + token.transform.position.y + "," + token.transform.position.z + "]");
 			var posVisAVisGP = token.transform.parent.parent.InverseTransformPoint(token.transform.position);
-			Debug.Log(tokenName + " gp[" + posVisAVisGP.x + "," + posVisAVisGP.y + "," + posVisAVisGP.z + "]");
 		}
 	}
 
@@ -745,11 +731,11 @@ public class Tile : MonoBehaviour
 			}
 			else if ( objectHit.name.Contains( "Token" ) )
 			{
-				Debug.Log("name " + objectHit.name);
-				Debug.Log("parent " + objectHit.parent);
-				Debug.Log("tile " + objectHit.parent.GetComponent<Tile>());
-				Debug.Log("center " + objectHit.parent.GetComponent<Tile>().centerPosition);
-				Debug.Log("camControl " + camControl);
+				//Debug.Log("name " + objectHit.name);
+				//Debug.Log("parent " + objectHit.parent);
+				//Debug.Log("tile " + objectHit.parent.GetComponent<Tile>());
+				//Debug.Log("center " + objectHit.parent.GetComponent<Tile>().centerPosition);
+				//Debug.Log("camControl " + camControl);
 				if (camControl != null)
 				{
 					camControl.MoveTo(objectHit.parent.GetComponent<Tile>().centerPosition, .2f);
@@ -838,22 +824,26 @@ public class Tile : MonoBehaviour
 
 		interactionManager.QueryTokenInteraction( objectEventName, objectEventToken, ( res ) =>
 	{
-		if ( res.btn2 )
+		if (res.btn2)
 		{
-			Debug.Log( "INTERACT::" + res.interaction.dataName );
-			if ( res.interaction.interactionType != InteractionType.Persistent )
+			//Debug.Log( "INTERACT::" + res.interaction.dataName );
+			if (res.interaction.interactionType != InteractionType.Persistent)
 			{
-				interactionManager.ShowInteraction( res.interaction, objectHit, ( iresult ) =>
+				interactionManager.ShowInteraction(res.interaction, objectHit, (iresult) =>
 				{
-					if ( !res.interaction.isPersistent && iresult.removeToken )
-						tile.RemoveInteractivetoken( objectHit, metaData );
-				} );
+					if (!res.interaction.isPersistent && iresult.removeToken)
+						tile.RemoveInteractivetoken(objectHit, metaData);
+				});
 			}
 			else
-				Debug.Log( "Persistent Event, doing nothing" );
+			{
+				//Debug.Log( "Persistent Event, doing nothing" );
+			}
 		}
 		else
-			Debug.Log( "NO BTN2" );
+		{
+			//Debug.Log("NO BTN2");
+		}
 	} );
 	}
 

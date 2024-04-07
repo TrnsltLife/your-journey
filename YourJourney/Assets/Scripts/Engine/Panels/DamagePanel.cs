@@ -101,8 +101,8 @@ public class DamagePanel : MonoBehaviour
 			negatedBy = (Ability)item.negate;
 			if(negatedBy == Ability.Random) { negatedBy = (Ability)GlowEngine.GenerateRandomNumbers(6)[0]; }
 			string enemyKey = ((MonsterType)m.activationsId).ToString();
-			Debug.Log("Attack: " + "enemy.attack." + enemyKey + "." + item.id);
-			Debug.Log("Effect: " + "enemy.effect." + enemyKey + "." + item.id);
+			//Debug.Log("Attack: " + "enemy.attack." + enemyKey + "." + item.id);
+			//Debug.Log("Effect: " + "enemy.effect." + enemyKey + "." + item.id);
 			sAttack = Translate("enemy.attack." + enemyKey + "." + item.id, item.text);
 			sEffect = Translate("enemy.effect." + enemyKey + "." + item.id, item.effect);
 		}

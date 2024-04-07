@@ -36,14 +36,37 @@ public class Engine : MonoBehaviour
 	private Vector2 scenarioImageSize = new Vector2(1024, 512);
 	public TextMeshProUGUI scenarioOverlayText;
 	public TextAsset monsterActivationJson;
+	public GameObject anchorSphere;
+	public GameObject connectorSphere;
+	public GameObject specialSphere;
 
 	public bool debug = false;
+	public bool mapDebug = true;
 
 	bool doneLoading = false;
+	string loadingText = "Loading";
+	string loadingText2 = "";
+
+	public static Engine FindEngine()
+    {
+		return FindObjectOfType<Engine>();
+    }
+
+	public void SetLoadingText(string text)
+    {
+		loadingText = text;
+		loadingText2 = "";
+		scenarioOverlayText.text = loadingText + loadingText2;
+    }
+	public void SetLoadingText2(string text)
+	{
+		loadingText2 = text;
+		scenarioOverlayText.text = loadingText + loadingText2;
+	}
 
 	void Awake()
 	{
-		LoadScenarioImage(Bootstrap.gameStarter.coverImage);
+		LoadScenarioImage(Bootstrap.gameStarter.coverImage, true);
 
 		System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		System.Globalization.CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
@@ -117,18 +140,23 @@ public class Engine : MonoBehaviour
 		objectiveManager.Init( scenario );
 		chapterManager.Init( scenario );
 
-		fader.gameObject.SetActive( true );
+		//fader.gameObject.SetActive( true );
+		gameObject.SetActive(true); //don't fade in
+
+
 		//build the tiles
 		StartCoroutine( BuildScenario() );
 		StartCoroutine( BeginGame() );
 	}
 
-	public void LoadScenarioImage(string base64Image)
+	public void LoadScenarioImage(string base64Image, bool transparent=false)
 	{
 		if (base64Image == null || base64Image.Length == 0)
 		{
-			scenarioOverlay.GetComponent<Image>().sprite = null;
-			scenarioOverlay.SetActive(false);
+			Image image = scenarioOverlay.GetComponent<Image>();
+			image.sprite = null;
+			image.color = new Color(1, 1, 1, transparent ? 0 : 255);
+			scenarioOverlay.SetActive(true);
 		}
 		else
 		{
@@ -138,7 +166,7 @@ public class Engine : MonoBehaviour
 			scenarioSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width / 2, texture.height / 2));
 			Image image = scenarioOverlay.GetComponent<Image>();
 			image.sprite = scenarioSprite;
-			image.color = new Color(1, 1, 1);
+			image.color = new Color(1, 1, 1, transparent ? 0 : 255);
 			scenarioOverlay.SetActive(true);
 		}
 	}
@@ -154,18 +182,18 @@ public class Engine : MonoBehaviour
 
 	private void LoadDefaultMonsterModifiers()
     {
-		Debug.Log("LoadDefaultMonsterMOdifiers()");
+		//Debug.Log("LoadDefaultMonsterModifiers()");
 		List<MonsterModifier> modifiers = MonsterModifier.Values.ToList();
 		foreach(var modifier in modifiers)
         {
 			scenario.monsterModifiersObserver.Add(modifier);
         }
-		Debug.Log("LoadDefaultMonsterMOdifiers() finished");
+		//Debug.Log("LoadDefaultMonsterModifiers() finished");
 	}
 
 	private void LoadCustomMonsterModifiers()
     {
-		Debug.Log("LoadCustomMonsterMOdifiers()");
+		//Debug.Log("LoadCustomMonsterModifiers()");
 		foreach (ThreatInteraction threat in scenario.interactionObserver.Where(it => it.interactionType == InteractionType.Threat))
 		{
 			foreach (Monster monster in threat.monsterCollection)
@@ -173,11 +201,12 @@ public class Engine : MonoBehaviour
 				monster.LoadCustomModifiers(scenario.monsterModifiersObserver);
 			}
 		}
-		Debug.Log("LoadCustomMonsterMOdifiers() finished");
+		//Debug.Log("LoadCustomMonsterModifiers() finished");
 	}
 
 	IEnumerator BeginGame()
 	{
+		Debug.Log("BeginGame");
 		while ( !doneLoading )
 		{
 			//Debug.Log( "waiting..." );
@@ -298,8 +327,17 @@ public class Engine : MonoBehaviour
 
 	IEnumerator BuildScenario()
 	{
-		tileManager.BuildScenario();
-		yield return null;
+		Debug.Log("BuildScenario");
+
+		yield return null; //Let the Update() function draw the screen as created in Awake()
+
+		//Original code:
+		//tileManager.BuildScenario();
+		//yield return null;
+
+		//Coroutine code:
+		yield return StartCoroutine(tileManager.BuildScenarioCoroutine());
+
 		doneLoading = true;
 	}
 
@@ -449,7 +487,7 @@ public class Engine : MonoBehaviour
 
 	public void OnSkinpackUpdate(string skinpackName)
     {
-		Debug.Log("Engine.OnSkinpackUpdate(" + skinpackName + ")");
+		//Debug.Log("Engine.OnSkinpackUpdate(" + skinpackName + ")");
 		SkinsManager.LoadSkins( skinpackName );
 
 		//Update any existing CombatPanel -- actually currently the Settings Dialog can't be used while the Combat Panel is open so we don't need to do this
@@ -463,7 +501,7 @@ public class Engine : MonoBehaviour
 
 	public void OnLanguageUpdate(string languageName)
 	{
-		Debug.Log("Engine.OnLanguageUpdate(" + languageName + ")");
+		//Debug.Log("Engine.OnLanguageUpdate(" + languageName + ")");
 		LanguageManager.LoadLanguage(languageName);
 		LanguageManager.UpdateCurrentLanguage(languageName);
 		LanguageManager.CallSubscribers();

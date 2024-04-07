@@ -2867,10 +2867,10 @@ RectTransform:
   m_Father: {fileID: 1613820787}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960, y: -540}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &311347010
 MonoBehaviour:
@@ -8896,7 +8896,14 @@ MonoBehaviour:
   scenarioOverlayText: {fileID: 1339681916}
   monsterActivationJson: {fileID: 4900000, guid: 4816f46a0c8242c47b41ddb2ebaa7a5a,
     type: 3}
+  anchorSphere: {fileID: 988778545020331381, guid: 32a38b7cb56096c43b720de5a41dccdc,
+    type: 3}
+  connectorSphere: {fileID: 988778545020331381, guid: 9d158379d94005349be9dcfb1701c6ba,
+    type: 3}
+  specialSphere: {fileID: 988778545020331381, guid: 4e881fc72ce888a47ad6b96567ac6ebd,
+    type: 3}
   debug: 0
+  mapDebug: 1
 --- !u!114 &965560139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12831,7 +12838,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0.00001809001, y: 30.000046}
+  m_AnchoredPosition: {x: 0.00001809001, y: 30}
   m_SizeDelta: {x: 200, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1339681916
@@ -15548,7 +15555,7 @@ Canvas:
   m_RenderMode: 0
   m_Camera: {fileID: 963194227}
   m_PlaneDistance: 100
-  m_PixelPerfect: 0
+  m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0

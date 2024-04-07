@@ -73,7 +73,7 @@ public class CombatPanel : MonoBehaviour
 
 	public bool Show( Monster monster, Sprite bannerSprite, int skinVariant = 0 )
 	{
-		Debug.Log("CombatPanel.Show(" + monster.dataName + ")");
+		//Debug.Log("CombatPanel.Show(" + monster.dataName + ")");
 		this.monster = monster;
 		UpdateSkin((int)monster.monsterType, skinVariant);
 		SetBanner(bannerSprite);
@@ -166,7 +166,7 @@ public class CombatPanel : MonoBehaviour
 
 	public void PointerEnterModifierLabel(int modifierIndex)
     {
-		Debug.Log("PointerEnterModifierLabel(" + modifierIndex + ")");
+		//Debug.Log("PointerEnterModifierLabel(" + modifierIndex + ")");
 
 		if (modifierIndex <= monster.modifierList.Count)
 		{
@@ -198,7 +198,7 @@ public class CombatPanel : MonoBehaviour
 
 	public void PointerExitModifierLabel(int modifierIndex)
 	{
-		Debug.Log("PointerExitModifierLabel(" + modifierIndex + ")");
+		//Debug.Log("PointerExitModifierLabel(" + modifierIndex + ")");
 		modifierDescriptionText.text = "";
 	}
 
@@ -366,7 +366,7 @@ public class CombatPanel : MonoBehaviour
 	{
 		if ( ( !monster.isElite && monster.isExhausted ) || ( monster.isElite && monster.isStunned ) )
 		{
-			Debug.Log( "Monster group is exhausted, skipping counterattack" );
+			//Debug.Log( "Monster group is exhausted, skipping counterattack" );
 			FindObjectOfType<MonsterManager>().UnselectAll();
 			return;
 		}
