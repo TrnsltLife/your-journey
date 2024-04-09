@@ -9226,9 +9226,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6328446595474707951}
   m_Layer: 0
-  m_Name: connector4 (2)
+  m_Name: connector-exclude4 (2)
   m_TagString: Untagged
-  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
