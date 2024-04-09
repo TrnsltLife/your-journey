@@ -11,6 +11,7 @@ public class TileGroup
 	public List<Tile> tileList;
 	public bool isExplored { get; set; }
 	public Vector3 startPosition { get; set; }
+	public bool isPlaced { get; set; }
 
 	//each Tile is a child of containerObject
 	public Transform containerObject;
@@ -324,6 +325,60 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 		//Debug.Log("tilefix>::" + tile.baseTile.idNumber + "::" + tilefix);
 		return tilefix;
 	}
+
+	public void PruneInternalAnchors(TileGroup tileGroup2 = null)
+    {
+		List<Transform> connectors = GetOpenConnectorsTransforms().ToList();
+		List<Transform> anchors = GetOpenAnchorsTransforms().ToList();
+
+		if(tileGroup2 != null)
+        {
+			connectors.AddRange(tileGroup2.GetOpenConnectorsTransforms().ToList());
+			anchors.AddRange(tileGroup2.GetOpenAnchorsTransforms().ToList());
+        }
+
+		//prune internal anchors
+		for(int ic = connectors.Count - 1; ic >= 0; ic--)
+        {
+			for(int ia = anchors.Count - 1; ia >= 0; ia--)
+            {
+                if(Vector3.Distance(connectors[ic].position, anchors[ia].position) <= 0.2)
+                {
+					//Remove the anchor altogether
+					Transform anchor = anchors[ia];
+					anchors.RemoveAt(ia);
+					Object.Destroy(anchor.gameObject);
+                }
+            }
+        }
+
+		//rename internal connectors as "connector-exclude"
+		for (int c1 = 0; c1 < connectors.Count; c1++)
+		{
+			if (!connectors[c1].gameObject.name.Contains("exclude")) //don't look at connectors with "exclude" in their name
+			{
+				int nearby = 0;
+				for (int c2 = 0; c2 < connectors.Count; c2++)
+				{
+					if (c1 != c2) //don't compare a connector to itself
+					{
+						if (Vector3.Distance(connectors[c1].position, connectors[c2].position) <= 1.0) //actual distances should be about 0.866
+						{
+							nearby++;
+							if (nearby >= 6)
+							{
+								//add "exclude" to the name so it will be excluded from certain future tile attachment matches
+								string name = connectors[c1].gameObject.name;
+								connectors[c1].gameObject.name = connectors[c1].gameObject.name.Replace("connector", "connector-exclude");
+								Debug.Log("renamed " + name + " => " + connectors[c1].gameObject.name);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 
 	void AddRandomTokens(List<Transform> usedPositions )
 	{
@@ -1041,6 +1096,9 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 	/// </summary>
 	public System.Collections.IEnumerator AttachToCoroutine(TileGroup tgToAttachTo)
 	{
+		WaitForSeconds wfs = new WaitForSeconds(0.5f);
+
+
 		for (int i = 0; i < tgToAttachTo.tileList.Count; i++)
 		{
 			Debug.Log("attach to tile " + tgToAttachTo.tileList[i].baseTile.idNumber + tgToAttachTo.tileList[i].baseTile.tileSide);
@@ -1050,7 +1108,7 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 
 		//get all open connectors in THIS tilegroup (connectors are INside the bounds of the tile)
 		Debug.Log("GetOpenConnectors...");
-		Vector3[] openConnectors = GlowEngine.RandomizeArray(GetOpenConnectors());
+		//Vector3[] openConnectors = GlowEngine.RandomizeArray(GetOpenConnectors());
 		//System.Tuple<Vector3, Vector3> openConnectorsMinMax = MinMax(openConnectorVectors.ToList<Vector3>());
 		//Debug.Log("Gotten. Connector Vector MinMax: " + openConnectorsMinMax.Item1 + " / " + openConnectorsMinMax.Item2);
 
@@ -1073,8 +1131,8 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 
 		//get all open anchors on group we're connecting TO (anchors are OUTside the bounds of the tile)
 		Debug.Log("GetOpenAnchors");
-		Vector3[] tgOpenConnectors = GlowEngine.RandomizeArray(tgToAttachTo.GetOpenAnchors());
-		System.Tuple<Vector3, Vector3> openAnchorsMinMax = MinMax(tgOpenConnectors.ToList<Vector3>());
+		Vector3[] attachToOpenAnchors = GlowEngine.RandomizeArray(tgToAttachTo.GetOpenAnchors());
+		System.Tuple<Vector3, Vector3> openAnchorsMinMax = MinMax(attachToOpenAnchors.ToList<Vector3>());
 		//Debug.Log("Gotten. Anchor Vector MinMax: " + openAnchorsMinMax.Item1 + " / " + openAnchorsMinMax.Item2);
 
 		//dummy
@@ -1097,6 +1155,7 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 		int vectorIndex = 1;
 		bool safe = false;
 		Engine engine = Engine.FindEngine();
+		GameObject connectorSphere = null;
 		//foreach (Vector3 c in openConnectors)
 		foreach(Transform ct in openConnectorTransforms)
 		{
@@ -1104,11 +1163,11 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 
 			if (engine.mapDebug)
 			{
-				ct.gameObject.SetActive(true);
+				connectorSphere = RevealAnchorConnectorToken(ct, "connector");
 			}
 
-			engine.SetLoadingText2(", vantage point (" + vectorIndex + " of " + openConnectors.Count() + ")");
-			Debug.Log("foreach open connector " + vectorIndex + " of " + openConnectors.Count());
+			engine.SetLoadingText2(", Measure " + vectorIndex + " / " + openConnectorTransforms.Count() + " }");
+			Debug.Log("foreach open connector " + vectorIndex + " of " + openConnectorTransforms.Count());
 			yield return null;
 			vectorIndex++;
 
@@ -1132,13 +1191,14 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 
 			//move containerObject to each anchor trying to connect to (anchors are OUTside the bounds of the tile)
 			int connectorIndex = 1;
-			foreach (Vector3 a in tgOpenConnectors)
+			foreach (Vector3 a in attachToOpenAnchors)
 			{
 				connectorIndex++;
 
 				containerObject.position = a;
 				//rotate 360 for different orientations?
 				yield return null;
+				//yield return wfs;
 
 				//check collision
 				if (!CheckCollisionsWithinGroup(GetAllOpenConnectorsOnBoard()))
@@ -1150,9 +1210,9 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 						for (int i = 0; i < 5; i++)
 						{
 							Visible(false);
-							yield return new WaitForSeconds(0.5f);
+							yield return wfs;
 							Visible(true);
-							yield return new WaitForSeconds(0.5f);
+							yield return wfs;
 						}
 					}
 
@@ -1162,10 +1222,10 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 				}
 			}
 
-			if (engine.mapDebug)
+			if (engine.mapDebug && connectorSphere != null)
 			{
-				//Hide the gizmo
-				ct.gameObject.SetActive(true);
+				connectorSphere.SetActive(false);
+				Object.Destroy(connectorSphere);
 			}
 
 			if (safe)
@@ -1188,6 +1248,245 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 
 		Object.Destroy(dummy);
 		if (!safe)
+		{
+			Debug.Log("AttachTo*********NOT FOUND");
+			attachToCoroutineResult = false;
+			yield break;
+		}
+
+		Debug.Log("GenerateGroupCenter...");
+		GenerateGroupCenter();
+		Debug.Log("Generated: " + groupCenter);
+		attachToCoroutineResult = true;
+
+		//This should prune anchors and exclude connectors at the boundary of the connected tiles
+		//TODO: currently this won't handle if the tile also borders another tile besides this tile and tgToAttachTo
+		PruneInternalAnchors(tgToAttachTo);
+	}
+
+	public enum DensityPreference { LOWEST, LOW, LOW_MEDIUM, MEDIAN, MEDIUM, MEDIUM_HIGH, HIGH, HIGHEST };
+
+	/// <summary>
+	/// Randomly attaches one group to another - coroutine
+	/// </summary>
+	public System.Collections.IEnumerator AttachToWithDensityPreferenceCoroutine(TileGroup tgToAttachTo, DensityPreference densityPreference)
+	{
+		WaitForSeconds wfs = new WaitForSeconds(0.5f);
+
+		for (int i = 0; i < tgToAttachTo.tileList.Count; i++)
+		{
+			Debug.Log("attach to tile " + tgToAttachTo.tileList[i].baseTile.idNumber + tgToAttachTo.tileList[i].baseTile.tileSide);
+		}
+
+		//get all open connectors in THIS tilegroup (connectors are INside the bounds of the tile)
+		Debug.Log("GetOpenConnectors...");
+
+		Transform[] openConnectorTransforms = GlowEngine.RandomizeArray(GetOpenConnectorsTransforms(false));
+		System.Tuple<Vector3, Vector3> openConnectorsMinMax = MinMax(openConnectorTransforms.Select(it => it.position).ToList<Vector3>());
+
+		foreach (Transform t in GetOpenConnectorsTransforms())
+		{
+			if (Mathf.Approximately(t.position.x, openConnectorsMinMax.Item1.x) ||
+				Mathf.Approximately(t.position.z, openConnectorsMinMax.Item1.z) ||
+				Mathf.Approximately(t.position.x, openConnectorsMinMax.Item2.x) ||
+				Mathf.Approximately(t.position.z, openConnectorsMinMax.Item2.z))
+			{
+				t.position.Y(3.0f);
+				t.localPosition.Y(3.0f);
+				//Debug.Log("Raise min/max gizmo at " + t.position);
+			}
+		}
+
+
+		//get all open anchors on group we're connecting TO (anchors are OUTside the bounds of the tile)
+		Debug.Log("GetOpenAnchors");
+		Transform[] attachToOpenAnchorsTransforms = GlowEngine.RandomizeArray(tgToAttachTo.GetOpenAnchorsTransforms());
+		Vector3[] attachToOpenAnchors = attachToOpenAnchorsTransforms.Select(it => it.position).ToArray<Vector3>();
+		System.Tuple<Vector3, Vector3> openAnchorsMinMax = MinMax(attachToOpenAnchors.ToList<Vector3>());
+		//Debug.Log("Gotten. Anchor Vector MinMax: " + openAnchorsMinMax.Item1 + " / " + openAnchorsMinMax.Item2);
+
+		//dummy
+		GameObject dummy = new GameObject();
+		Vector3[] orTiles = new Vector3[tileList.Count];
+
+		//record original CONTAINER position
+		Vector3 or = containerObject.position;
+		//record original TILE positions
+		//Debug.Log("record tile positions...");
+		for (int i = 0; i < tileList.Count; i++)
+		{
+			orTiles[i] = tileList[i].transform.position;
+			//Debug.Log("tile " + tileList[i].baseTile.idNumber + tileList[i].baseTile.tileSide);
+			//Debug.Log("tile size: " + tileList[i].meshRenderer.bounds.size);
+			//Debug.Log("tile box min/max: " + tileList[i].meshRenderer.bounds.min + " -> " + tileList[i].meshRenderer.bounds.max);
+		}
+		//Debug.Log("recorded.");
+
+		int vectorIndex = 1;
+		bool foundAttachment = false;
+		Engine engine = Engine.FindEngine();
+		GameObject connectorSphere = null;
+		Dictionary<System.Tuple<Transform, Transform>, int> densityMap = new Dictionary<System.Tuple<Transform, Transform>, int>();
+		Transform[] allOpenConnectorsOnBoard = GetAllOpenConnectorsOnBoard();
+		Transform[] allOpenAnchorsOnBoard = GetAllOpenAnchorsOnBoard();
+		//foreach (Vector3 c in openConnectors)
+		foreach (Transform connectorTransform in openConnectorTransforms)
+		{
+			Vector3 connectorTransformPosition = connectorTransform.position;
+
+			if (engine.mapDebug)
+			{
+				connectorSphere = RevealAnchorConnectorToken(connectorTransform, "connector");
+			}
+
+			engine.SetLoadingText2(", Measure " + vectorIndex + " / " + openConnectorTransforms.Count() + " }");
+			Debug.Log("foreach open connector " + vectorIndex + " of " + openConnectorTransforms.Count());
+			yield return null;
+			vectorIndex++;
+
+			//parent each TILE to dummy
+			//Debug.Log("parenting tiles...");
+			foreach (Tile tile in tileList)
+			{
+				tile.transform.parent.transform.parent = dummy.transform;
+			}
+			//Debug.Log("parented.");
+			//move containerObject to each connector in THIS group (connectors are INside the bounds of the tile)
+			containerObject.position = connectorTransformPosition;
+			//parent TILES back to containerObject
+			//Debug.Log("parenting tiles back to containerObject...");
+			foreach (Tile tile in tileList)
+			{
+				tile.transform.parent.transform.parent = containerObject.transform;
+			}
+			//Debug.Log("parented.");
+
+			//move containerObject to each anchor trying to connect to (anchors are OUTside the bounds of the tile)
+			int connectorIndex = 1;
+			foreach (Transform attachToAnchorTransform in attachToOpenAnchorsTransforms)
+			{
+				connectorIndex++;
+
+				containerObject.position = attachToAnchorTransform.position;
+				//rotate 360 for different orientations?
+				yield return null;
+				//yield return wfs;
+
+				//check collision
+				//if (!CheckCollisionsWithinGroup(GetAllOpenConnectorsOnBoard()))
+				if (!CheckCollisionsWithinGroup(allOpenConnectorsOnBoard))
+				{
+
+					if (engine.mapDebug)
+					{
+						//Blink the tile group in its final position
+						for (int i = 0; i < 1; i++)
+						{
+							Visible(false);
+							yield return wfs;
+							Visible(true);
+							yield return wfs;
+						}
+					}
+
+					Debug.Log("Succeeded in connecting.");
+					foundAttachment = true;
+					//break;
+
+					//Check for density - how many anchors the new tile attaches to
+					//int attachmentCount = CountAttachmentsWithinGroup(GetAllOpenAnchorsOnBoard());
+					int attachmentCount = CountAttachmentsWithinGroup(allOpenAnchorsOnBoard);
+					densityMap[System.Tuple.Create(attachToAnchorTransform, connectorTransform)] = attachmentCount;
+				}
+			}
+
+			if (engine.mapDebug && connectorSphere != null)
+			{
+				connectorSphere.SetActive(false);
+				Object.Destroy(connectorSphere);
+			}
+
+		}
+
+		if(foundAttachment)
+		{
+			Debug.Log("DensityPreference: " + densityPreference);
+			//Separate densityMap into 3 tranches
+			Dictionary<int, int> densityValueMap = new Dictionary<int, int>();
+			densityMap.Values.ToList().ForEach(v => densityValueMap[v] = v);
+			List<int> densityValueList = densityValueMap.Keys.ToList();
+			densityValueList.Sort();
+			Debug.Log("densityValueList: " + string.Join(", ", densityValueList));
+			//int minDensity = densityValueList[0];
+			//int medDensity = densityValueList[densityValueList.Count / 2];
+			//int maxDensity = densityValueList.Last();
+
+			int minStartIndex = 0;
+			int medStartIndex = densityValueList.Count / 3;
+			int maxStartIndex = densityValueList.Count / 3 * 2;
+			if (maxStartIndex >= densityValueList.Count) { maxStartIndex = densityValueList.Count - 1; }
+
+			//Pick a set of attachment values in the prefered tranche based on the densityPreference
+			List<int> densityList = new List<int>();
+			switch (densityPreference)
+			{
+				case DensityPreference.LOWEST: densityList.Add(densityValueList[0]); break;
+				case DensityPreference.LOW: densityList.AddRange(densityValueList.GetRange(minStartIndex, System.Math.Max(1, medStartIndex - minStartIndex))); break;
+				case DensityPreference.LOW_MEDIUM: densityList.AddRange(densityValueList.GetRange(minStartIndex, System.Math.Max(1, maxStartIndex - medStartIndex))); break;
+				case DensityPreference.MEDIAN: densityList.Add(densityValueList[densityValueList.Count / 2]); break;
+				case DensityPreference.MEDIUM: densityList.AddRange(densityValueList.GetRange(medStartIndex, System.Math.Max(1, maxStartIndex - medStartIndex))); break;
+				case DensityPreference.MEDIUM_HIGH: densityList.AddRange(densityValueList.GetRange(medStartIndex, System.Math.Max(1, densityValueList.Count - medStartIndex))); break;
+				case DensityPreference.HIGH: densityList.AddRange(densityValueList.GetRange(maxStartIndex, System.Math.Max(1, densityValueList.Count - maxStartIndex))); break;
+				case DensityPreference.HIGHEST: densityList.Add(densityValueList[System.Math.Max(0, densityValueList.Count - 1)]); break;
+			}
+			Debug.Log("densityList: " + string.Join(", ", densityList));
+
+			//Pick a random position from the densityMap that maches one of the chosen attachment values
+			System.Tuple<Transform, Transform>[] availablePositions = densityMap.Where(x => densityList.Contains(x.Value)).Select(x => x.Key).ToArray();
+			var randomizedArray = GlowEngine.RandomizeArray(availablePositions);
+			Transform chosenAnchorTransform = randomizedArray[0].Item1;
+			Transform chosenConnectorTransform = randomizedArray[0].Item2;
+			Debug.Log("density anchorPosition: " + chosenAnchorTransform.position);
+			Debug.Log("density connectorPosition: " + chosenConnectorTransform.position);
+
+
+			//Reset tilegroup to original position
+			containerObject.position = or;
+			//Debug.Log("Reset tile original positions...");
+			for (int i = 0; i < tileList.Count; i++)
+			{
+				tileList[i].transform.position = orTiles[i];
+			}
+			//Move the tilegroup's container to the chosen position
+			foreach (Tile tile in tileList)
+			{
+				tile.transform.parent.transform.parent = dummy.transform;
+			}
+			//move containerObject to each connector in THIS group (connectors are INside the bounds of the tile)
+			containerObject.position = chosenConnectorTransform.position;
+			//parent TILES back to containerObject
+			foreach (Tile tile in tileList)
+			{
+				tile.transform.parent.transform.parent = containerObject.transform;
+			}
+			containerObject.position = chosenAnchorTransform.position;
+		}
+
+		if(!foundAttachment)
+		{
+			//Debug.Log( "RESETTING" );
+			//reset tilegroup to original position
+			containerObject.position = or;
+			//Debug.Log("Reset tile original positions...");
+			for (int i = 0; i < tileList.Count; i++)
+			{
+				tileList[i].transform.position = orTiles[i];
+			}
+			//Debug.Log("Reset.");
+		}
+
+		Object.Destroy(dummy);
+		if(!foundAttachment)
 		{
 			Debug.Log("AttachTo*********NOT FOUND");
 			attachToCoroutineResult = false;
@@ -1222,8 +1521,8 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 		}
 		if (token != null)
 		{
-			//token.transform.parent = transform;
-			token.transform.position.Z(1);
+			token.transform.parent = t;
+			token.transform.position.Y(0.5f);
 			token.SetActive(true);
 			//var posVisAVisGP = token.transform.parent.parent.InverseTransformPoint(token.transform.position);
 		}
@@ -1278,6 +1577,36 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 	}
 
 	/// <summary>
+	/// Count attachments between THIS group's CONNECTORS and input test points (ANCHORS)
+	/// (connectors are INside the bounds of the tile, anchors are OUTside)
+	/// </summary>
+	/// <returns>true if collision found</returns>
+	public int CountAttachmentsWithinGroup(Transform[] anchorPoints)
+	{
+		//create list of ALL connectors in ALL tiles in the group (connectors are INside the bounds of the tile)
+		var allConnectorsSet = from tile in tileList from tf in tile.GetChildren("connector") select tf.position;
+
+		//create list of all test point connectors
+		var anchorVectors = from tf in anchorPoints select tf.position;
+
+		int attachmentCount = 0;
+
+		foreach (Vector3 tp in anchorVectors)
+		{
+			foreach (Vector3 a in allConnectorsSet)
+			{
+				float d = Vector3.Distance(a, tp);
+				if (d <= .5)
+				{
+					attachmentCount++;
+				}
+			}
+		}
+
+		return attachmentCount;
+	}
+
+	/// <summary>
 	/// Given a set of transforms, find the minimum x and minimum z, and the maximum x and maximum z values.
 	/// Ignore the y value since we basically just care about 2D space
 	/// </summary>
@@ -1301,7 +1630,7 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
     }
 
 	/// <summary>
-	/// Returns ALL connectors in ALL tiles on board across ALL tilegroups (except THIS one)
+	/// Returns ALL connectors in ALL tiles on board across ALL tilegroups (except THIS one) that have isPlaced == true
 	/// (connectors are INside the bounds of the tile)
 	/// </summary>
 	public Transform[] GetAllOpenConnectorsOnBoard()
@@ -1310,12 +1639,30 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 		//get all connectors EXCEPT the ones in THIS tilegroup since we'll be testing THIS group's connectors against all OTHERS
 		//otherwise it'll test against ITSELF
 		var allConnectors = from tg in tileManager.GetAllTileGroups()
-												where tg.GUID != GUID
+												where tg.GUID != GUID && tg.isPlaced
 												from tile in tg.tileList
 												from tf in tile.GetChildren( "connector" )
 												select tf;
 		return allConnectors.ToArray();
 	}
+
+	/// <summary>
+	/// Returns ALL anchors in ALL tiles on board across ALL tilegroups (except THIS one) that have isPlaced == true
+	/// (anchors are OUTside the bounds of the tile)
+	/// </summary>
+	public Transform[] GetAllOpenAnchorsOnBoard()
+	{
+		//(connectors are INside the bounds of the tile)
+		//get all anchors EXCEPT the ones in THIS tilegroup since we'll be testing THIS group's anchors against all OTHERS
+		//otherwise it'll test against ITSELF
+		var allAnchors = from tg in tileManager.GetAllTileGroups()
+							where tg.GUID != GUID && tg.isPlaced
+							from tile in tg.tileList
+							from tf in tile.GetChildren("anchor")
+							select tf;
+		return allAnchors.ToArray();
+	}
+
 
 	/// <summary>
 	/// returns all connector positions in the tilegroup
@@ -1331,6 +1678,8 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 
 	public Transform[] GetOpenConnectorsTransforms(bool allowExcluded=true)
 	{
+		var baz = from tile in tileList select tile.name;
+		Debug.Log("openConnectors tiles: " + string.Join(", ", baz.ToArray()));
 		var bar = from tile in tileList from c in tile.GetChildren("connector") where c.name.Contains("exclude") == allowExcluded select c.name;
 		Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
 		var foo = from tile in tileList from c in tile.GetChildren("connector") select c;
@@ -1384,7 +1733,7 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 	public Transform[] GetOpenAnchorsTransforms()
 	{
 		var bar = from tile in tileList from c in tile.GetChildren("anchor") select c.name;
-		Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
+		//Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
 		var allAnchors = from tile in tileList from tf in tile.GetChildren("anchor") select tf;
 		return allAnchors.ToArray();
 	}

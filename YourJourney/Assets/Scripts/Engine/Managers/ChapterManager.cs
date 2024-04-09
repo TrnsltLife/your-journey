@@ -181,7 +181,7 @@ public class ChapterManager : MonoBehaviour
 			//fall back to using random tg if it doesn't fit
 			if ( c.isDynamic )
 			{
-				StartCoroutine( AttachTile( tg ) );
+				StartCoroutine( AttachTileCoroutine( tg ) );
 
 				////get ALL explored tilegroups in play
 				//var tilegroups = ( from ch in chapterList
@@ -299,6 +299,53 @@ public class ChapterManager : MonoBehaviour
 				success = tg.AttachTo( _tg );
 				if ( success )
 					break;
+			}
+		}
+		yield return null;
+	}
+
+	IEnumerator AttachTileCoroutine(TileGroup tg)
+	{
+		//get ALL explored tilegroups in play
+		var tilegroups = (from ch in chapterList
+						  where ch.tileGroup.isExplored && ch.tileGroup.isPlaced
+						  select ch.tileGroup).ToList();
+
+		bool success = false;
+
+		if (previousGroup != null)
+		{
+			yield return StartCoroutine(tg.AttachToCoroutine(previousGroup));
+			success = tg.attachToCoroutineResult;
+
+			//remove so not attempted again below
+			tilegroups.Remove(previousGroup);
+		}
+		else
+		{
+			int randIdx = GlowEngine.GenerateRandomNumbers(tilegroups.Count)[0];
+			TileGroup randGroup = tilegroups[randIdx];
+
+			yield return StartCoroutine(tg.AttachToCoroutine(randGroup));
+			success = tg.attachToCoroutineResult;
+
+			//remove so not attempted again below
+			tilegroups.RemoveAt(randIdx);
+		}
+		tg.isPlaced = success;
+
+		if (!success)
+		{
+			Debug.Log("***SEARCHING for random tilegroup to attach to...");
+			foreach (TileGroup _tg in tilegroups)
+			{
+				yield return StartCoroutine(tg.AttachToCoroutine(_tg));
+				success = tg.attachToCoroutineResult;
+				if (success)
+				{
+					tg.isPlaced = true;
+					break;
+				}
 			}
 		}
 		yield return null;

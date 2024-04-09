@@ -41,7 +41,7 @@ public class Engine : MonoBehaviour
 	public GameObject specialSphere;
 
 	public bool debug = false;
-	public bool mapDebug = true;
+	public bool mapDebug = false;
 
 	bool doneLoading = false;
 	string loadingText = "Loading";
@@ -66,7 +66,7 @@ public class Engine : MonoBehaviour
 
 	void Awake()
 	{
-		LoadScenarioImage(Bootstrap.gameStarter.coverImage, true);
+		LoadScenarioImage(Bootstrap.gameStarter.coverImage, mapDebug);
 
 		System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		System.Globalization.CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;

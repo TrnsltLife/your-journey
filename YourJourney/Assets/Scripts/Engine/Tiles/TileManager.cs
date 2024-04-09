@@ -371,6 +371,7 @@ public class TileManager : MonoBehaviour
 			return null;
 
 		TileGroup tg = c.isRandomTiles ? TileGroup.CreateRandomGroup( c ) : TileGroup.CreateFixedGroup( c );
+		tg.PruneInternalAnchors();
 		tileGroupList.Add( tg );
 		return tg;
 	}
@@ -681,7 +682,7 @@ public class TileManager : MonoBehaviour
 		//build ALL chapter tilegroups
 		foreach (Chapter c in cm.chapterList)
 		{
-			engine.SetLoadingText("Scouting Region " + TGList.Count);
+			engine.SetLoadingText("A Mighty Theme Unfolds...");
 			yield return null;
 			Debug.Log("Building Tile Group " + TGList.Count + " of " + cm.chapterList.Count + "...");
 			//build the tiles in the tg
@@ -693,37 +694,49 @@ public class TileManager : MonoBehaviour
 			}
 
 			TGList.Add(tg);
+
+			if(tg.GetChapter().dataName == "Start")
+            {
+				tg.isPlaced = true;
+            }
+
 			Debug.Log("Built");
 		}
 
 		//Connect all non-dynamic tiles excluding start
-		int nonDynamicNonStart = TGList.Where(x => !x.GetChapter().isDynamic && x.GetChapter().dataName != "Start").Count();
+		//int nonDynamicNonStart = TGList.Where(x => !x.isPlaced && !x.GetChapter().isDynamic && x.GetChapter().dataName != "Start").Count();
+		List<TileGroup> nonDynamicNonStartList = TGList.Where(x => !x.isPlaced && !x.GetChapter().isDynamic && x.GetChapter().dataName != "Start").ToList();
 		int outerCount = 1;
-		foreach (TileGroup tg in TGList.Where(x => !x.GetChapter().isDynamic && x.GetChapter().dataName != "Start"))
+		//foreach (TileGroup tg in TGList.Where(x => !x.isPlaced && !x.GetChapter().isDynamic && x.GetChapter().dataName != "Start"))
+		foreach (TileGroup tg in nonDynamicNonStartList)
 		{
-			//try attaching tg to oldest tg already on board
-			int nonDynamic = TGList.Where(x => !x.GetChapter().isDynamic && x.GUID != tg.GUID).Count();
+			//try attaching tg to oldest tg already on board - only ones that have already been placed
+			//int nonDynamic = TGList.Where(x => x.isPlaced && !x.GetChapter().isDynamic && x.GUID != tg.GUID).Count();
+			List<TileGroup> nonDynamicList = TGList.Where(x => x.isPlaced && !x.GetChapter().isDynamic && x.GUID != tg.GUID).ToList();
 			int innerCount = 1;
-			foreach (TileGroup tilegroup in TGList.Where(x => !x.GetChapter().isDynamic && x.GUID != tg.GUID))//every non-dynamic
+			foreach (TileGroup tilegroup in nonDynamicList)//every non-dynamic
 			{
 				Debug.Log("Attach TileGroups " + tg.GetChapter().dataName + " " + tg.ToString() + " to " + tilegroup.GetChapter().dataName + " " + tilegroup.ToString());
-				Debug.Log("Attach TileGroups outerLoop " + outerCount + " of " + nonDynamicNonStart + ", innerLoop " + innerCount + " of " + nonDynamic);
+				Debug.Log("Attach TileGroups outerLoop " + outerCount + " of " + nonDynamicNonStartList.Count() + ", innerLoop " + innerCount + " of " + nonDynamicList.Count());
 
 				//original code
 				//bool success = tg.AttachTo(tilegroup);
 
 				//coroutine code
-				engine.SetLoadingText("Triangulating Region (" + outerCount + " of " + nonDynamicNonStart + ") from Neighbor " + innerCount);
+				engine.SetLoadingText("Singing region " + outerCount + " into being...  { Canto " + innerCount);
 
 				if (engine.mapDebug)
 				{
 					tg.Visible(true);
+					tg.Sepia(true);
+
 					tilegroup.Visible(true);
-					tg.Sepia(false);
 					tilegroup.Sepia(false);
 				}
 
+
 				yield return StartCoroutine(tg.AttachToCoroutine(tilegroup));
+				//yield return StartCoroutine(tg.AttachToWithDensityPreferenceCoroutine(tilegroup, TileGroup.DensityPreference.HIGH));
 				bool success = tg.attachToCoroutineResult;
 
 				if (engine.mapDebug)
@@ -734,6 +747,7 @@ public class TileManager : MonoBehaviour
 
 				if (success)
 				{
+					tg.isPlaced = true;
 					Debug.Log("***ATTACHING " + tg.GetChapter().dataName + " to " + tilegroup.GetChapter().dataName);
 					GameObject fog = Instantiate(fogPrefab, transform);
 					FogData fg = fog.GetComponent<FogData>();
@@ -743,8 +757,10 @@ public class TileManager : MonoBehaviour
 
 					if (engine.mapDebug)
 					{
+						//Turn a tile group off after it has been placed
 						//tg.Visible(false);
 						//tilegroup.Visible(false);
+						fog.SetActive(false);
 					}
 
 					break;
