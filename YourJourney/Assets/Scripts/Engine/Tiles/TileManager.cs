@@ -682,7 +682,7 @@ public class TileManager : MonoBehaviour
 		//build ALL chapter tilegroups
 		foreach (Chapter c in cm.chapterList)
 		{
-			engine.SetLoadingText("A Mighty Theme Unfolds...");
+			engine.SetLoadingText(Translate("title.text.AMightyThemeUnfolds", "A Mighty Theme Unfolds..."));
 			yield return null;
 			Debug.Log("Building Tile Group " + TGList.Count + " of " + cm.chapterList.Count + "...");
 			//build the tiles in the tg
@@ -723,7 +723,9 @@ public class TileManager : MonoBehaviour
 				//bool success = tg.AttachTo(tilegroup);
 
 				//coroutine code
-				engine.SetLoadingText("Singing region " + outerCount + " into being...  { Canto " + innerCount);
+				engine.SetLoadingText(Translate("title.text.SingingTheWorldIntoBeing", "Singing the world into being {{ Cantata {0}, Movement {1} ",
+						new List<string> { outerCount.ToString(), innerCount.ToString()}
+					));
 
 				if (engine.mapDebug)
 				{

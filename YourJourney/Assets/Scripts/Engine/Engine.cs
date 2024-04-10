@@ -338,6 +338,12 @@ public class Engine : MonoBehaviour
 		//Coroutine code:
 		yield return StartCoroutine(tileManager.BuildScenarioCoroutine());
 
+		if(mapDebug)
+        {
+			ActivateFog();
+			HideAllTiles();
+        }
+
 		doneLoading = true;
 	}
 
@@ -535,6 +541,28 @@ public class Engine : MonoBehaviour
 				ob.gameObject.SetActive( false );
 			if (ob.name.StartsWith("Start Token"))
 				ob.gameObject.SetActive(false);
+		}
+	}
+
+	void ActivateFog()
+    {
+		//Used when we've turned off fog for mapDebug
+		foreach (Transform child in transform)
+		{
+			FogData fg = child.GetComponent<FogData>();
+			if (fg != null)
+            {
+				child.gameObject.SetActive(true);
+			}
+		}
+	}
+
+	void HideAllTiles()
+    {
+		foreach (Chapter c in chapterManager.chapterList)
+		{
+			TileGroup tg = c.tileGroup;
+			tg.Visible(false);
 		}
 	}
 

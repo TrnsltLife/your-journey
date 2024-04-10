@@ -128,16 +128,18 @@ public class ChapterManager : MonoBehaviour
 			Chapter c = chapterList.Where( x => x.dataName == chname ).First();
 			Debug.Log( "TryTriggerChapter::Found Chapter: " + c.dataName );
 			//show flavor text
-			if ( !c.noFlavorText )
+			if (!c.noFlavorText)
 			{
 				var im = FindObjectOfType<InteractionManager>().GetNewTextPanel();
-				im.ShowOkContinue( c.flavorBookData.pages[0], ButtonIcon.Continue, () =>
+				im.ShowOkContinue(c.flavorBookData.pages[0], ButtonIcon.Continue, () =>
 				 {
-					 FinishChapterTrigger( c, firstChapter );
-				 } );
+					 StartCoroutine(FinishChapterTriggerCoroutine(c, firstChapter));
+				 });
 			}
 			else
-				FinishChapterTrigger( c, firstChapter );
+			{
+				StartCoroutine(FinishChapterTriggerCoroutine(c, firstChapter));
+			}
 		}
 	}
 
@@ -181,7 +183,7 @@ public class ChapterManager : MonoBehaviour
 			//fall back to using random tg if it doesn't fit
 			if ( c.isDynamic )
 			{
-				StartCoroutine( AttachTileCoroutine( tg ) );
+				AttachDynamicTileCoroutine( tg, null );
 
 				////get ALL explored tilegroups in play
 				//var tilegroups = ( from ch in chapterList
@@ -267,6 +269,106 @@ public class ChapterManager : MonoBehaviour
 		} );
 	}
 
+
+	IEnumerator FinishChapterTriggerCoroutine(Chapter c, bool firstChapter)
+	{
+		Debug.Log("FinishChapterTrigger chapter " + c.dataName + " firstChapter? " + firstChapter);
+		string s = Translate("dialog.text.PrepareTiles", "Prepare the following tiles:") + "\r\n\r\n";
+		//Create the list of tiles
+		foreach (BaseTile bt in c.tileObserver)
+		{
+			Debug.Log(bt.ToString());
+			if (bt.tileType == TileType.Hex)
+			{
+				s += bt.idNumber + bt.tileSide
+					+ "<font=\"Icon\">" + Collection.FromTileNumber(bt.idNumber).FontCharacter + "</font>" //Add the Collection symbol.
+					+ ", ";
+			}
+			else if (bt.tileType == TileType.Square)
+			{
+				s += Translate(bt.tileSide == "A" ? "dialog.text.BattleTileGrass" : "BattleTileDirt",
+						"Battle Map Tile " + (bt.tileSide == "A" ? " (Grass)" : " (Dirt)"))
+					+ ", ";
+			}
+		}
+		s = s.Substring(0, s.Length - 2); //Remove trailing comma
+
+		TextPanel textPanel = FindObjectOfType<InteractionManager>().GetNewTextPanel();
+
+		//TileGroup tg = FindObjectOfType<TileManager>().CreateGroupFromChapter( c );
+		TileGroup tg = c.tileGroup;
+
+		//Show the panel, and afterwards start creating the dynamic tile attachment if needed
+		textPanel.ShowPrepareTiles(s, ButtonIcon.Continue, c.isDynamic, () =>
+		{
+			if (tg == null)
+			{
+				Debug.Log("FinishChapterTrigger::WARNING::Chapter has no tiles: " + c.dataName);
+				return;
+			}
+
+			tg.ActivateTiles();
+			FindObjectOfType<Engine>().RemoveFog(tg.GetChapter().dataName);
+
+			tg.AnimateTileUp(c);
+
+			previousGroup = tg;
+
+			if (firstChapter && c.isPreExplored)
+			{
+				tg.Colorize();
+				tg.isExplored = true;
+			}
+			else if (firstChapter)
+			{
+				//Starting tile group unexplored, but we still need to colorize the starting tile
+				tg.Colorize(true);
+			}
+
+			FindObjectOfType<CamControl>().MoveTo(tg.groupCenter);
+
+			//check triggered token queue
+			var foo = from tname in tokenTriggerQueue from tile in tg.tileList.Where(x => x.HasTriggeredToken(tname)) select new { tile, tname };
+			//if ( foo.Count() > 0 )
+			//Debug.Log( "FinishChapterTrigger::" + foo.Count() );
+			foreach (var item in foo)
+			{
+				item.tile.EnqueueTokenTrigger(item.tname);
+				//tokenTriggerQueue.Remove( item.tname );
+			}
+
+			if (tg.startPosition.x != -1000)
+			{
+				GlowTimer.SetTimer(1, () =>
+				{
+					startMarker.Spawn(tg.startPosition);
+					if (firstChapter && !c.isPreExplored)
+					{
+						tg.Colorize(true);
+						tg.isExplored = true;
+					}
+				});
+				FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("dialog.text.PlaceHeroes", "Place your Heroes in the indicated position."), ButtonIcon.Continue, () =>
+				{
+					int scoutAmount = Engine.currentScenario.initialScout;
+					if (scoutAmount > 0)
+					{
+						FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowScoutX(scoutAmount);
+					}
+				});
+			}
+		});
+
+		//attempt to attach this tg, but only if it IS dynamic. The coroutine should also update the text panel's value with a progress bar type update.
+		if (c.isDynamic)
+		{
+			yield return StartCoroutine(AttachDynamicTileCoroutine(tg, textPanel));
+			textPanel.ShowButtonSingle(); //once we're done finding the attach point, show the button to close the text panel
+			textPanel.UpdateText(""); //remove any Scouting Location text
+		}
+
+	}
+
 	IEnumerator AttachTile( TileGroup tg )
 	{
 		//get ALL explored tilegroups in play
@@ -304,7 +406,7 @@ public class ChapterManager : MonoBehaviour
 		yield return null;
 	}
 
-	IEnumerator AttachTileCoroutine(TileGroup tg)
+	IEnumerator AttachDynamicTileCoroutine(TileGroup tg, TextPanel textPanel)
 	{
 		//get ALL explored tilegroups in play
 		var tilegroups = (from ch in chapterList
@@ -315,7 +417,7 @@ public class ChapterManager : MonoBehaviour
 
 		if (previousGroup != null)
 		{
-			yield return StartCoroutine(tg.AttachToCoroutine(previousGroup));
+			yield return StartCoroutine(tg.AttachToCoroutine(previousGroup, textPanel));
 			success = tg.attachToCoroutineResult;
 
 			//remove so not attempted again below
@@ -326,7 +428,7 @@ public class ChapterManager : MonoBehaviour
 			int randIdx = GlowEngine.GenerateRandomNumbers(tilegroups.Count)[0];
 			TileGroup randGroup = tilegroups[randIdx];
 
-			yield return StartCoroutine(tg.AttachToCoroutine(randGroup));
+			yield return StartCoroutine(tg.AttachToCoroutine(randGroup, textPanel));
 			success = tg.attachToCoroutineResult;
 
 			//remove so not attempted again below
@@ -339,7 +441,7 @@ public class ChapterManager : MonoBehaviour
 			Debug.Log("***SEARCHING for random tilegroup to attach to...");
 			foreach (TileGroup _tg in tilegroups)
 			{
-				yield return StartCoroutine(tg.AttachToCoroutine(_tg));
+				yield return StartCoroutine(tg.AttachToCoroutine(_tg, textPanel));
 				success = tg.attachToCoroutineResult;
 				if (success)
 				{

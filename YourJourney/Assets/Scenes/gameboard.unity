@@ -8903,7 +8903,7 @@ MonoBehaviour:
   specialSphere: {fileID: 988778545020331381, guid: 4e881fc72ce888a47ad6b96567ac6ebd,
     type: 3}
   debug: 0
-  mapDebug: 1
+  mapDebug: 0
 --- !u!114 &965560139
 MonoBehaviour:
   m_ObjectHideFlags: 0

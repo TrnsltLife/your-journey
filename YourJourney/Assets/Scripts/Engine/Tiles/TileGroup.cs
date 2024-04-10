@@ -2,6 +2,7 @@
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
+using static LanguageManager;
 
 public class TileGroup
 {
@@ -1094,7 +1095,7 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 	/// <summary>
 	/// Randomly attaches one group to another - coroutine
 	/// </summary>
-	public System.Collections.IEnumerator AttachToCoroutine(TileGroup tgToAttachTo)
+	public System.Collections.IEnumerator AttachToCoroutine(TileGroup tgToAttachTo, TextPanel prepareTileTextPanel=null)
 	{
 		WaitForSeconds wfs = new WaitForSeconds(0.5f);
 
@@ -1166,7 +1167,18 @@ grid.CopyTileToTileGroup(tileGrid, tileMarker);
 				connectorSphere = RevealAnchorConnectorToken(ct, "connector");
 			}
 
-			engine.SetLoadingText2(", Measure " + vectorIndex + " / " + openConnectorTransforms.Count() + " }");
+			if(prepareTileTextPanel != null)
+            {
+				//Display in the Prepare Tiles text panel
+				prepareTileTextPanel.UpdateText("\n" + Translate("dialog.text.tile.ScoutingApproach", "\nScouting approach {0} / {1}...",
+					new List<string> { vectorIndex.ToString(), openConnectorTransforms.Count().ToString()}));
+			}
+			else
+            {
+				//Display on the Loading screen
+				engine.SetLoadingText2(Translate("dialog.text.Aria", ", Aria {0} / {1} }}",
+					new List<string> { vectorIndex.ToString(), openConnectorTransforms.Count().ToString() }));
+			}
 			Debug.Log("foreach open connector " + vectorIndex + " of " + openConnectorTransforms.Count());
 			yield return null;
 			vectorIndex++;
