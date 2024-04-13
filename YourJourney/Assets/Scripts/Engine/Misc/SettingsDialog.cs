@@ -110,7 +110,7 @@ public class SettingsDialog : MonoBehaviour
 
 		//populate language dropdown
 		string savedLanguage = settings.Rest.Item1;
-		Debug.Log("Saved language is: " + savedLanguage);
+		//Debug.Log("Saved language is: " + savedLanguage);
 		languageList = LanguageManager.DiscoverLanguageFiles();
 		languageDropdownList = new List<TMP_Dropdown.OptionData>();
 		int selectedLanguageIndex = 0;
@@ -120,7 +120,7 @@ public class SettingsDialog : MonoBehaviour
 			//string languageName = LanguageManager.LanguageNameFromFilename(language);
 			string languageName = language.languageName;
 			languageDropdownList.Add(new TMP_Dropdown.OptionData(languageName));
-			Debug.Log("Compare " + languageName + " to " + savedLanguage + " with List.Count " + languageDropdownList.Count);
+			//Debug.Log("Compare " + languageName + " to " + savedLanguage + " with List.Count " + languageDropdownList.Count);
 			if (languageName == savedLanguage)
 			{
 				selectedLanguageIndex = languageDropdownList.Count - 1;
@@ -152,7 +152,7 @@ public class SettingsDialog : MonoBehaviour
 
 	public void OnQuit()
 	{
-		Debug.Log("OnQuit");
+		//Debug.Log("OnQuit");
 		//save settings
 		Bootstrap.SaveSettings( new Tuple<int, int, int, int, int, int, string, Tuple<string>>(
 			musicToggle.isOn ? 1 : 0,
@@ -167,7 +167,7 @@ public class SettingsDialog : MonoBehaviour
 
 		if (quitAction != null)
 		{
-			Debug.Log("Quit Action");
+			//Debug.Log("Quit Action");
 			settingsCanvasGroup.DOFade(0, .25f).OnComplete(() =>
 			{
 				settingsCanvasGroup.gameObject.SetActive(false);
@@ -176,7 +176,7 @@ public class SettingsDialog : MonoBehaviour
 		}
 		else
 		{
-			Debug.Log("Quit App");
+			//Debug.Log("Quit App");
 			Application.Quit();
 		}
 	}
@@ -217,22 +217,22 @@ public class SettingsDialog : MonoBehaviour
 
 	public void OnSkinpack()
     {
-		Debug.Log("SettingsDialog.OnSkinpack()");
+		//Debug.Log("SettingsDialog.OnSkinpack()");
 		string skinpack = GetSelectedSkinpack();
 		if(skinUpdateAction != null)
         {
-			Debug.Log("skinUpdateAction()");
+			//Debug.Log("skinUpdateAction()");
 			skinUpdateAction(skinpack);
         }
     }
 
 	public void OnLanguage()
 	{
-		Debug.Log("SettingsDialog.OnLanguage()");
+		//Debug.Log("SettingsDialog.OnLanguage()");
 		string language = GetSelectedLanguage();
 		if (languageUpdateAction != null)
 		{
-			Debug.Log("languageUpdateAction()");
+			//Debug.Log("languageUpdateAction()");
 			languageUpdateAction(language);
 		}
 	}

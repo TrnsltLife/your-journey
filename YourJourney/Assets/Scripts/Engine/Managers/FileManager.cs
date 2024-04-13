@@ -118,14 +118,14 @@ public class FileManager
 
 		try
 		{
-			Debug.Log("StreamReader#ReadToEnd()");
+			//Debug.Log("StreamReader#ReadToEnd()");
 			string json = "";
 			using ( StreamReader sr = new StreamReader( filename ) )
 			{
 				json = sr.ReadToEnd();
 			}
 
-			Debug.Log("JsonConvert#DeserializeObject()");
+			//Debug.Log("JsonConvert#DeserializeObject()");
 			ITraceWriter traceWriter = new MemoryTraceWriter();
 			var fm = JsonConvert.DeserializeObject<FileManager>( json, new JsonSerializerSettings()
 			{
@@ -138,7 +138,7 @@ public class FileManager
 				}
 			});
 
-			Debug.Log("Scenario#CreateInstance()");
+			//Debug.Log("Scenario#CreateInstance()");
 			return Scenario.CreateInstance( fm );
 		}
 		catch(Exception e)
@@ -219,7 +219,7 @@ public class FileManager
 					item.collections = scenario.collectionObserver.ToList();
 					item.coverImage = scenario.coverImage;
 					item.scenarioVersion = scenario.scenarioVersion;
-					Debug.Log("setting version for " + scenario.scenarioName + " " + item.scenarioVersion);
+					//Debug.Log("setting version for " + scenario.scenarioName + " " + item.scenarioVersion);
 					foreach ( int col in scenario.collectionObserver )
                     {
 						if(!pi.collections.Contains( col)) { pi.collections.Add( col ); }
@@ -262,7 +262,7 @@ public class FileManager
 				item.coverImage = scenario.coverImage;
 				item.scenarioVersion = scenario.scenarioVersion;
 				item.specialInstructions = scenario.specialInstructions;
-				Debug.Log("setting coverImage for " + scenario.scenarioName + " " + item.coverImage);
+				//Debug.Log("setting coverImage for " + scenario.scenarioName + " " + item.coverImage);
 			}
 
 			return c;

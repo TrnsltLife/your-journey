@@ -190,7 +190,7 @@ public class SelectSaveSlot : MonoBehaviour
 			itemTypeTranslation.Change("file.text.Standalone", "This is a Standalone Scenario");
 			//itemType.text = "This is a Standalone Scenario";
 
-			Debug.Log( "OnSelectSlot::" + index + "::" + selectedState.projectType );
+			//Debug.Log( "OnSelectSlot::" + index + "::" + selectedState.projectType );
 			//check file version for standalone scenario
 			if ( selectedState.projectType == ProjectType.Standalone )
 			{

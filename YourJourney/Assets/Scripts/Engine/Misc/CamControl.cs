@@ -1,6 +1,7 @@
 ﻿using System;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Rendering.PostProcessing;
 
 public class CamControl : MonoBehaviour
@@ -16,7 +17,10 @@ public class CamControl : MonoBehaviour
 
 	//old Z = -2.40108
 	public float moveDragSpeed = .005f, rotateSpeed = 30, rotateDuration = .25f, 
-		doubleClickSpeed = .25f, zoomMin = 3f, zoomMax = 20f, smoothSpeed;
+		doubleClickSpeed = .25f, zoomMin = 5f, zoomMax = 14f, smoothSpeed,
+		tiltMin = 45f, tiltMax = 85f, zSlideMin = 0f, zSlideMax = 0.6f;
+
+	//zoomMin = 3f, zoomMax = 20f
 
 	float rotateAmount = 0, dClickTimer;
 	Vector2 dragStart;
@@ -32,6 +36,37 @@ public class CamControl : MonoBehaviour
 		targetZoom = cam.transform.localPosition;
 		DOF = Vector3.one;
 		combatPanel = FindObjectOfType<CombatPanel>();
+	}
+
+	public void AdjustSettings(bool isJourneyMap)
+    {
+		//original values
+		zoomMin = 3f;
+		zoomMax = 6f;
+		tiltMin = 50f;
+		tiltMax = 55f;
+		zSlideMin = 0f;
+		zSlideMax = 0.6f;
+
+		if (isJourneyMap)
+        {
+			zoomMin = 3f;
+			zoomMax = 14f; // 20f
+			tiltMin = 50f; // 45f
+			tiltMax = 75f; // 85f
+			zSlideMin = 0f;
+			zSlideMax = 0.6f;
+		}
+		else //Battle Map
+        {
+			zoomMin = 5f;
+			zoomMax = 14f;
+			tiltMin = 55f;
+			tiltMax = 75f;
+			zSlideMin = 0f;
+			zSlideMax = 0f;
+		}
+
 	}
 
 	//void lookAt()
@@ -79,9 +114,51 @@ public class CamControl : MonoBehaviour
 		HandleRotation();
 		HandleMove();
 		HandleZoom();
+
+		//Use to debug zoom and positioning
+		if (Engine.FindEngine().mapDebug)
+		{
+			Engine.FindEngine().scenarioOverlay.SetActive(true);
+			Engine.FindEngine().scenarioOverlay.GetComponent<Image>().color = new Color(1, 1, 1, 0); //set image transparent
+			Engine.FindEngine().SetLoadingText("p" + targetPos + " z" + targetZoom + " F" + DOF + " *F" + targetDOF + " 8)" + targetLookAt);
+		}
 	}
 
-	void HandleZoom()
+	void HandleZoomOriginal() //original
+    {
+		float axis = Input.GetAxis("Mouse ScrollWheel");
+		float y = cam.transform.localPosition.y;
+
+		// scroll up
+		if (axis > 0f)
+		{
+			if (y - .2f >= 3f)
+				targetZoom = cam.transform.localPosition - new Vector3(0, .2f, 0);
+		}
+		// scroll down
+		else if (axis < 0f)
+		{
+			if (y + .2f <= 6f)
+				targetZoom = cam.transform.localPosition + new Vector3(0, .2f, 0);
+		}
+
+		float fdScalar = GlowEngine.RemapValue(y, 3, 6, focusDistMin, focusDistMax);
+		targetDOF.Set(fdScalar, fdScalar, fdScalar);
+
+		//Set the polar rotation - the map rotates around this axis
+		if(Engine.currentScenario.scenarioTypeJourney)
+		{
+			targetLookAt.y = 26.87f; //offset angle for the hex map
+		}
+		else
+        {
+			targetLookAt.y = 0f; //this looks straight on to the battle map
+		}
+		//30.58
+		targetLookAt.x = GlowEngine.RemapValue(targetZoom.y, .2f, 6f, 50f, 55f);
+	}
+
+	void HandleZoom() //new
 	{
 		float axis = Input.GetAxis( "Mouse ScrollWheel" );
 		float y = cam.transform.localPosition.y;
@@ -97,7 +174,7 @@ public class CamControl : MonoBehaviour
 			if (y - zoomAmount >= zoomMin)
 				targetZoom = cam.transform.localPosition - new Vector3(0, zoomAmount, 0);
 			else
-				targetZoom = new Vector3(0, zoomMin, 0);
+				targetZoom = cam.transform.localPosition.Y(zoomMin);
 		}
 		// scroll down
 		else if ( axis < 0f )
@@ -105,24 +182,45 @@ public class CamControl : MonoBehaviour
 			if (y + zoomAmount <= zoomMax)
 				targetZoom = cam.transform.localPosition + new Vector3(0, zoomAmount, 0);
 			else
-				targetZoom = new Vector3(0, zoomMax, 0);
+				targetZoom = cam.transform.localPosition.Y(zoomMax);
 		}
 
-		float fdScalar = GlowEngine.RemapValue( y, 3, 6, focusDistMin, focusDistMax );
+		//Change zSlide only when zooming
+		if(axis != 0)
+        {
+			//targetPos.z = GlowEngine.RemapValue(targetZoom.y, zoomMin, zoomMax, zSlideMax, zSlideMin); //slide camera base forward zoomed out or backward zoomed in to keep focused object closer to the center of the screen
+		}
+
+		float fdScalar = GlowEngine.RemapValue( y, zoomMin, zoomMax, focusDistMin, focusDistMax );
 		targetDOF.Set( fdScalar, fdScalar, fdScalar );
-		targetLookAt.y = 0f;
+		//Set the polar rotation - the map rotates around this axis
+		if (Engine.currentScenario.scenarioTypeJourney)
+		{
+			targetLookAt.y = 26.87f; //offset angle for the hex map
+		}
+		else
+		{
+			targetLookAt.y = 0f; //this looks straight on to the battle map
+		}
+		//0f;
 		//26.87f;
 		//30.58
-		targetLookAt.x = GlowEngine.RemapValue( targetZoom.y, .2f, 6f, 50f, 55f );
+		//targetLookAt.x = GlowEngine.RemapValue( targetZoom.y, .2f, 6f, 50f, 55f );
+		targetLookAt.x = GlowEngine.RemapValue(targetZoom.y, zoomMin, zoomMax, tiltMin, tiltMax); //change tilt of camera angle
 	}
 
-	public void MoveTo( Vector3 pos, float speed = .35f )
+	public void MoveTo( Vector3 pos, bool evenBattleMap = false, float speed = .35f )
 	{
 		if ( pos == Vector3.zero )
 			return;
-		pos.y = 0;
-		targetPos = pos;
-		smoothSpeed = speed;
+
+		if (Engine.currentScenario.scenarioTypeJourney || evenBattleMap)
+		{
+			pos.y = 0;
+			pos.z = GlowEngine.RemapValue(targetZoom.y, zoomMin, zoomMax, zSlideMax, zSlideMin);
+			targetPos = pos;
+			smoothSpeed = speed;
+		}
 	}
 
 	void HandleDragging()
@@ -173,7 +271,7 @@ public class CamControl : MonoBehaviour
 			{
 				//Debug.Log( "click::" + hit.collider.name );
 
-				MoveTo( hit.collider.transform.parent.GetComponent<Tile>().centerPosition, .2f );
+				MoveTo( hit.collider.transform.parent.GetComponent<Tile>().centerPosition, true, .2f );
 			}
 		}
 
@@ -218,7 +316,7 @@ public class CamControl : MonoBehaviour
 	public void SetState( CamState camState )
 	{
 		transform.position = camState.position;
-		MoveTo( camState.position );
+		MoveTo( camState.position, true );
 		transform.rotation = Quaternion.Euler( 0, camState.YRotation, 0 );
 	}
 }

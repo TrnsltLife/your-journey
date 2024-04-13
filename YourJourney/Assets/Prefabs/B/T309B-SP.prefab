@@ -277,9 +277,9 @@ GameObject:
   m_Component:
   - component: {fileID: 15366713488318927}
   m_Layer: 0
-  m_Name: connector
+  m_Name: connector-exclude
   m_TagString: Untagged
-  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -637,9 +637,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6551933763768905144}
   m_Layer: 0
-  m_Name: connector (1)
+  m_Name: connector-exclude (1)
   m_TagString: Untagged
-  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

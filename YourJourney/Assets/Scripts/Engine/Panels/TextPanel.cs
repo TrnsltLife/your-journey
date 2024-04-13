@@ -9,6 +9,7 @@ using System.Collections.Generic;
 
 public class TextPanel : MonoBehaviour
 {
+	string staticText = "";
 	public TextMeshProUGUI mainText, btn1Text, btn2Text, btn2ActionText, btnSingleText, dummy;
 	public GameObject btn1, btn2;
 	public GameObject buttonSingle;
@@ -99,6 +100,19 @@ public class TextPanel : MonoBehaviour
 		ShowOkContinue(Translate("dialog.text.EachResetScoutX", "Each Hero resets their deck and Scouts {0}.", new List<string> { scoutAmount.ToString() }), ButtonIcon.Continue, action);
 	}
 
+	public void ShowPrepareTiles( string s, ButtonIcon icon, bool isDynamic, Action action = null )
+    {
+		if (isDynamic)
+		{
+			ShowOkContinue(s + "\r\n\r\n" + Translate("dialog.text.tile.ScoutingApproaches", "Scouting approaches..."), icon, action);
+			staticText = s;
+			buttonSingle.SetActive(false); //turn off the continue button until the dynamic tile group has found its attachment point
+		}
+		else
+		{
+			ShowOkContinue(s, icon, action);
+		}
+	}
 
 	public void ShowOkContinue( string s, ButtonIcon icon, Action action = null )
 	{
@@ -182,6 +196,17 @@ public class TextPanel : MonoBehaviour
 
 		rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, dialogHeight);
 	}
+
+	//Used with ShowPrepareTiles to update the status of dynamic tile placement
+	public void UpdateText(string t)
+	{
+		mainText.text = staticText + t;
+	}
+
+	public void ShowButtonSingle()
+    {
+		buttonSingle.SetActive(true);
+    }
 
 	public void OnBtn1()
 	{

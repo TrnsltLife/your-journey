@@ -141,7 +141,7 @@ public class SpecialInstructions : MonoBehaviour
 
 	public void OnAdjustLore(int amount)
 	{
-		Debug.Log("Adjust Lore " + amount);
+		//Debug.Log("Adjust Lore " + amount);
 
 		int minLore = 0;
 		int maxLore = 105;
@@ -158,7 +158,7 @@ public class SpecialInstructions : MonoBehaviour
 
 	public void OnAdjustXP(int amount)
 	{
-		Debug.Log("Adjust XP " + amount);
+		//Debug.Log("Adjust XP " + amount);
 
 		int minXP = 0;
 		int maxXP = 105;

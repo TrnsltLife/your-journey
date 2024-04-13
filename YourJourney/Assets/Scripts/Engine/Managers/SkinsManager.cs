@@ -43,11 +43,11 @@ public class SkinsManager : MonoBehaviour
 
 	public void Awake()
     {
-		Debug.Log("SkinsManager Awake!");
+		//Debug.Log("SkinsManager Awake!");
 		staticBuiltinSkinpacks = builtinSkinpacks;
 		foreach(var skinpack in staticBuiltinSkinpacks)
         {
-			Debug.Log(skinpack.name + " " + skinpack.sprites.Count);
+			//Debug.Log(skinpack.name + " " + skinpack.sprites.Count);
         }
     }
 
@@ -57,7 +57,7 @@ public class SkinsManager : MonoBehaviour
 
 	public static void RestoreOriginalSkins()
 	{
-		Debug.Log("SkinsManager.RestoreOriginalSkins()");
+		//Debug.Log("SkinsManager.RestoreOriginalSkins()");
 		for (int i = 0; i < monsterSkins.Length; i++)
 		{
 			if (monsterSkins[i] == null) 
