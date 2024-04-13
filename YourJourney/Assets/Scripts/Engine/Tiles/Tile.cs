@@ -502,7 +502,7 @@ public class Tile : MonoBehaviour
 	*/
 	public ConnectorGrid GenerateConnectorGrid(bool alreadyPlaced = false)
     {
-		Debug.Log("GenerateConnectorGrid for tile " + this.ToString());
+		//Debug.Log("GenerateConnectorGrid for tile " + this.ToString());
 		ConnectorGrid grid = new ConnectorGrid();
 		grid.EstablishMinMaxFromTransformChildren(transform);
 		grid.EstablishOffsetToTranslateToZero();
@@ -531,7 +531,7 @@ public class Tile : MonoBehaviour
 			{
 				if (gridPos.x >= grid.gridX || gridPos.z >= grid.gridZ || gridPos.x < 0 || gridPos.z < 0)
 				{
-					Debug.Log("Oops. Out of bounds. pos[" + gridPos.x + "," + gridPos.z + "] vs gridSize[" + grid.gridX + "," + grid.gridZ + "]");
+					//Debug.Log("Oops. Out of bounds. pos[" + gridPos.x + "," + gridPos.z + "] vs gridSize[" + grid.gridX + "," + grid.gridZ + "]");
 				}
 				grid.grid[gridPos.x, gridPos.z] = value;
 
@@ -542,7 +542,7 @@ public class Tile : MonoBehaviour
             }
 		}
 
-		Debug.Log("Grid Output " + this.ToString() + " " + this.transform.rotation + "*\r\n" + grid.ToString());
+		//Debug.Log("Grid Output " + this.ToString() + " " + this.transform.rotation + "*\r\n" + grid.ToString());
 
 		return grid;
 	}
@@ -726,7 +726,7 @@ public class Tile : MonoBehaviour
 					}
 				} );
 
-				camControl.MoveTo( tile.centerPosition, .2f );
+				camControl.MoveTo( tile.centerPosition, false, .2f );
 				return true;
 			}
 			else if ( objectHit.name.Contains( "Token" ) )
@@ -738,7 +738,7 @@ public class Tile : MonoBehaviour
 				//Debug.Log("camControl " + camControl);
 				if (camControl != null)
 				{
-					camControl.MoveTo(objectHit.parent.GetComponent<Tile>().centerPosition, .2f);
+					camControl.MoveTo(objectHit.parent.GetComponent<Tile>().centerPosition, false, .2f);
 				}
 				QueryTokenInteraction( objectHit );
 				return true;

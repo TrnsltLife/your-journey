@@ -1154,9 +1154,13 @@ MonoBehaviour:
   rotateSpeed: 30
   rotateDuration: 0.25
   doubleClickSpeed: 0.25
-  zoomMin: 3
-  zoomMax: 20
+  zoomMin: 5
+  zoomMax: 14
   smoothSpeed: 0.5
+  tiltMin: 45
+  tiltMax: 85
+  zSlideMin: 0
+  zSlideMax: 0.6
 --- !u!4 &71727266
 Transform:
   m_ObjectHideFlags: 0

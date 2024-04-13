@@ -144,6 +144,9 @@ public class Engine : MonoBehaviour
 		gameObject.SetActive(true); //don't fade in
 
 
+		//Set camera for scenario type Journey/Battle
+		camControl.AdjustSettings(scenario.scenarioTypeJourney);
+
 		//build the tiles
 		StartCoroutine( BuildScenario() );
 		StartCoroutine( BeginGame() );
@@ -462,7 +465,7 @@ public class Engine : MonoBehaviour
 			if ( tileManager.GetAllTileGroups().Length > 0 )
 			{
 				Vector3 p = tileManager.GetAllTileGroups()[0].groupCenter;
-				camControl.MoveTo( p );
+				camControl.MoveTo( p, true );
 			}
 		}
 		else if ( Input.GetKeyDown( KeyCode.X ) )
