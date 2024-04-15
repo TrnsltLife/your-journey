@@ -16,9 +16,9 @@ public class CamControl : MonoBehaviour
 	Camera cam;
 
 	//old Z = -2.40108
-	public float moveDragSpeed = .005f, rotateSpeed = 30, rotateDuration = .25f, 
+	public float moveDragSpeed = .005f, rotateSpeed = 30, rotateDuration = .25f,
 		doubleClickSpeed = .25f, zoomMin = 5f, zoomMax = 14f, smoothSpeed,
-		tiltMin = 45f, tiltMax = 85f, zSlideMin = 0f, zSlideMax = 0.6f;
+		tiltMin = 45f, tiltMax = 85f, zSlideMin = 0f, zSlideMax = 0.6f, targetLookAtY = 0.0f;
 
 	//zoomMin = 3f, zoomMax = 20f
 
@@ -47,6 +47,7 @@ public class CamControl : MonoBehaviour
 		tiltMax = 55f;
 		zSlideMin = 0f;
 		zSlideMax = 0.6f;
+		targetLookAtY = 0f;
 
 		if (isJourneyMap)
         {
@@ -56,6 +57,7 @@ public class CamControl : MonoBehaviour
 			tiltMax = 75f; // 85f
 			zSlideMin = 0f;
 			zSlideMax = 0.6f;
+			targetLookAtY = 0f; //26.87f;
 		}
 		else //Battle Map
         {
@@ -65,6 +67,7 @@ public class CamControl : MonoBehaviour
 			tiltMax = 75f;
 			zSlideMin = 0f;
 			zSlideMax = 0f;
+			targetLookAtY = 0f;
 		}
 
 	}
@@ -194,14 +197,8 @@ public class CamControl : MonoBehaviour
 		float fdScalar = GlowEngine.RemapValue( y, zoomMin, zoomMax, focusDistMin, focusDistMax );
 		targetDOF.Set( fdScalar, fdScalar, fdScalar );
 		//Set the polar rotation - the map rotates around this axis
-		if (Engine.currentScenario.scenarioTypeJourney)
-		{
-			targetLookAt.y = 26.87f; //offset angle for the hex map
-		}
-		else
-		{
-			targetLookAt.y = 0f; //this looks straight on to the battle map
-		}
+		targetLookAt.y = targetLookAtY;
+
 		//0f;
 		//26.87f;
 		//30.58
@@ -217,7 +214,7 @@ public class CamControl : MonoBehaviour
 		if (Engine.currentScenario.scenarioTypeJourney || evenBattleMap)
 		{
 			pos.y = 0;
-			pos.z = GlowEngine.RemapValue(targetZoom.y, zoomMin, zoomMax, zSlideMax, zSlideMin);
+			pos.z = pos.z + GlowEngine.RemapValue(targetZoom.y, zoomMin, zoomMax, zSlideMax, zSlideMin);
 			targetPos = pos;
 			smoothSpeed = speed;
 		}
