@@ -52,20 +52,16 @@ public class Tile : MonoBehaviour
 		tilemesh = GetChildren( "tile" )[0].gameObject;
 		meshRenderer = tilemesh.GetComponent<Renderer>();
 		anchorCount = GetCount( "anchor" );
-		connectorCount = GetCount( "connector" );
+
+		Transform[] connectorTransforms = GetChildren("connector");
+		connectorCount = connectorTransforms.Length;
 		connectorOffset = new Vector3[connectorCount];
 
 		int c = 0;
-		for ( int i = 0; i < transform.childCount; i++ )
+		foreach (Transform child in connectorTransforms )
 		{
-			Transform child = transform.GetChild( i );
-
-			if ( child.name.Contains( "connector" ) )
-			{
-				//calculate LOCAL offsets to each connector
-				//connectorOffset[c++] = child.localPosition - Vector3.zero;
-				connectorOffset[c++] = child.position - transform.position;
-			}
+			//calculate LOCAL offsets to each connector
+			connectorOffset[c++] = child.position - transform.position;
 		}
 
 		Transform findResult = transform.Find("Exploration Token");
@@ -300,6 +296,116 @@ public class Tile : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Randomly attaches 2 tiles (random anchor/connector) within a given group, tile=previous tile already on board
+	/// </summary>
+	public void AttachToWithDensityPreference(Tile tile, TileGroup tg, DensityPreference densityPreference)
+	{
+		//anchors = white outer transforms
+		//connectors = red inner transforms
+		Transform[] anchorPoints = tile.GetChildren("anchor");
+		int[] ra = GlowEngine.GenerateRandomNumbers(anchorPoints.Length);
+		int[] rc = GlowEngine.GenerateRandomNumbers(connectorCount);
+		bool foundAttachment = false;
+		Dictionary<System.Tuple<int, int>, int> densityMap = new Dictionary<System.Tuple<int, int>, int>();
+		Transform[] openAnchors = tg.GetOpenAnchorsTransforms();
+
+		for (int c = 0; c < connectorCount; c++)
+		{
+			for (int a = 0; a < anchorPoints.Length; a++)//white anchors on board
+			{
+				tile.SetAnchor(ra[a]);
+				SetConnector(rc[c]);
+				AttachTo(tile.currentAnchor);
+
+				Transform[] ap = GetChildren("connector");
+				if(!tg.CheckCollisionsWithinGroup(ap))
+                {
+					foundAttachment = true;
+
+					//Check for density - how many anchors the new tile attaches to
+					int attachmentCount = CountAttachmentsWithinTile(openAnchors);
+                    densityMap[System.Tuple.Create(ra[a], rc[c])] = attachmentCount;
+				}
+			}
+		}
+
+		if(foundAttachment)
+        {
+			//Debug.Log("DensityPreference: " + densityPreference);
+			//Separate densityMap into 3 tranches
+			Dictionary<int, int> densityValueMap = new Dictionary<int, int>();
+			densityMap.Values.ToList().ForEach(v => densityValueMap[v] = v);
+			List<int> densityValueList = densityValueMap.Keys.ToList();
+			densityValueList.Sort();
+
+			int minStartIndex = 0;
+			int medStartIndex = densityValueList.Count / 3;
+			int maxStartIndex = densityValueList.Count / 3 * 2;
+			if (maxStartIndex >= densityValueList.Count) { maxStartIndex = densityValueList.Count - 1; }
+
+			//Pick a set of attachment values in the prefered tranche based on the densityPreference
+			List<int> densityList = new List<int>();
+			switch (densityPreference)
+			{
+				case DensityPreference.LOWEST: densityList.Add(densityValueList[0]); break;
+				case DensityPreference.LOW: densityList.AddRange(densityValueList.GetRange(minStartIndex, System.Math.Max(1, medStartIndex - minStartIndex))); break;
+				case DensityPreference.LOW_MEDIUM: densityList.AddRange(densityValueList.GetRange(minStartIndex, System.Math.Max(1, maxStartIndex - medStartIndex))); break;
+				case DensityPreference.MEDIAN: densityList.Add(densityValueList[densityValueList.Count / 2]); break;
+				case DensityPreference.MEDIUM: densityList.AddRange(densityValueList.GetRange(medStartIndex, System.Math.Max(1, maxStartIndex - medStartIndex))); break;
+				case DensityPreference.MEDIUM_HIGH: densityList.AddRange(densityValueList.GetRange(medStartIndex, System.Math.Max(1, densityValueList.Count - medStartIndex))); break;
+				case DensityPreference.HIGH: densityList.AddRange(densityValueList.GetRange(maxStartIndex, System.Math.Max(1, densityValueList.Count - maxStartIndex))); break;
+				case DensityPreference.HIGHEST: densityList.Add(densityValueList[System.Math.Max(0, densityValueList.Count - 1)]); break;
+			}
+			//Debug.Log("densityList: " + string.Join(", ", densityList));
+
+			//Pick a random position from the densityMap that maches one of the chosen attachment values
+			System.Tuple<int, int>[] availablePositions = densityMap.Where(x => densityList.Contains(x.Value)).Select(x => x.Key).ToArray();
+			var randomizedArray = GlowEngine.RandomizeArray(availablePositions);
+
+			//Attach the tile using the chosen anchor and connector
+			tile.SetAnchor(randomizedArray[0].Item1);
+			SetConnector(randomizedArray[0].Item2);
+			AttachTo(tile.currentAnchor);
+		}
+
+		if (!foundAttachment)
+		{
+			Debug.Log("FAILED TO FIND OPEN TILE LOCATION");
+			throw new System.Exception("FAILED TO FIND OPEN TILE LOCATION");
+		}
+	}
+
+	/// <summary>
+	/// Count attachments between THIS tile's CONNECTORS and input test points (ANCHORS)
+	/// (connectors are INside the bounds of the tile, anchors are OUTside)
+	/// </summary>
+	/// <returns>true if collision found</returns>
+	public int CountAttachmentsWithinTile(Transform[] anchorPoints)
+	{
+		//create list of ALL connectors in this tile (connectors are INside the bounds of the tile)
+		var allConnectorsSet = from tf in GetChildren("connector") select tf.position;
+
+		//create list of all test point connectors
+		var anchorVectors = from tf in anchorPoints select tf.position;
+
+		int attachmentCount = 0;
+
+		foreach (Vector3 tp in anchorVectors)
+		{
+			foreach (Vector3 a in allConnectorsSet)
+			{
+				float d = Vector3.Distance(a, tp);
+				if (d <= .5)
+				{
+					attachmentCount++;
+				}
+			}
+		}
+
+		return attachmentCount;
+	}
+
 	public void SetPosition( Vector3 worldpos, float angle )
 	{
 		//rootPosition is the position where all xforms take place from
@@ -464,7 +570,7 @@ public class Tile : MonoBehaviour
 
 				tf[i].gameObject.SetActive( true );
 				tf[i].position = tf[i].position.Y( 2 );
-				tf[i].RotateAround( center, Vector3.up, baseTile.angle );
+				//tf[i].RotateAround( center, Vector3.up, baseTile.angle );
 				tf[i].DOLocalMoveY( .3f, 1 ).SetEase( Ease.OutBounce );
 
 				//update token state to active

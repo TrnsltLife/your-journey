@@ -512,7 +512,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5557600925315864168}
   m_Layer: 0
-  m_Name: token attach (1)
+  m_Name: token attach east
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -602,7 +602,7 @@ GameObject:
   m_Component:
   - component: {fileID: 290848782289982335}
   m_Layer: 0
-  m_Name: token attach
+  m_Name: token attach label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

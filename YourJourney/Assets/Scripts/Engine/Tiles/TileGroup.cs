@@ -121,7 +121,8 @@ public class TileGroup
 			containerObject.name += " " + tileroot.idNumber.ToString();
 			if ( previous != null )
 			{
-				tile.AttachTo( previous, this );
+				//tile.AttachTo( previous, this );
+				tile.AttachToWithDensityPreference( previous, this, DensityPreference.HIGHEST );
 			}
 			tileList.Add( tile );
 			previous = tile;
@@ -129,7 +130,7 @@ public class TileGroup
 //Show ball/sphere/marker for anchor and connection points for debugging
 //tile.gameObject.SetActive(true);
 //tile.RevealAllAnchorConnectorTokens();
-tile.GenerateConnectorGrid(false);
+//tile.GenerateConnectorGrid(false);
 
 			//add fixed tokens
 			if ( tile.baseTile.tokenList.Count > 0 )
@@ -371,7 +372,7 @@ tile.GenerateConnectorGrid(false);
 								//add "exclude" to the name so it will be excluded from certain future tile attachment matches
 								string name = connectors[c1].gameObject.name;
 								connectors[c1].gameObject.name = connectors[c1].gameObject.name.Replace("connector", "connector-exclude");
-								Debug.Log("renamed " + name + " => " + connectors[c1].gameObject.name);
+								//Debug.Log("renamed " + name + " => " + connectors[c1].gameObject.name);
 							}
 						}
 					}
@@ -383,9 +384,10 @@ tile.GenerateConnectorGrid(false);
 
 	void AddRandomTokens(List<Transform> usedPositions )
 	{
-		if ( chapter.randomInteractionGroup == "None" )
-			return;
+		if (chapter.randomInteractionGroup == "None") {return;}
+
 		//Debug.Log("Add events to " + (chapter.isRandomTiles ? "random" : "fixed") + " tile group.");
+
 		//usedPositions = wonky user placed token position
 		InteractionManager im = GlowEngine.FindObjectOfType<InteractionManager>();
 		//get array of interactions that are in the interaction group; don't include interactions that have already been placed (unless isReusable is set to indicate they can be used more than once)
@@ -395,45 +397,94 @@ tile.GenerateConnectorGrid(false);
 		//Debug.Log( "EVENTS IN GROUP [" + chapter.randomInteractionGroup + "]: " + interactionGroupArray.Length );
 
 		//get all the possible token spawn locations that are NOT near FIXED tokens already placed
-		List<Transform> attachtfs = new List<Transform>();
-		List<Transform> finalOpenTFS = new List<Transform>();
-		foreach ( Tile t in tileList )
-		{
-			attachtfs.Clear();
-			attachtfs.AddRange( t.GetChildren( "token attach" ) );
-			var usedInThisTile = from tu in usedPositions
-													 where tu.GetComponent<MetaData>().tileID/*tile.hexTile.idNumber*/ == t.baseTile.idNumber
-													 select tu;
+		List<Transform> attachTransforms = new List<Transform>();
+		List<Transform> allOpenAttachTransforms = new List<Transform>();
 
-			var opentfs = new List<Transform>();
-			foreach ( Transform tf in attachtfs )
+		//Each tile
+		foreach (Tile t in tileList)
+		{
+			var tileOpenAttachTransforms = new List<Transform>();
+			attachTransforms.Clear();
+			attachTransforms.AddRange( t.GetChildren( "token attach" ) );
+			//Debug.Log("FIXED TOKENS on tile " + t.baseTile.idNumber + ": " + attachTransforms.Count);
+			var usedInThisTile = from tu in usedPositions
+								 where tu.GetComponent<MetaData>().tileID/*tile.hexTile.idNumber*/ == t.baseTile.idNumber
+								 select tu;
+
+			//Print attach point data
+			/*
+			foreach (Transform attachTransform in attachTransforms)
 			{
-				float minD = 1000;
-				foreach ( Transform utf in usedInThisTile )
+				Debug.Log(t.baseTile.ToShortString() + " " + attachTransform.gameObject.name + " " + attachTransform.position);
+			}
+			*/
+
+			//Each attach point
+			foreach ( Transform attachTransform in attachTransforms)
+			{
+				float minDistance = 1000;
+
+				//Each fixed token
+				foreach ( Transform usedTransform in usedInThisTile )
 				{
-					float d = Vector3.Distance( utf.position, tf.position );
-					if ( d < minD )
-						minD = d;
+					float distance = Vector2.Distance(
+						new Vector2(usedTransform.position.x, usedTransform.position.z), 
+						new Vector2(attachTransform.position.x, attachTransform.position.z));
+					/*
+					Debug.Log("Compare " +
+						"[" +
+						attachTransform.gameObject.name + " " +
+						attachTransform.position +
+						"] to\r\n" +
+						"[" +
+						usedTransform.gameObject.name + " " +
+						usedTransform.gameObject.GetComponent<MetaData>().interactionName +
+						usedTransform.position +
+						"]");
+					Debug.Log(
+						"=> distance " + distance);
+					*/
+					if (distance < minDistance)
+					{
+						minDistance = distance;
+					}
 				}
-				if (minD > 1.1f)
+
+				Engine engine = Engine.FindEngine();
+				float distanceTest = 1.5f;
+				//if none of the tokens is near this attach point, add the attach point to the list
+				if (minDistance > distanceTest)
 				{
-					opentfs.Add(tf);
+					//Debug.Log("Add " + attachTransform.gameObject.name + " to attach list based on minDistance.");
+					tileOpenAttachTransforms.Add(attachTransform);
+					if (engine.mapDebug)
+					{
+						GameObject flag = Object.Instantiate(engine.attachPointFlag, new Vector3(attachTransform.position.x, attachTransform.position.y, attachTransform.position.z), attachTransform.rotation, t.transform);
+					}
+				}
+				else
+				{
+					//Debug.Log(attachTransform.gameObject.name + " too close to a token");
+					if (engine.mapDebug)
+					{
+						GameObject flag = Object.Instantiate(engine.attachPointFlag, new Vector3(attachTransform.position.x, attachTransform.position.y, attachTransform.position.z), attachTransform.rotation, t.transform);
+						flag.GetComponent<MeshRenderer>().material.color = new Color(255, 0, 0);
+					}
 				}
 			}
 
-			finalOpenTFS.AddRange( opentfs );
+			allOpenAttachTransforms.AddRange(tileOpenAttachTransforms);
 		}
 
-		//recreate opentfs as hash with UNIQUE items, no dupes
-		var openhash = new HashSet<Transform>( finalOpenTFS );
-		finalOpenTFS = GlowEngine.ShuffleArray(openhash.Select( x => x ).ToArray()).ToList(); //grab the array and then shuffle it so it's different every time
+		//recreate allOpenAttachTransforms as a Set with UNIQUE items, no dupes
+		var openTransformsSet = new HashSet<Transform>(allOpenAttachTransforms);
+		allOpenAttachTransforms = GlowEngine.ShuffleArray(openTransformsSet.Select( x => x ).ToArray()).ToList(); //grab the array and then shuffle it so it's different every time
 		//Debug.Log( "REQUESTED EVENTS: " + chapter.randomInteractionGroupCount );
-		//Debug.Log( "USED POSITIONS: " + usedPositions.Length );
-		//Debug.Log( "FOUND POSSIBLE POSITIONS: " + attachtfs.Count );
-		//Debug.Log( "FOUND OPEN POSITIONS: " + finalOpenTFS.Count() );
+		//Debug.Log( "USED POSITIONS: " + usedPositions.Count );
+		//Debug.Log( "FOUND OPEN POSITIONS: " + allOpenAttachTransforms.Count() );
 
 		//sanity check, max number of events based on how many requested and how many actually found in group how many actual open positions
-		int max = Mathf.Min( interactionGroupArray.Length, Mathf.Min( chapter.randomInteractionGroupCount, finalOpenTFS.Count() ) );
+		int max = Mathf.Min( interactionGroupArray.Length, Mathf.Min( chapter.randomInteractionGroupCount, allOpenAttachTransforms.Count() ) );
 		//Debug.Log( $"GRABBING {max} EVENTS" );
 
 		//generate random indexes to interactions within the group
@@ -447,12 +498,13 @@ tile.GenerateConnectorGrid(false);
 		}
 
 		//create the tokens on random tiles for the interactions we just got
-		int[] rands = GlowEngine.GenerateRandomNumbers( max/*opentfs.Count()*/ );
-		for ( int i = 0; i < max/*igs.Length*/; i++ )
+		int[] rands = GlowEngine.GenerateRandomNumbers( max );
+		for ( int i = 0; i < max; i++ )
 		{
 			//get tile this transform position belongs to
-			Tile tile = finalOpenTFS[rands[i]].parent.GetComponent<Tile>();
-			//Debug.Log( "TILE #:" + tile.hexTile.idNumber );
+			Transform chosenAttachTransform = allOpenAttachTransforms[rands[i]];
+			Tile tile = chosenAttachTransform.parent.GetComponent<Tile>();
+			//Debug.Log( "TILE #:" + tile.baseTile.idNumber );
 			//if the token points to a persistent event, swap the token type with the event it's delegating to
 
 			//create new token prefab for this interaction
@@ -540,7 +592,12 @@ tile.GenerateConnectorGrid(false);
 				Debug.Log( $"ERROR: TOKEN TYPE SET TO NONE FOR {igs[i].dataName}" );
 			}
 
-			go.transform.position = new Vector3( finalOpenTFS[rands[i]].position.x, go.transform.position.y, finalOpenTFS[rands[i]].position.z );
+			//Scale tokens for hex map
+			if (tile.baseTile.tileType == TileType.Hex)
+			{
+				go.transform.localScale = new Vector3(0.8f, 1f, 0.8f);
+			}
+			go.transform.position = new Vector3(chosenAttachTransform.position.x, go.transform.position.y, chosenAttachTransform.position.z );
 			go.GetComponent<MetaData>().tokenType = HandlePersistentTokenSwap( igs[i].dataName );//igs[i].tokenType;
 			go.GetComponent<MetaData>().personType = igs[i].personType;
 			go.GetComponent<MetaData>().terrainType = igs[i].terrainType;
@@ -751,6 +808,9 @@ tile.GenerateConnectorGrid(false);
 			offset = Vector3.Reflect( offset, new Vector3( 0, 0, 1 ) );
 			var tokenPos = new Vector3( center.x + offset.x, 2, center.z + offset.z );
 			go.transform.position = tokenPos.Y( 0 );
+
+			//Rotate token around tile center here instead of Tile.RevealToken where it used to be done. Do this so AddRandomTokens will detect where fixed tokens are actually placed instead of where they were before they were properly rotated.
+			go.transform.RotateAround(center, Vector3.up, tile.baseTile.angle);
 
 			if (t.tokenType != TokenType.Start)
 			{
@@ -1275,8 +1335,6 @@ tile.GenerateConnectorGrid(false);
 		//TODO: currently this won't handle if the tile also borders another tile besides this tile and tgToAttachTo
 		PruneInternalAnchors(tgToAttachTo);
 	}
-
-	public enum DensityPreference { LOWEST, LOW, LOW_MEDIUM, MEDIAN, MEDIUM, MEDIUM_HIGH, HIGH, HIGHEST };
 
 	/// <summary>
 	/// Randomly attaches one group to another - coroutine

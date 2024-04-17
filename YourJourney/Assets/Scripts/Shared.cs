@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+public enum DensityPreference { LOWEST, LOW, LOW_MEDIUM, MEDIAN, MEDIUM, MEDIUM_HIGH, HIGH, HIGHEST };
 public enum ScenarioType { Journey, Battle }
 public enum InteractionType { Text, Threat, StatTest, Decision, Branch, Darkness, MultiEvent, Persistent, Conditional, Dialog, Replace, Reward, Item, Title, Start }
 public enum MonsterType { Ruffian, GoblinScout, OrcHunter, OrcMarauder, HungryVarg, HillTroll, Wight, 
