@@ -726,7 +726,8 @@ public class Tile : MonoBehaviour
 					}
 				} );
 
-				camControl.MoveTo( tile.centerPosition, false, .2f );
+				//camControl.MoveTo( tile.centerPosition, false, .2f );
+				camControl.MoveTo(objectHit.transform.position, false, 0.2f);
 				return true;
 			}
 			else if ( objectHit.name.Contains( "Token" ) )
@@ -738,7 +739,8 @@ public class Tile : MonoBehaviour
 				//Debug.Log("camControl " + camControl);
 				if (camControl != null)
 				{
-					camControl.MoveTo(objectHit.parent.GetComponent<Tile>().centerPosition, false, .2f);
+					//camControl.MoveTo(objectHit.parent.GetComponent<Tile>().centerPosition, false, .2f);
+					camControl.MoveTo(objectHit.transform.position, false, 0.2f);
 				}
 				QueryTokenInteraction( objectHit );
 				return true;

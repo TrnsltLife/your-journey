@@ -1161,6 +1161,7 @@ MonoBehaviour:
   tiltMax: 85
   zSlideMin: 0
   zSlideMax: 0.6
+  targetLookAtY: 0
 --- !u!4 &71727266
 Transform:
   m_ObjectHideFlags: 0
