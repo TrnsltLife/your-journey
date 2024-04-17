@@ -39,6 +39,7 @@ public class Engine : MonoBehaviour
 	public GameObject anchorSphere;
 	public GameObject connectorSphere;
 	public GameObject specialSphere;
+	public GameObject attachPointFlag;
 
 	public bool debug = false;
 	public bool mapDebug = false;

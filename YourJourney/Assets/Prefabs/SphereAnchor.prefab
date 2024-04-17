@@ -4133,9 +4133,13 @@ MonoBehaviour:
   triggerName: 
   interactionName: 
   triggeredByName: 
+  tokenInteractionText: 
+  tokenInteractionKey: 
   tokenType: 5
   personType: 0
+  terrainType: 0
   offset: {x: 0, y: 0, z: 0}
+  size: {x: 0, y: 0, z: 0}
   isRandom: 0
   tileID: 0
 --- !u!1 &4890561338393423779
