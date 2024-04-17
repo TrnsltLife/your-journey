@@ -191,6 +191,7 @@ public class TileManager : MonoBehaviour
 
 	GameObject getBTile( int id )
 	{
+		Debug.Log("getBTile(" + id + ")");
 		switch ( id )
 		{
 			//Original JiME Tiles
