@@ -3,6 +3,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.EventSystems;
 
 public class CamControl : MonoBehaviour
 {
@@ -96,7 +97,8 @@ public class CamControl : MonoBehaviour
 		//dof.focusDistance.value = fp;
 
 		//disable camera control if panels are showing
-		if (uiRoot.childCount > 0) return;
+		//if (uiRoot.childCount > 0) return;
+		if (EventSystem.current.IsPointerOverGameObject()) return;
 		else if (combatPanel.gameObject.activeInHierarchy) return;
 		else if (partyPanel.gameObject.activeInHierarchy) return;
 		else if (chroniclePanel.gameObject.activeInHierarchy) return;
@@ -316,4 +318,6 @@ public class CamControl : MonoBehaviour
 		MoveTo( camState.position, true );
 		transform.rotation = Quaternion.Euler( 0, camState.YRotation, 0 );
 	}
+
+
 }
