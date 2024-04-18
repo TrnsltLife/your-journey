@@ -663,8 +663,8 @@ CanvasGroup:
   m_GameObject: {fileID: 3481645952642935974}
   m_Enabled: 1
   m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &3481645952817825923
 GameObject:
@@ -1869,7 +1869,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6691929712550022683}
   m_HandleRect: {fileID: 4167174119046552228}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

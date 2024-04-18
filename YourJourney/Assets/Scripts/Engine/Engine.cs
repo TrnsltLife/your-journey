@@ -159,7 +159,7 @@ public class Engine : MonoBehaviour
 		{
 			Image image = scenarioOverlay.GetComponent<Image>();
 			image.sprite = null;
-			image.color = new Color(1, 1, 1, transparent ? 0 : 255);
+			image.color = new Color(0, 0, 0, transparent ? 0 : 255);
 			scenarioOverlay.SetActive(true);
 		}
 		else
