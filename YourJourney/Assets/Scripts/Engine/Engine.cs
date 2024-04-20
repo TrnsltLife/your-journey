@@ -335,14 +335,11 @@ public class Engine : MonoBehaviour
 
 		yield return null; //Let the Update() function draw the screen as created in Awake()
 
-		//Original code:
-		//tileManager.BuildScenario();
-		//yield return null;
-
 		//Coroutine code:
-		yield return StartCoroutine(tileManager.BuildScenarioCoroutine());
+		//yield return StartCoroutine(tileManager.BuildScenarioCoroutine());
+		yield return StartCoroutine(tileManager.BuildHintedScenarioCoroutine());
 
-		if(mapDebug)
+		if (mapDebug)
         {
 			ActivateFog();
 			HideAllTiles();

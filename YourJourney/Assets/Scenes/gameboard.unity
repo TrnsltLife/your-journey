@@ -8910,7 +8910,7 @@ MonoBehaviour:
   attachPointFlag: {fileID: 1608795031574051309, guid: af1e481f1464366409c8354a82a4f25b,
     type: 3}
   debug: 0
-  mapDebug: 0
+  mapDebug: 1
 --- !u!114 &965560139
 MonoBehaviour:
   m_ObjectHideFlags: 0
