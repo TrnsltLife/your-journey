@@ -417,7 +417,7 @@ public class ChapterManager : MonoBehaviour
 
 		if (previousGroup != null)
 		{
-			yield return StartCoroutine(tg.AttachToCoroutine(previousGroup, textPanel));
+			yield return StartCoroutine(tg.AttachToCoroutine(previousGroup, 0, textPanel));
 			success = tg.attachToCoroutineResult;
 
 			//remove so not attempted again below
@@ -428,7 +428,7 @@ public class ChapterManager : MonoBehaviour
 			int randIdx = GlowEngine.GenerateRandomNumbers(tilegroups.Count)[0];
 			TileGroup randGroup = tilegroups[randIdx];
 
-			yield return StartCoroutine(tg.AttachToCoroutine(randGroup, textPanel));
+			yield return StartCoroutine(tg.AttachToCoroutine(randGroup, 0, textPanel));
 			success = tg.attachToCoroutineResult;
 
 			//remove so not attempted again below
@@ -441,7 +441,7 @@ public class ChapterManager : MonoBehaviour
 			Debug.Log("***SEARCHING for random tilegroup to attach to...");
 			foreach (TileGroup _tg in tilegroups)
 			{
-				yield return StartCoroutine(tg.AttachToCoroutine(_tg, textPanel));
+				yield return StartCoroutine(tg.AttachToCoroutine(_tg, tg.GetChapter().attachTileHint, textPanel));
 				success = tg.attachToCoroutineResult;
 				if (success)
 				{

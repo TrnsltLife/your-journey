@@ -191,7 +191,6 @@ public class TileManager : MonoBehaviour
 
 	GameObject getBTile( int id )
 	{
-		Debug.Log("getBTile(" + id + ")");
 		switch ( id )
 		{
 			//Original JiME Tiles
@@ -736,7 +735,7 @@ public class TileManager : MonoBehaviour
 				}
 
 
-				yield return StartCoroutine(tg.AttachToCoroutine(tilegroup));
+				yield return StartCoroutine(tg.AttachToCoroutine(tilegroup, 0));
 				//yield return StartCoroutine(tg.AttachToWithDensityPreferenceCoroutine(tilegroup, TileGroup.DensityPreference.HIGH));
 				bool success = tg.attachToCoroutineResult;
 
@@ -863,10 +862,13 @@ public class TileManager : MonoBehaviour
 			//Connect one block with a hinted attach that is already present on the board (or Random)
 			if(tg != null)
 			{
-				//List of potential attach blocks; first add the block that matches the attachHint; then randomize the other potential placed blocks.
+				//List of potential attach blocks
+				//First add the block that matches the attachHint
 				List<TileGroup> nonDynamicOrderedList = TGList.Where(x => x.isPlaced && 
 					x.GetChapter().dataName != tg.GetChapter().dataName && 
 					x.GetChapter().dataName == tg.GetChapter().attachHint).ToList();
+				int attachTileHint = nonDynamicOrderedList.Count == 1 ? tg.GetChapter().attachTileHint : 0; //If the hinted attach block was found, also use the attachTileHint
+				//Then randomize the other potential placed blocks and add them to the list
 				nonDynamicOrderedList.AddRange(GlowEngine.RandomizeArray(TGList.Where(x => x.isPlaced &&
 					x.GetChapter().dataName != tg.GetChapter().dataName &&
 					x.GetChapter().dataName != tg.GetChapter().attachHint).ToArray()).ToList());
@@ -889,8 +891,17 @@ public class TileManager : MonoBehaviour
 						tilegroup.Sepia(false);
 					}
 
-					yield return StartCoroutine(tg.AttachToCoroutine(tilegroup));
-					bool success = tg.attachToCoroutineResult;
+					bool success = false;
+					if(attachTileHint != 0)
+                    {
+						yield return StartCoroutine(tg.AttachToCoroutine(tilegroup, attachTileHint));
+					}
+					success = tg.attachToCoroutineResult;
+					if(!success)
+                    {
+						yield return StartCoroutine(tg.AttachToCoroutine(tilegroup, 0));
+						success = tg.attachToCoroutineResult;
+					}
 
 					if (engine.mapDebug)
 					{
@@ -919,6 +930,7 @@ public class TileManager : MonoBehaviour
 						break;
 					}
 					innerCount++;
+					attachTileHint = 0; //If it's not the first TileGroup that matches the attachHint, there won't be an attachTileHint so set it to 0.
 					yield return null;
 				}
 				outerCount++;
