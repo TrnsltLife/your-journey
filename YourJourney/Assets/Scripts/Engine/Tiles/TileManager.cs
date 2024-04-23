@@ -191,7 +191,6 @@ public class TileManager : MonoBehaviour
 
 	GameObject getBTile( int id )
 	{
-		Debug.Log("getBTile(" + id + ")");
 		switch ( id )
 		{
 			//Original JiME Tiles
@@ -555,7 +554,7 @@ public class TileManager : MonoBehaviour
 	/// <summary>
 	/// Pre-build scenario tile layout
 	/// </summary>
-	public void BuildScenario2()
+	public void BuildHintedScenario()
 	{
 		ChapterManager cm = FindObjectOfType<ChapterManager>();
 		List<TileGroup> TGList = new List<TileGroup>();
@@ -686,12 +685,13 @@ public class TileManager : MonoBehaviour
 			engine.SetLoadingText(Translate("title.text.AMightyThemeUnfolds", "A Mighty Theme Unfolds..."));
 			yield return null;
 			Debug.Log("Building Tile Group " + TGList.Count + " of " + cm.chapterList.Count + "...");
+
 			//build the tiles in the tg
 			TileGroup tg = c.tileGroup = CreateGroupFromChapter(c);
 			if (tg == null)
 			{
 				Debug.Log("WARNING::BuildScenario::Chapter has no tiles: " + c.dataName);
-				yield break;
+				continue;
 			}
 
 			TGList.Add(tg);
@@ -700,8 +700,6 @@ public class TileManager : MonoBehaviour
             {
 				tg.isPlaced = true;
             }
-
-			Debug.Log("Built");
 		}
 
 		//Connect all non-dynamic tiles excluding start
@@ -727,7 +725,6 @@ public class TileManager : MonoBehaviour
 				engine.SetLoadingText(Translate("title.text.SingingTheWorldIntoBeing", "Singing the world into being {{ Cantata {0}, Movement {1} ",
 						new List<string> { outerCount.ToString(), innerCount.ToString()}
 					));
-
 				if (engine.mapDebug)
 				{
 					tg.Visible(true);
@@ -738,7 +735,7 @@ public class TileManager : MonoBehaviour
 				}
 
 
-				yield return StartCoroutine(tg.AttachToCoroutine(tilegroup));
+				yield return StartCoroutine(tg.AttachToCoroutine(tilegroup, 0));
 				//yield return StartCoroutine(tg.AttachToWithDensityPreferenceCoroutine(tilegroup, TileGroup.DensityPreference.HIGH));
 				bool success = tg.attachToCoroutineResult;
 
@@ -777,6 +774,176 @@ public class TileManager : MonoBehaviour
 
 		yield break;
 	}
+
+
+	/// <summary>
+	/// Pre-build scenario tile layout
+	/// </summary>
+	public IEnumerator BuildHintedScenarioCoroutine()
+	{
+		Debug.Log("BuildHintedScenarioCoroutine()");
+		ChapterManager cm = FindObjectOfType<ChapterManager>();
+		List<TileGroup> TGList = new List<TileGroup>();
+		List<TileGroup> pendingTGList = new List<TileGroup>();
+		Engine engine = Engine.FindEngine();
+
+		engine.SetLoadingText(Translate("title.text.AMightyThemeUnfolds", "A Mighty Theme Unfolds..."));
+		yield return null;
+
+		//create Start chapter first
+		Debug.Log("Building Start Tile Group...");
+		Chapter first = cm.chapterList.Where(x => x.dataName == "Start").First();
+		TileGroup firstTG = first.tileGroup = CreateGroupFromChapter(first);
+		firstTG.isPlaced = true;
+		TGList.Add(firstTG);
+
+		//build all chapter tilegroups except Start
+		foreach (Chapter c in cm.chapterList.Where(x => x.dataName != "Start"))
+		{
+			engine.SetLoadingText(Translate("title.text.AMightyThemeUnfolds", "A Mighty Theme Unfolds..."));
+			yield return null;
+			Debug.Log("Building Tile Group " + TGList.Count + " of " + cm.chapterList.Count + "...");
+
+			//build the tiles in the tg
+			TileGroup tg = c.tileGroup = CreateGroupFromChapter(c);
+			if (tg == null)
+			{
+				Debug.Log("WARNING::BuildScenario::Chapter has no tiles: " + c.dataName);
+				continue;
+			}
+
+			TGList.Add(tg);
+		}
+
+		//for each block with an attach hint of "Random", assign its attach hint as one of the actual blocks
+		/*
+		foreach (TileGroup currentTG in TGList.Where(x => x.GetChapter().attachHint == "Random"))
+		{
+			string[] randomTargets = TGList.Where(tg => tg != currentTG).Select(tg => tg.GetChapter().dataName).ToArray();
+			randomTargets = GlowEngine.RandomizeArray(randomTargets.ToArray());
+			currentTG.GetChapter().attachHint = randomTargets[0];
+		}
+		*/
+
+		//for each block with an attach hint of null or "", assign its attach hint as "Start"
+		foreach (TileGroup currentTG in TGList.Where(x => x.GetChapter().attachHint == null || x.GetChapter().attachHint == "" || x.GetChapter().attachHint == "None"))
+		{
+			currentTG.GetChapter().attachHint = "Start";
+		}
+
+
+		List<TileGroup> nonPlacedNonDynamicList = TGList.Where(x => !x.isPlaced && !x.GetChapter().isDynamic).ToList();
+		int outerCount = 1;
+		int outerTotal = nonPlacedNonDynamicList.Count;
+		while (nonPlacedNonDynamicList.Count > 0)
+		{
+			//Randomize the list so we pick different blocks first each time the game is run
+			//nonPlacedNonDynamicList = GlowEngine.RandomizeArray(nonPlacedNonDynamicList.ToArray()).ToList();
+
+			//Grab the first item from the placeable list whose attachHint target is on the board already, or is Random
+			TileGroup tg = null;
+			foreach (TileGroup candidate in nonPlacedNonDynamicList)
+            {
+				if(candidate.GetChapter().attachHint == "Random" ||
+					TGList.Where(x => x.GetChapter().dataName == candidate.GetChapter().attachHint).Any())
+                {
+					tg = candidate;
+					break;
+                }
+            }
+			//If tg is null at this point, just grab the first unplaced, non-dynamic tile.
+			//e.g. if the game creator made 4 blocks all assigned to each other as attachHint,
+			//and none of the 4 pointed at the Start block, we'll have to point at least one at Start.
+			if(tg == null)
+            {
+				tg = nonPlacedNonDynamicList[0];
+            }
+
+			//Connect one block with a hinted attach that is already present on the board (or Random)
+			if(tg != null)
+			{
+				//List of potential attach blocks
+				//First add the block that matches the attachHint
+				List<TileGroup> nonDynamicOrderedList = TGList.Where(x => x.isPlaced && 
+					x.GetChapter().dataName != tg.GetChapter().dataName && 
+					x.GetChapter().dataName == tg.GetChapter().attachHint).ToList();
+				int attachTileHint = nonDynamicOrderedList.Count == 1 ? tg.GetChapter().attachTileHint : 0; //If the hinted attach block was found, also use the attachTileHint
+				//Then randomize the other potential placed blocks and add them to the list
+				nonDynamicOrderedList.AddRange(GlowEngine.RandomizeArray(TGList.Where(x => x.isPlaced &&
+					x.GetChapter().dataName != tg.GetChapter().dataName &&
+					x.GetChapter().dataName != tg.GetChapter().attachHint).ToArray()).ToList());
+				int innerCount = 1;
+				foreach (TileGroup tilegroup in nonDynamicOrderedList)
+				{
+					Debug.Log("Attach TileGroups " + tg.GetChapter().dataName + " " + tg.ToString() + " with attachHint " + tg.GetChapter().attachHint + " to " + tilegroup.GetChapter().dataName + " " + tilegroup.ToString());
+					Debug.Log("Attach TileGroups outerLoop " + outerCount + " of " + outerTotal + ", innerLoop " + innerCount + " of " + nonDynamicOrderedList.Count());
+
+					//coroutine code
+					engine.SetLoadingText(Translate("title.text.SingingTheWorldIntoBeing", "Singing the world into being {{ Cantata {0}, Movement {1} ",
+							new List<string> { outerCount.ToString(), innerCount.ToString() }
+						));
+					if (engine.mapDebug)
+					{
+						tg.Visible(true);
+						tg.Sepia(true);
+
+						tilegroup.Visible(true);
+						tilegroup.Sepia(false);
+					}
+
+					bool success = false;
+					if(attachTileHint != 0)
+                    {
+						yield return StartCoroutine(tg.AttachToCoroutine(tilegroup, attachTileHint));
+					}
+					success = tg.attachToCoroutineResult;
+					if(!success)
+                    {
+						yield return StartCoroutine(tg.AttachToCoroutine(tilegroup, 0));
+						success = tg.attachToCoroutineResult;
+					}
+
+					if (engine.mapDebug)
+					{
+						tg.Sepia(true);
+						tilegroup.Sepia(true);
+					}
+
+					if (success)
+					{
+						tg.isPlaced = true;
+						Debug.Log("***ATTACHING " + tg.GetChapter().dataName + " to " + tilegroup.GetChapter().dataName);
+						GameObject fog = Instantiate(fogPrefab, transform);
+						FogData fg = fog.GetComponent<FogData>();
+						fg.chapterName = tg.GetChapter().dataName;
+						fog.transform.position = tg.groupCenter.Y(.5f);
+						Debug.Log("Attached");
+
+						if (engine.mapDebug)
+						{
+							//Turn a tile group off after it has been placed
+							//tg.Visible(false);
+							//tilegroup.Visible(false);
+							fog.SetActive(false);
+						}
+
+						break;
+					}
+					innerCount++;
+					attachTileHint = 0; //If it's not the first TileGroup that matches the attachHint, there won't be an attachTileHint so set it to 0.
+					yield return null;
+				}
+				outerCount++;
+			}
+
+			nonPlacedNonDynamicList = TGList.Where(x => !x.isPlaced && !x.GetChapter().isDynamic).ToList();
+		}
+
+		Debug.Log("BuildScenario Complete");
+
+		yield break;
+	}
+
 
 	public TileState GetState()
 	{

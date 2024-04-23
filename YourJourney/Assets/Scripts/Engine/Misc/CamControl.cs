@@ -121,12 +121,14 @@ public class CamControl : MonoBehaviour
 		HandleZoom();
 
 		//Use to debug zoom and positioning
+		/*
 		if (Engine.FindEngine().mapDebug)
 		{
 			Engine.FindEngine().scenarioOverlay.SetActive(true);
 			Engine.FindEngine().scenarioOverlay.GetComponent<Image>().color = new Color(1, 1, 1, 0); //set image transparent
 			Engine.FindEngine().SetLoadingText("p" + targetPos + " z" + targetZoom + " F" + DOF + " *F" + targetDOF + " 8)" + targetLookAt);
 		}
+		*/
 	}
 
 	void HandleZoomOriginal() //original

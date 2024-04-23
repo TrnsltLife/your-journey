@@ -348,6 +348,7 @@ public class Tile : MonoBehaviour
 			List<int> densityList = new List<int>();
 			switch (densityPreference)
 			{
+				case DensityPreference.FIRST: //FIRST shouldn't make it in here, but if it does, treat it as LOWEST
 				case DensityPreference.LOWEST: densityList.Add(densityValueList[0]); break;
 				case DensityPreference.LOW: densityList.AddRange(densityValueList.GetRange(minStartIndex, System.Math.Max(1, medStartIndex - minStartIndex))); break;
 				case DensityPreference.LOW_MEDIUM: densityList.AddRange(densityValueList.GetRange(minStartIndex, System.Math.Max(1, maxStartIndex - medStartIndex))); break;

@@ -23,5 +23,8 @@ public class Chapter
 	public bool usesRandomGroups { get; set; }
 	public bool isDynamic { get; set; }
 	public string attachHint { get; set; }
+	public int attachTileHint { get; set; }
+	public DensityPreference tileDensityPreference { get; set; } = DensityPreference.FIRST;
+	public DensityPreference blockDensityPreference { get; set; } = DensityPreference.FIRST;
 	public TileGroup tileGroup { get; set; }
 }

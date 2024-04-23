@@ -77,7 +77,7 @@ public class TileGroup
 	//Build random group from editor Chapter
 	void BuildRandomFromChapter( Chapter c )
 	{
-		//Debug.Log( "BuildRandomFromChapter" );
+		Debug.Log( "BuildRandomFromChapter with tileDensityPreference " + c.tileDensityPreference );
 		List<Transform> usedPositions = new List<Transform>();
 		tileManager = Object.FindObjectOfType<TileManager>();
 		chapter = c;
@@ -121,8 +121,14 @@ public class TileGroup
 			containerObject.name += " " + tileroot.idNumber.ToString();
 			if ( previous != null )
 			{
-				//tile.AttachTo( previous, this );
-				tile.AttachToWithDensityPreference( previous, this, DensityPreference.HIGHEST );
+				if(chapter.tileDensityPreference == DensityPreference.FIRST)
+                {
+					tile.AttachTo( previous, this );
+				}
+				else
+                {
+					tile.AttachToWithDensityPreference(previous, this, chapter.tileDensityPreference);
+				}
 			}
 			tileList.Add( tile );
 			previous = tile;
@@ -1155,17 +1161,20 @@ public class TileGroup
 	/// <summary>
 	/// Randomly attaches one group to another - coroutine
 	/// </summary>
-	public System.Collections.IEnumerator AttachToCoroutine(TileGroup tgToAttachTo, TextPanel prepareTileTextPanel=null)
+	public System.Collections.IEnumerator AttachToCoroutine(TileGroup tgToAttachTo, int tileToAttachTo, TextPanel prepareTileTextPanel=null)
 	{
+		Debug.Log("AttachToCoroutine " + tgToAttachTo.GetChapter().dataName + ", tile: " + tileToAttachTo);
 		WaitForSeconds wfs = new WaitForSeconds(0.5f);
 
 
+		/*
 		for (int i = 0; i < tgToAttachTo.tileList.Count; i++)
 		{
 			//Debug.Log("attach to tile " + tgToAttachTo.tileList[i].baseTile.idNumber + tgToAttachTo.tileList[i].baseTile.tileSide);
 			//Debug.Log("attach to tile size: " + tgToAttachTo.tileList[i].meshRenderer.bounds.size);
 			//Debug.Log("attach to tile box min/max: " + tgToAttachTo.tileList[i].meshRenderer.bounds.min + " -> " + tgToAttachTo.tileList[i].meshRenderer.bounds.max);
 		}
+		*/
 
 		//get all open connectors in THIS tilegroup (connectors are INside the bounds of the tile)
 		//Debug.Log("GetOpenConnectors...");
@@ -1189,12 +1198,38 @@ public class TileGroup
 			}
 		}
 
+		//Check if the tileToAttachTo exists in this tilegroup; if not, set it to 0
+		if(!tgToAttachTo.tileList.Where(x => x.baseTile.idNumber == tileToAttachTo).Any())
+        {
+			tileToAttachTo = 0;
+        }
 
-		//get all open anchors on group we're connecting TO (anchors are OUTside the bounds of the tile)
-		//Debug.Log("GetOpenAnchors");
-		Vector3[] attachToOpenAnchors = GlowEngine.RandomizeArray(tgToAttachTo.GetOpenAnchors());
+		//Get the anchors of placed tile groups - one of these is what the connectors from above will attach to
+		Vector3[] attachToOpenAnchors;
+		if (tileToAttachTo != 0)
+        {
+			//Get the open anchors on the preferred attachment tile (if it exists)
+			Vector3[] tileOpenAnchors = tgToAttachTo.GetOpenAnchorsFromTile(tileToAttachTo);
+			List<Vector3> openAnchors = new List<Vector3>(GlowEngine.RandomizeArray(tileOpenAnchors));
+
+			//Then get the open anchors on all the rest of the tiles in this tile group
+			/*
+			Vector3[] tgOpenAnchors = tgToAttachTo.GetOpenAnchorsExceptTile(tileToAttachTo);
+			openAnchors.AddRange(GlowEngine.RandomizeArray(tgOpenAnchors));
+
+			attachToOpenAnchors = openAnchors.ToArray();
+
+			Debug.Log(chapter.dataName + " => " + chapter.attachHint + ", tileToAttachTo " + tileToAttachTo + " had " + tileOpenAnchors.Length + " anchors; other tiles had " + tgOpenAnchors.Length);
+			*/
+
+			attachToOpenAnchors = openAnchors.ToArray();
+		}
+		else
+        {
+			//get all open anchors on group we're connecting TO (anchors are OUTside the bounds of the tile)
+			attachToOpenAnchors = GlowEngine.RandomizeArray(tgToAttachTo.GetOpenAnchors());
+		}
 		System.Tuple<Vector3, Vector3> openAnchorsMinMax = MinMax(attachToOpenAnchors.ToList<Vector3>());
-		//Debug.Log("Gotten. Anchor Vector MinMax: " + openAnchorsMinMax.Item1 + " / " + openAnchorsMinMax.Item2);
 
 		//dummy
 		GameObject dummy = new GameObject();
@@ -1217,7 +1252,7 @@ public class TileGroup
 		bool safe = false;
 		Engine engine = Engine.FindEngine();
 		GameObject connectorSphere = null;
-		//foreach (Vector3 c in openConnectors)
+
 		foreach(Transform ct in openConnectorTransforms)
 		{
 			Vector3 c = ct.position;
@@ -1290,6 +1325,7 @@ public class TileGroup
 
 					//Debug.Log("Succeeded in connecting.");
 					safe = true;
+					Debug.Log("connected to index " + (connectorIndex-1));
 					break;
 				}
 			}
@@ -1339,7 +1375,7 @@ public class TileGroup
 	/// <summary>
 	/// Randomly attaches one group to another - coroutine
 	/// </summary>
-	public System.Collections.IEnumerator AttachToWithDensityPreferenceCoroutine(TileGroup tgToAttachTo, DensityPreference densityPreference)
+	public System.Collections.IEnumerator AttachToWithDensityPreferenceCoroutine(TileGroup tgToAttachTo, int tileToAttachTo, DensityPreference densityPreference)
 	{
 		WaitForSeconds wfs = new WaitForSeconds(0.5f);
 
@@ -1369,13 +1405,27 @@ public class TileGroup
 			}
 		}
 
+		//Transform[] attachToOpenAnchorsTransforms = GlowEngine.RandomizeArray(tgToAttachTo.GetOpenAnchorsTransforms());
+		Transform[] attachToOpenAnchorsTransforms;
+		if (tileToAttachTo != 0)
+		{
+			//Get the open anchors on the preferred attachment tile (if it exists)
+			Transform[] tileOpenAnchors = tgToAttachTo.GetOpenAnchorsFromTileTransforms(tileToAttachTo);
+			List<Transform> openAnchors = new List<Transform>(GlowEngine.RandomizeArray(tileOpenAnchors));
 
-		//get all open anchors on group we're connecting TO (anchors are OUTside the bounds of the tile)
-		//Debug.Log("GetOpenAnchors");
-		Transform[] attachToOpenAnchorsTransforms = GlowEngine.RandomizeArray(tgToAttachTo.GetOpenAnchorsTransforms());
+			//Then get the open anchors on all the rest of the tiles in this tile group
+			Transform[] tgOpenAnchors = tgToAttachTo.GetOpenAnchorsExceptTileTransforms(tileToAttachTo);
+			openAnchors.AddRange(GlowEngine.RandomizeArray(tgOpenAnchors));
+
+			attachToOpenAnchorsTransforms = openAnchors.ToArray();
+		}
+		else
+		{
+			//get all open anchors on group we're connecting TO (anchors are OUTside the bounds of the tile)
+			attachToOpenAnchorsTransforms = GlowEngine.RandomizeArray(tgToAttachTo.GetOpenAnchorsTransforms());
+		}
 		Vector3[] attachToOpenAnchors = attachToOpenAnchorsTransforms.Select(it => it.position).ToArray<Vector3>();
 		System.Tuple<Vector3, Vector3> openAnchorsMinMax = MinMax(attachToOpenAnchors.ToList<Vector3>());
-		//Debug.Log("Gotten. Anchor Vector MinMax: " + openAnchorsMinMax.Item1 + " / " + openAnchorsMinMax.Item2);
 
 		//dummy
 		GameObject dummy = new GameObject();
@@ -1489,9 +1539,6 @@ public class TileGroup
 			List<int> densityValueList = densityValueMap.Keys.ToList();
 			densityValueList.Sort();
 			//Debug.Log("densityValueList: " + string.Join(", ", densityValueList));
-			//int minDensity = densityValueList[0];
-			//int medDensity = densityValueList[densityValueList.Count / 2];
-			//int maxDensity = densityValueList.Last();
 
 			int minStartIndex = 0;
 			int medStartIndex = densityValueList.Count / 3;
@@ -1502,6 +1549,7 @@ public class TileGroup
 			List<int> densityList = new List<int>();
 			switch (densityPreference)
 			{
+				case DensityPreference.FIRST: //FIRST shouldn't make it in here, but if it does, treat it as LOWEST
 				case DensityPreference.LOWEST: densityList.Add(densityValueList[0]); break;
 				case DensityPreference.LOW: densityList.AddRange(densityValueList.GetRange(minStartIndex, System.Math.Max(1, medStartIndex - minStartIndex))); break;
 				case DensityPreference.LOW_MEDIUM: densityList.AddRange(densityValueList.GetRange(minStartIndex, System.Math.Max(1, maxStartIndex - medStartIndex))); break;
@@ -1796,9 +1844,25 @@ public class TileGroup
 	/// </summary>
 	public Vector3[] GetOpenAnchors()
 	{
-		var bar = from tile in tileList from c in tile.GetChildren("anchor") select c.name;
-		//Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
+		var temp = from tile in tileList from c in tile.GetChildren("anchor") select c.name;
+		Debug.Log("openAnchors: " + string.Join(", ", temp.ToArray()));
 		var allAnchors = from tile in tileList from tf in tile.GetChildren( "anchor" ) select tf.position;
+		return allAnchors.ToArray();
+	}
+
+	public Vector3[] GetOpenAnchorsFromTile(int tileToAttachTo)
+	{
+		var temp = from tile in tileList where tile.baseTile.idNumber == tileToAttachTo from tf in tile.GetChildren("anchor") select tf.name;
+		Debug.Log("openAnchorsFromTile: " + tileToAttachTo + " => " + string.Join(", ", temp.ToArray()));
+		var allAnchors = from tile in tileList where tile.baseTile.idNumber == tileToAttachTo from tf in tile.GetChildren("anchor") select tf.position;
+		return allAnchors.ToArray();
+	}
+
+	public Vector3[] GetOpenAnchorsExceptTile(int tileToAttachTo)
+	{
+		var temp = from tile in tileList where tile.baseTile.idNumber != tileToAttachTo from tf in tile.GetChildren("anchor") select tf.name;
+		Debug.Log("openAnchorsExceptTile: " + tileToAttachTo + " => " + string.Join(", ", temp.ToArray()));
+		var allAnchors = from tile in tileList where tile.baseTile.idNumber != tileToAttachTo from tf in tile.GetChildren("anchor") select tf.position;
 		return allAnchors.ToArray();
 	}
 
@@ -1807,6 +1871,22 @@ public class TileGroup
 		var bar = from tile in tileList from c in tile.GetChildren("anchor") select c.name;
 		//Debug.Log("openConnectors: " + string.Join(", ", bar.ToArray()));
 		var allAnchors = from tile in tileList from tf in tile.GetChildren("anchor") select tf;
+		return allAnchors.ToArray();
+	}
+
+	public Transform[] GetOpenAnchorsFromTileTransforms(int tileToAttachTo)
+	{
+		var temp = from tile in tileList where tile.baseTile.idNumber == tileToAttachTo from tf in tile.GetChildren("anchor") select tf.name;
+		Debug.Log("openAnchorsFromTile: " + tileToAttachTo + " => " + string.Join(", ", temp.ToArray()));
+		var allAnchors = from tile in tileList where tile.baseTile.idNumber == tileToAttachTo from tf in tile.GetChildren("anchor") select tf;
+		return allAnchors.ToArray();
+	}
+
+	public Transform[] GetOpenAnchorsExceptTileTransforms(int tileToAttachTo)
+	{
+		var temp = from tile in tileList where tile.baseTile.idNumber != tileToAttachTo from tf in tile.GetChildren("anchor") select tf.name;
+		Debug.Log("openAnchorsExceptTile: " + tileToAttachTo + " => " + string.Join(", ", temp.ToArray()));
+		var allAnchors = from tile in tileList where tile.baseTile.idNumber != tileToAttachTo from tf in tile.GetChildren("anchor") select tf;
 		return allAnchors.ToArray();
 	}
 
