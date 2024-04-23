@@ -1198,6 +1198,12 @@ public class TileGroup
 			}
 		}
 
+		//Check if the tileToAttachTo exists in this tilegroup; if not, set it to 0
+		if(!tgToAttachTo.tileList.Where(x => x.baseTile.idNumber == tileToAttachTo).Any())
+        {
+			tileToAttachTo = 0;
+        }
+
 		//Get the anchors of placed tile groups - one of these is what the connectors from above will attach to
 		Vector3[] attachToOpenAnchors;
 		if (tileToAttachTo != 0)

@@ -362,7 +362,8 @@ public class ChapterManager : MonoBehaviour
 		//attempt to attach this tg, but only if it IS dynamic. The coroutine should also update the text panel's value with a progress bar type update.
 		if (c.isDynamic)
 		{
-			yield return StartCoroutine(AttachDynamicTileCoroutine(tg, textPanel));
+			//yield return StartCoroutine(AttachDynamicTileCoroutine(tg, textPanel));
+			yield return StartCoroutine(AttachHintedDynamicTileCoroutine(tg, textPanel));
 			textPanel.ShowButtonSingle(); //once we're done finding the attach point, show the button to close the text panel
 			textPanel.UpdateText(""); //remove any Scouting Location text
 		}
@@ -424,6 +425,68 @@ public class ChapterManager : MonoBehaviour
 			tilegroups.Remove(previousGroup);
 		}
 		else
+		{
+			int randIdx = GlowEngine.GenerateRandomNumbers(tilegroups.Count)[0];
+			TileGroup randGroup = tilegroups[randIdx];
+
+			yield return StartCoroutine(tg.AttachToCoroutine(randGroup, 0, textPanel));
+			success = tg.attachToCoroutineResult;
+
+			//remove so not attempted again below
+			tilegroups.RemoveAt(randIdx);
+		}
+		tg.isPlaced = success;
+
+		if (!success)
+		{
+			Debug.Log("***SEARCHING for random tilegroup to attach to...");
+			foreach (TileGroup _tg in tilegroups)
+			{
+				yield return StartCoroutine(tg.AttachToCoroutine(_tg, tg.GetChapter().attachTileHint, textPanel));
+				success = tg.attachToCoroutineResult;
+				if (success)
+				{
+					tg.isPlaced = true;
+					break;
+				}
+			}
+		}
+		yield return null;
+	}
+
+	IEnumerator AttachHintedDynamicTileCoroutine(TileGroup tg, TextPanel textPanel)
+	{
+		//get ALL explored tilegroups in play
+		var tilegroups = (from ch in chapterList
+						  where ch.tileGroup.isExplored && ch.tileGroup.isPlaced
+						  select ch.tileGroup).ToList();
+
+		bool success = false;
+
+		string attachHint = tg.GetChapter().attachHint;
+		TileGroup attachTG = null;
+		if(attachHint != null && attachHint != "" && attachHint != "None" && attachHint != "Random")
+        {
+			attachTG = tilegroups.Where(x => x.GetChapter().dataName == attachHint).FirstOrDefault();
+		}
+
+		if(attachTG != null)
+        {
+			yield return StartCoroutine(tg.AttachToCoroutine(attachTG, tg.GetChapter().attachTileHint, textPanel));
+			success = tg.attachToCoroutineResult;
+
+			//remove so not attempted again below
+			tilegroups.Remove(attachTG);
+		}
+		else if (previousGroup != null && attachHint != "Random")
+		{
+			yield return StartCoroutine(tg.AttachToCoroutine(previousGroup, 0, textPanel));
+			success = tg.attachToCoroutineResult;
+
+			//remove so not attempted again below
+			tilegroups.Remove(previousGroup);
+		}
+		else //pick randomly - this includes when attachHint==Random since it was excluded above
 		{
 			int randIdx = GlowEngine.GenerateRandomNumbers(tilegroups.Count)[0];
 			TileGroup randGroup = tilegroups[randIdx];
