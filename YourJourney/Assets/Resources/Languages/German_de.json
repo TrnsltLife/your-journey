@@ -769,5 +769,10 @@
 	"enemy.attack.LordJavelin.7": "Javelin umkreist dich geduldig, stets etwas mehr als eine Schwertlänge entfernt, und wartet auf einen winzigen Moment der Unachtsamkeit.",
 	"enemy.effect.LordJavelin.7": "Nach diesem Angriff bewegt sich Fürst Javelin 1 Feld vom angegriffenen Helden weg.",
 	"enemy.attack.SupplicantOfMoreGoth.1": "Der Jünger More-Goths stößt einen bösartigen Fluch nach dem anderen aus.",
-	"dialog.text.EachResetScoutX": "Jeder Held setzt sein Deck zurück und späht {0} aus."
+	"dialog.text.EachResetScoutX": "Jeder Held setzt sein Deck zurück und späht {0} aus.",
+	"title.text.AMightyThemeUnfolds": "A mighty theme unfolds...",
+	"title.text.SingingTheWorldIntoBeing": "Singing the world into being {{ Cantata {0}, Movement {1}",
+	"title.text.Aria": ", Aria {0} / {1} }}",
+	"dialog.text.tile.ScoutingApproaches": "Scouting approaches...",
+	"dialog.text.tile.ScoutingApproach": "Scouting approach {0} / {1}..."
 }

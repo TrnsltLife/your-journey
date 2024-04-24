@@ -9053,6 +9053,10 @@ MonoBehaviour:
     languageName: "\u0395\u03BB\u03BB\u03B7\u03BD\u03B9\u03BA\u03AC"
     internalFile: {fileID: 4900000, guid: 61a9a015b50ee0649a7e2f11dfaf8eda, type: 3}
     externalFile: 
+  - languageCode: uk
+    languageName: "\u0423\u043A\u0440\u0430\u0457\u043D\u0441\u044C\u043A\u043E\u044E"
+    internalFile: {fileID: 4900000, guid: cd67a60be584de74485e2fbbf229aed9, type: 3}
+    externalFile: 
 --- !u!1 &270939961
 GameObject:
   m_ObjectHideFlags: 0
