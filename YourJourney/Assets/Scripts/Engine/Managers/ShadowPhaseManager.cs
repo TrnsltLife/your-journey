@@ -82,6 +82,33 @@ public class ShadowPhaseManager : MonoBehaviour
 		}, 1, 4f );
 
 		allowAttacks = false;
+
+		//Check for dead heroes
+		for(int i=0; i<Bootstrap.isDead.Length; i++)
+        {
+			if(Bootstrap.isDead[i])
+            {
+				//Fail the mission
+				string lastStandFailedResolution = Engine.currentScenario.lastStandFailedResolution;
+
+				Engine engine = Engine.FindEngine();
+
+				if(!string.IsNullOrEmpty(lastStandFailedResolution) && lastStandFailedResolution.ToLower() != "none")
+                {
+					Debug.Log("DoEndTurn -> TriggerEndGame lastStandFailedResolution: " + lastStandFailedResolution);
+					//engine.triggerManager.TriggerEndGame(lastStandFailedResolution);
+					engine.triggerManager.FireTrigger(lastStandFailedResolution);
+					return;
+				}
+				else
+                {
+					Debug.Log("DoEndTurn -> EndScenario, lastStandFailedResolution: " + lastStandFailedResolution);
+					engine.EndScenario(lastStandFailedResolution);
+					return;
+				}
+			}
+		}
+
 		doingShadowPhase = true;
 		//go thru each monster, ask if it can move+attack random hero
 		//attack OR no target
