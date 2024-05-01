@@ -369,7 +369,7 @@ public class Engine : MonoBehaviour
 
 		//bool success = scenario.scenarioEndStatus[resName];//default reso
 		bool success = false;
-		if (!string.IsNullOrEmpty(resName))
+		if (!string.IsNullOrEmpty(resName) && resName.ToLower() != "none")
 		{
 			success = scenario.scenarioEndStatus.ContainsKey(resName) ? scenario.scenarioEndStatus[resName] : false;
 		}
