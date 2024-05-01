@@ -281,7 +281,7 @@ public class Engine : MonoBehaviour
 		//fire any campaign triggers
 		if (Bootstrap.campaignState != null)
 		{
-			foreach (var t in Bootstrap.campaignState.campaignTriggerState)
+			foreach (var t in Bootstrap.campaignState.currentCampaignTriggerState[Bootstrap.campaignState.scenarioPlayingIndex])
 				triggerManager.FireTrigger(t);
 		}
 	}

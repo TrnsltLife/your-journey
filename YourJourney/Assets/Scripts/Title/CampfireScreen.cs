@@ -47,6 +47,9 @@ public class CampfireScreen : MonoBehaviour
 	List<int> startingMounts; //loaded from campaignState
 	List<int> campfireMounts; //as updated on the campfire screen
 
+	List<string> startingCampaignStateTriggers; //loaded from campaignState
+	List<string> campaignTriggerState; //as updated behind the scenes on the campfire screen
+
 	CampfireState campfireState;
 
 	SkillRecord currentSkillRecord;
@@ -141,12 +144,15 @@ public class CampfireScreen : MonoBehaviour
 
 	public void LoadCharacterSheets()
     {
+		//We also load the campaignTriggerState here because it's stored in the same place and follows basically the same pattern as the characterSheets, trinkets, and mounts.
+
 		if (campfireState == CampfireState.SETUP)
 		{
 			//Start with the starting state of the first scenario
 			startingCharacterSheets = campaignState.startingCharacterSheets[0];
 			startingTrinkets = campaignState.startingTrinkets[0];
 			startingMounts = campaignState.startingMounts[0];
+			startingCampaignStateTriggers = campaignState.startingCampaignTriggerState[0];
 		}
 		else if (campfireState == CampfireState.VIEW)
 		{
@@ -154,6 +160,7 @@ public class CampfireScreen : MonoBehaviour
 			startingCharacterSheets = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex];
 			startingTrinkets = campaignState.currentTrinkets[campaignState.scenarioPlayingIndex];
 			startingMounts = campaignState.currentMounts[campaignState.scenarioPlayingIndex];
+			startingCampaignStateTriggers = campaignState.currentCampaignTriggerState[campaignState.scenarioPlayingIndex];
 		}
 		else if (campfireState == CampfireState.UPGRADE)
 		{
@@ -164,6 +171,7 @@ public class CampfireScreen : MonoBehaviour
 				startingCharacterSheets = campaignState.startingCharacterSheets[0];
 				startingTrinkets = campaignState.startingTrinkets[0];
 				startingMounts = campaignState.startingMounts[0];
+				startingCampaignStateTriggers = campaignState.startingCampaignTriggerState[0];
 			}
 			else
 			{
@@ -171,6 +179,7 @@ public class CampfireScreen : MonoBehaviour
 				startingCharacterSheets = campaignState.currentCharacterSheets[previousIndex];
 				startingTrinkets = campaignState.currentTrinkets[previousIndex];
 				startingMounts = campaignState.currentMounts[previousIndex];
+				startingCampaignStateTriggers = campaignState.currentCampaignTriggerState[previousIndex];
 			}
 		}
 
@@ -182,12 +191,14 @@ public class CampfireScreen : MonoBehaviour
 			characterSheets = campaignState.startingCharacterSheets[campaignState.scenarioPlayingIndex];
 			campfireTrinkets = campaignState.startingTrinkets[campaignState.scenarioPlayingIndex];
 			campfireMounts = campaignState.startingMounts[campaignState.scenarioPlayingIndex];
+			campaignTriggerState = campaignState.startingCampaignTriggerState[campaignState.scenarioPlayingIndex];
 		}
 		else
 		{
 			characterSheets = CampaignState.CloneCharacterSheetList(startingCharacterSheets);
 			campfireTrinkets = new List<int>(startingTrinkets);
 			campfireMounts = new List<int>(startingMounts);
+			campaignTriggerState = new List<string>(startingCampaignStateTriggers);
 		}
 	}
 
@@ -1059,12 +1070,14 @@ public class CampfireScreen : MonoBehaviour
 			campaignState.startingCharacterSheets[0] = CampaignState.CloneCharacterSheetList(characterSheets);
 			campaignState.startingTrinkets[0] = new List<int>(campfireTrinkets);
 			campaignState.startingMounts[0] = new List<int>(campfireMounts);
+			campaignState.startingCampaignTriggerState[0] = new List<string>(campaignTriggerState);
 		}
 		else if (campfireState == CampfireState.UPGRADE)
 		{
 			campaignState.startingCharacterSheets[campaignState.scenarioPlayingIndex] = CampaignState.CloneCharacterSheetList(characterSheets);
 			campaignState.startingTrinkets[campaignState.scenarioPlayingIndex] = new List<int>(campfireTrinkets);
 			campaignState.startingMounts[campaignState.scenarioPlayingIndex] = new List<int>(campfireMounts);
+			campaignState.startingCampaignTriggerState[campaignState.scenarioPlayingIndex] = new List<string>(campaignTriggerState);
 		}
 
 		//Set the save flag on this scenario so CampfireScreen will load from this scenario's startCharacterSheets instead of the last scenario's currentCharacterSheets
@@ -1094,6 +1107,7 @@ public class CampfireScreen : MonoBehaviour
 		campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex] = CampaignState.CloneCharacterSheetList(characterSheets);
 		campaignState.currentTrinkets[campaignState.scenarioPlayingIndex] = campfireTrinkets;
 		campaignState.currentMounts[campaignState.scenarioPlayingIndex] = campfireMounts;
+		campaignState.currentCampaignTriggerState[campaignState.scenarioPlayingIndex] = campaignTriggerState;
 
 		StartGame();
 	}

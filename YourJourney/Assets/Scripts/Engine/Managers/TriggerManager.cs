@@ -109,8 +109,8 @@ public class TriggerManager : MonoBehaviour
 			//add campaign trigger to campaignstate trigger fired list
 			if ( Bootstrap.campaignState != null
 				&& trigger.isCampaignTrigger
-				&& !Bootstrap.campaignState.campaignTriggerState.Contains( name ) )
-				Bootstrap.campaignState.campaignTriggerState.Add( name );
+				&& !Bootstrap.campaignState.currentCampaignTriggerState[Bootstrap.campaignState.scenarioPlayingIndex].Contains( name ) )
+				Bootstrap.campaignState.currentCampaignTriggerState[Bootstrap.campaignState.scenarioPlayingIndex].Add( name );
 
 			//first, check conditional events listening for triggers to fire
 			foreach ( ConditionalInteraction con in engine.interactionManager.interactions.Where( x => x.interactionType == InteractionType.Conditional ) )

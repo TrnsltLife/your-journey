@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using System.Collections.Generic;
 using static LanguageManager;
+using System.Linq;
 
 public class ShadowPhaseManager : MonoBehaviour
 {
@@ -89,21 +90,22 @@ public class ShadowPhaseManager : MonoBehaviour
 			if(Bootstrap.isDead[i])
             {
 				//Fail the mission
-				string lastStandFailedResolution = Engine.currentScenario.lastStandFailedResolution;
+				string lastStandFailedResolutionName = Engine.currentScenario.lastStandFailedResolution;
+				TextBookData lastStandFailedResolution = Engine.currentScenario.resolutionObserver.Where(x => x.dataName == lastStandFailedResolutionName).FirstOrDefault();
+				string lastStandFailedResolutionTrigger = lastStandFailedResolution?.triggerName ?? "None";
 
 				Engine engine = Engine.FindEngine();
 
-				if(!string.IsNullOrEmpty(lastStandFailedResolution) && lastStandFailedResolution.ToLower() != "none")
-                {
-					Debug.Log("DoEndTurn -> TriggerEndGame lastStandFailedResolution: " + lastStandFailedResolution);
-					//engine.triggerManager.TriggerEndGame(lastStandFailedResolution);
-					engine.triggerManager.FireTrigger(lastStandFailedResolution);
+				if (lastStandFailedResolution != null && !string.IsNullOrEmpty(lastStandFailedResolutionTrigger) && lastStandFailedResolutionTrigger.ToLower() != "none")
+				{
+					Debug.Log("DoEndTurn -> TriggerEndGame lastStandFailedResolution: " + lastStandFailedResolutionTrigger);
+					engine.triggerManager.FireTrigger(lastStandFailedResolutionTrigger);
 					return;
 				}
 				else
-                {
+				{
 					Debug.Log("DoEndTurn -> EndScenario, lastStandFailedResolution: " + lastStandFailedResolution);
-					engine.EndScenario(lastStandFailedResolution);
+					engine.EndScenario(lastStandFailedResolutionName);
 					return;
 				}
 			}
