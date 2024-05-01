@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 using static LanguageManager;
 public class HeroItem : MonoBehaviour
 {
@@ -29,11 +30,19 @@ public class HeroItem : MonoBehaviour
 			{
 				FindObjectOfType<InteractionManager>().GetNewDamagePanel().ShowFinalStand(Bootstrap.lastStandCounter[heroIndex], FinalStand.Damage, (pass) =>
 				{
-					Bootstrap.lastStandCounter[heroIndex]++;
 					if (!pass)
+					{
 						Bootstrap.isDead[heroIndex] = true;
+						int deadHeroes = Bootstrap.isDead.Where(x => x).Count();
+						Engine.FindEngine().triggerManager.FireTrigger("Last Stand Failed " + deadHeroes); //a trigger fired when the Last Stand Failed, e.g. "Last Stand Failed 1"
+					}
+					else
+                    {
+						Engine.FindEngine().triggerManager.FireTrigger("Last Stand x" + Bootstrap.lastStandCounter[heroIndex]); //a trigger fired when the Last Stand Succeeded at this level for the first time. The number indicates this hero has succeeded in that many Last Stands, e.g. "Last Stand x2"
+					}
+					Bootstrap.lastStandCounter[heroIndex]++;
 					UpdateUI();
-					pPanel.ToggleVisible(true);
+					pPanel.ToggleVisible(false);
 				});
 			}
 			else
@@ -53,11 +62,19 @@ public class HeroItem : MonoBehaviour
 			{
 				FindObjectOfType<InteractionManager>().GetNewDamagePanel().ShowFinalStand( Bootstrap.lastStandCounter[heroIndex], FinalStand.Fear, ( pass ) =>
 				{
-					Bootstrap.lastStandCounter[heroIndex]++;
-					if ( !pass )
+					if (!pass)
+					{
 						Bootstrap.isDead[heroIndex] = true;
+						int deadHeroes = Bootstrap.isDead.Where(x => x).Count();
+						Engine.FindEngine().triggerManager.FireTrigger("Last Stand Failed " + deadHeroes); //a trigger fired when the Last Stand Failed, e.g. "Last Stand Failed 1"
+					}
+					else
+                    {
+						Engine.FindEngine().triggerManager.FireTrigger("Last Stand x" + Bootstrap.lastStandCounter[heroIndex]); //a trigger fired when the Last Stand Succeeded at this level for the first time. The number indicates this hero has succeeded in that many Last Stands, e.g. "Last Stand x2"
+					}
+					Bootstrap.lastStandCounter[heroIndex]++;
 					UpdateUI();
-					pPanel.ToggleVisible( true );
+					pPanel.ToggleVisible( false );
 				} );
 			}
 			else
