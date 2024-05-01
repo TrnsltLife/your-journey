@@ -53,7 +53,7 @@ public class TriggerManager : MonoBehaviour
 	{
 		endTriggerGUID = Guid.NewGuid().ToString();
 		resolutionName = rname;
-
+		Debug.Log("TriggerEndGame -> FireTrigger " + endTriggerGUID);
 		FireTrigger( endTriggerGUID );
 	}
 
@@ -89,6 +89,7 @@ public class TriggerManager : MonoBehaviour
 					dataName = endTriggerGUID,
 					triggerName = resolutionName
 				};
+				Debug.Log("TriggerChain -> new Trigger dataName: " + trigger.dataName + ", triggerName: " + trigger.triggerName);
 			}
 			//handle no Trigger with name found
 			else
@@ -108,8 +109,8 @@ public class TriggerManager : MonoBehaviour
 			//add campaign trigger to campaignstate trigger fired list
 			if ( Bootstrap.campaignState != null
 				&& trigger.isCampaignTrigger
-				&& !Bootstrap.campaignState.campaignTriggerState.Contains( name ) )
-				Bootstrap.campaignState.campaignTriggerState.Add( name );
+				&& !Bootstrap.campaignState.currentCampaignTriggerState[Bootstrap.campaignState.scenarioPlayingIndex].Contains( name ) )
+				Bootstrap.campaignState.currentCampaignTriggerState[Bootstrap.campaignState.scenarioPlayingIndex].Add( name );
 
 			//first, check conditional events listening for triggers to fire
 			foreach ( ConditionalInteraction con in engine.interactionManager.interactions.Where( x => x.interactionType == InteractionType.Conditional ) )
@@ -199,9 +200,11 @@ public class TriggerManager : MonoBehaviour
 			}
 			yield return WaitUntilFinished();
 
+			Debug.Log("TriggerChain -> TryFireEndScenario name: " + name);
 			//trigger end scenario
 			if ( engine.interactionManager.TryFireEndScenario( name ) )
 			{
+				Debug.Log("TriggerChain -> TryFireEndScenario name: " + name + " triggered");
 				if ( !trigger.isMultiTrigger )
 				{
 					queue.Dequeue();

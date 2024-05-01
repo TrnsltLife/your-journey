@@ -281,7 +281,7 @@ public class Engine : MonoBehaviour
 		//fire any campaign triggers
 		if (Bootstrap.campaignState != null)
 		{
-			foreach (var t in Bootstrap.campaignState.campaignTriggerState)
+			foreach (var t in Bootstrap.campaignState.currentCampaignTriggerState[Bootstrap.campaignState.scenarioPlayingIndex])
 				triggerManager.FireTrigger(t);
 		}
 	}
@@ -367,7 +367,12 @@ public class Engine : MonoBehaviour
 		//add scenario lore/xp reward
 		FindObjectOfType<LorePanel>().AddReward( scenario.loreReward, scenario.xpReward );
 
-		bool success = scenario.scenarioEndStatus[resName];//default reso
+		//bool success = scenario.scenarioEndStatus[resName];//default reso
+		bool success = false;
+		if (!string.IsNullOrEmpty(resName))
+		{
+			success = scenario.scenarioEndStatus.ContainsKey(resName) ? scenario.scenarioEndStatus[resName] : false;
+		}
 		string msg = success ? Translate("game.text.Success", "SUCCESS") : Translate("game.text.Failure", "FAILURE");
 		string end = "\r\n\r\n";
 		if(scenario.projectType == ProjectType.Campaign)

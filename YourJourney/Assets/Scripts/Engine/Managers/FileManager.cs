@@ -18,6 +18,7 @@ public class FileManager
 	public int xpStartValue { get; set; }
 	public string specialInstructions { get; set; }
 	public string coverImage { get; set; }
+	public string lastStandFailedResolution { get; set; }
 	public string fileVersion { get; set; }
 	//public string fileName { get; set; }
 	public string saveDate { get; set; }
@@ -89,6 +90,7 @@ public class FileManager
 		shadowFear = source.shadowFear;
 		specialInstructions = source.specialInstructions;
 		coverImage = source.coverImage;
+		lastStandFailedResolution = source.lastStandFailedResolution;
 		scenarioGUID = source.scenarioGUID;
 		campaignGUID = source.campaignGUID;
 		loreStartValue = source.loreStartValue;

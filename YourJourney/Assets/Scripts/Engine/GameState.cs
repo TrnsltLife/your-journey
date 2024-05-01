@@ -155,6 +155,7 @@ public class GameState
 			if (fm.campaignState != null)
 			{
 				fm.campaignState.UpgradeMissingCharacterSheets();
+				fm.campaignState.UpgradeMissingCampaignTriggers();
 			}
 
 			return fm;
@@ -288,8 +289,11 @@ public class CampaignState
 	public int[] heroesIndex;
 	public string gameName;
 	public Difficulty difficulty;
+
 	//list of FIRED campaign triggers
-	public List<string> campaignTriggerState = new List<string>();
+	//public List<string> campaignTriggerState = new List<string>();
+	public List<string>[] startingCampaignTriggerState; //snapshot of campaignTriggerState at the beginning of a scenario; used for replays
+	public List<string>[] currentCampaignTriggerState; //snapshot of campaignTriggerState at the current saved/finished state in the scenario
 
 	public CampaignState()
 	{
@@ -310,6 +314,9 @@ public class CampaignState
 		currentTrinkets = new List<int>[campaign.scenarioCollection.Count];
 		startingMounts = new List<int>[campaign.scenarioCollection.Count];
 		currentMounts = new List<int>[campaign.scenarioCollection.Count];
+		startingCampaignTriggerState = new List<string>[campaign.scenarioCollection.Count];
+		currentCampaignTriggerState = new List<string>[campaign.scenarioCollection.Count];
+
 		gameDate = DateTime.Today.ToShortDateString();
 		saveStateIndex = -1;
 		scenarioPlayingIndex = 0;
@@ -325,6 +332,22 @@ public class CampaignState
 		currentTrinkets.Fill(new List<int>());
 		startingMounts.Fill(new List<int>());
 		currentMounts.Fill(new List<int>());
+		startingCampaignTriggerState.Fill(new List<string>());
+		currentCampaignTriggerState.Fill(new List<string>());
+	}
+
+	public void UpgradeMissingCampaignTriggers()
+    {
+		if (startingCampaignTriggerState == null)
+		{
+			startingCampaignTriggerState = new List<string>[campaign.scenarioCollection.Count];
+			startingCampaignTriggerState.Fill(new List<string>());
+		}
+		if (currentCampaignTriggerState == null)
+		{
+			currentCampaignTriggerState = new List<string>[campaign.scenarioCollection.Count];
+			currentCampaignTriggerState.Fill(new List<string>());
+		}
 	}
 
 	public void UpgradeMissingCharacterSheets()
