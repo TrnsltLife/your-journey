@@ -37,7 +37,9 @@ public class HeroSelectionPanel : MonoBehaviour
 	List<Title> giveTitles;
 	int missingTitles;
 
+	CorruptionInteraction corruptionInteraction;
 	int corruption;
+	CorruptionTarget corruptionTarget;
 
 	Action<InteractionResult> originalAction;
 
@@ -56,6 +58,17 @@ public class HeroSelectionPanel : MonoBehaviour
 		root = transform.parent;
 		mainText.alignment = TextAlignmentOptions.Top; //We set this here instead of the editor to make it easier to see mainText and dummy are lined up with each other in the editor
 		dummy.alignment = TextAlignmentOptions.Top;
+	}
+
+	public void Show(CorruptionInteraction ii, List<Item> giveItems, int missingItems, Item item, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
+	{
+		corruptionInteraction = ii;
+		this.giveItem = item;
+		this.giveItems = giveItems;
+		this.missingItems = missingItems;
+		this.originalAction = originalAction;
+
+		Show(actions);
 	}
 
 	public void Show(ItemInteraction ii, List<Item> giveItems, int missingItems, Item item, Action<InteractionResult> originalAction, Action<InteractionResult> actions)

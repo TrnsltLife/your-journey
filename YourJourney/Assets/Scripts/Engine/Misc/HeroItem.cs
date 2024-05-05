@@ -22,65 +22,63 @@ public class HeroItem : MonoBehaviour
 
 	public void OnDamageFinalStand()
 	{
-		pPanel.ToggleVisible(false);
-		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowYesNo(Translate("stand.text.ConfirmStand", "{0}: Do you wish to perform a Last Stand against {1}?",
-			new List<string> { Bootstrap.gameStarter.heroes[heroIndex], "<font=\"Icon\">D</font> " + Translate("damage." + FinalStand.Damage.ToString(), FinalStand.Damage.ToString()) }), res =>
-		{
-			if (res.btn1)
-			{
-				FindObjectOfType<InteractionManager>().GetNewDamagePanel().ShowFinalStand(Bootstrap.lastStandCounter[heroIndex], FinalStand.Damage, (pass) =>
-				{
-					if (!pass)
-					{
-						Bootstrap.isDead[heroIndex] = true;
-						int deadHeroes = Bootstrap.isDead.Where(x => x).Count();
-						Engine.FindEngine().triggerManager.FireTrigger("Last Stand Failed " + deadHeroes); //a trigger fired when the Last Stand Failed, e.g. "Last Stand Failed 1"
-					}
-					else
-                    {
-						Engine.FindEngine().triggerManager.FireTrigger("Last Stand x" + Bootstrap.lastStandCounter[heroIndex]); //a trigger fired when the Last Stand Succeeded at this level for the first time. The number indicates this hero has succeeded in that many Last Stands, e.g. "Last Stand x2"
-					}
-					Bootstrap.lastStandCounter[heroIndex]++;
-					UpdateUI();
-					pPanel.ToggleVisible(false);
-				});
-			}
-			else
-            {
-				pPanel.ToggleVisible(true);
-			}
-		});
+		AskFinalStand(FinalStand.Damage,
+			"<font=\"Icon\">D</font> " + Translate("damage." + FinalStand.Damage.ToString(), FinalStand.Damage.ToString())
+			);
 	}
 
 	public void OnFearFinalStand()
 	{
+		AskFinalStand(FinalStand.Fear,
+			"<font=\"Icon\">F</font> " + Translate("damage." + FinalStand.Fear.ToString(), FinalStand.Fear.ToString())
+			);
+	}
+
+	public void AskFinalStand(FinalStand finalStandType, string finalStandText)
+    {
 		pPanel.ToggleVisible(false);
 		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowYesNo(Translate("stand.text.ConfirmStand", "{0}: Do you wish to perform a Last Stand against {1}?",
-			new List<string> { Bootstrap.gameStarter.heroes[heroIndex], "<font=\"Icon\">F</font> " + Translate("damage." + FinalStand.Fear.ToString(), FinalStand.Fear.ToString()) }), res =>
-		{
-			if (res.btn1)
+			new List<string> { Bootstrap.gameStarter.heroes[heroIndex], finalStandText }), res =>
 			{
-				FindObjectOfType<InteractionManager>().GetNewDamagePanel().ShowFinalStand( Bootstrap.lastStandCounter[heroIndex], FinalStand.Fear, ( pass ) =>
+				if (res.btn1)
 				{
-					if (!pass)
-					{
-						Bootstrap.isDead[heroIndex] = true;
-						int deadHeroes = Bootstrap.isDead.Where(x => x).Count();
-						Engine.FindEngine().triggerManager.FireTrigger("Last Stand Failed " + deadHeroes); //a trigger fired when the Last Stand Failed, e.g. "Last Stand Failed 1"
-					}
-					else
-                    {
-						Engine.FindEngine().triggerManager.FireTrigger("Last Stand x" + Bootstrap.lastStandCounter[heroIndex]); //a trigger fired when the Last Stand Succeeded at this level for the first time. The number indicates this hero has succeeded in that many Last Stands, e.g. "Last Stand x2"
-					}
-					Bootstrap.lastStandCounter[heroIndex]++;
-					UpdateUI();
-					pPanel.ToggleVisible( false );
-				} );
+					DoFinalStand(finalStandType);
+				}
+				else
+				{
+					pPanel.ToggleVisible(true);
+				}
+			});
+	}
+
+	public void CorruptionFinalStand()
+    {
+		string finalStandText = "<font=\"Icon\">F</font> " + Translate("damage." + FinalStand.Fear.ToString(), FinalStand.Fear.ToString());
+		pPanel.ToggleVisible(false);
+		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("stand.text.ContinueStand", "{0}: You must perform a Last Stand against {1}?",
+			new List<string> { Bootstrap.gameStarter.heroes[heroIndex], finalStandText }), ButtonIcon.Continue, () =>
+			{
+				DoFinalStand(FinalStand.Fear);
+			});
+	}
+
+	public void DoFinalStand(FinalStand finalStandType)
+    {
+		FindObjectOfType<InteractionManager>().GetNewDamagePanel().ShowFinalStand(Bootstrap.lastStandCounter[heroIndex], finalStandType, (pass) =>
+		{
+			if (!pass)
+			{
+				Bootstrap.isDead[heroIndex] = true;
+				int deadHeroes = Bootstrap.isDead.Where(x => x).Count();
+				Engine.FindEngine().triggerManager.FireTrigger("Last Stand Failed " + deadHeroes); //a trigger fired when the Last Stand Failed, e.g. "Last Stand Failed 1"
 			}
 			else
-            {
-				pPanel.ToggleVisible(true);
+			{
+				Engine.FindEngine().triggerManager.FireTrigger("Last Stand x" + Bootstrap.lastStandCounter[heroIndex]); //a trigger fired when the Last Stand Succeeded at this level for the first time. The number indicates this hero has succeeded in that many Last Stands, e.g. "Last Stand x2"
 			}
+			Bootstrap.lastStandCounter[heroIndex]++;
+			UpdateUI();
+			pPanel.ToggleVisible(false);
 		});
 	}
 

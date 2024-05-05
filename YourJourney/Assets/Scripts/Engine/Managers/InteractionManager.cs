@@ -131,6 +131,8 @@ public class InteractionManager : MonoBehaviour
 			return (TitleInteraction)interaction;
 		else if (interaction.interactionType == InteractionType.Start)
 			return (StartInteraction)interaction;
+		else if (interaction.interactionType == InteractionType.Corruption)
+			return (CorruptionInteraction)interaction;
 
 		throw new Exception( "Couldn't create Interaction from: " + interaction.dataName );
 	}
@@ -373,6 +375,10 @@ public class InteractionManager : MonoBehaviour
         {
 			//Do nothing
         }
+		else if (it.interactionType == InteractionType.Corruption)
+		{
+			HandleCorruption(it, action);
+		}
 		else
 			GetNewTextPanel().ShowOkContinue( $"Data Error (ShowInteraction)\r\nCould not find Interaction with type '{it.interactionType}'.", ButtonIcon.Continue );
 	}
@@ -564,6 +570,71 @@ public class InteractionManager : MonoBehaviour
 		} );
 		//event reward right after event fired, before test shown
 		FindObjectOfType<LorePanel>().AddReward( it.loreReward, it.xpReward, it.threatReward );
+	}
+
+	void HandleCorruption(IInteraction it, Action<InteractionResult> action = null)
+	{
+		CorruptionInteraction ii = (CorruptionInteraction)it;
+		int corruption = ii.corruption;
+		CorruptionTarget target = ii.corruptionTarget;
+
+
+		//Loop until we've given selected the items we're supposed to (a random assortment out of the list of possible items)
+		/*
+		for (int i = 0; i < giveCount; i++)
+		{
+			if (giveableItems.Count > 0)
+			{
+				//Get a random item
+				int itemIndex = Bootstrap.random.Next(giveableItems.Count);
+
+				Item item = Items.FromID(giveableItems[itemIndex]);
+				if (Bootstrap.campaignState != null)
+				{
+					//Add the item to the party's list of owned trinkets for the current scenario; also to the giveItems list which will be used in the dialogs
+					int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+					Bootstrap.campaignState.currentTrinkets[scenarioIndex].Add(item.id);
+				}
+				giveItems.Add(item);
+
+				//Remove the item we just gave from the giveable list so we don't try to give it again
+				giveableItems.Remove(item.id);
+			}
+			else
+			{
+				missingItems++;
+			}
+		}
+
+		GetNewTextPanel().ShowTextInteraction(it, () =>
+		{
+			CorruptionFollowup(ii, giveItems, missingItems, action);
+		});
+		*/
+	}
+
+	public void CorruptionFollowup(CorruptionInteraction ii, List<Item> giveItems, int missingItems, Action<InteractionResult> originalAction)
+	{
+		if (giveItems.Count > 0)
+		{
+			Item item = giveItems[0];
+			giveItems.RemoveAt(0);
+			//Ask the players which hero to assign that item to for the current scenario
+			//GetNewHeroSelctionPanel will call this method ItemFollowup when it's done
+			GetNewHeroSelectionPanel().Show(ii, giveItems, missingItems, item, originalAction, (b) =>
+			{
+				//engine.triggerManager.FireTrigger(ii.triggerAfterName);
+
+				int selectedHero = b.value;
+
+				if (Bootstrap.campaignState != null)
+				{
+					//Overwrite whatever the current trinket was for that hero with the trinket that's just been given
+					int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+					Bootstrap.campaignState.currentCharacterSheets[scenarioIndex][selectedHero].trinketId = item.id;
+				}
+			});
+		}
 	}
 
 	void HandleItem(IInteraction it, Action<InteractionResult> action = null)

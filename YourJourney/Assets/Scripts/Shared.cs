@@ -2,9 +2,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public enum DensityPreference { FIRST, LOWEST, LOW, LOW_MEDIUM, MEDIAN, MEDIUM, MEDIUM_HIGH, HIGH, HIGHEST };
 public enum ScenarioType { Journey, Battle }
-public enum InteractionType { Text, Threat, StatTest, Decision, Branch, Darkness, MultiEvent, Persistent, Conditional, Dialog, Replace, Reward, Item, Title, Start }
+public enum InteractionType { Text, Threat, StatTest, Decision, Branch, Darkness, MultiEvent, Persistent, Conditional, Dialog, Replace, Reward, Item, Title, Start, Corruption }
 public enum MonsterType { Ruffian, GoblinScout, OrcHunter, OrcMarauder, HungryVarg, HillTroll, Wight, 
 						Atari, Gargletarg, Chartooth,
 						GiantSpider, PitGoblin, OrcTaskmaster, Shadowman, AnonymousThing, CaveTroll, Balerock, SpawnOfUglygiant,
@@ -25,6 +24,8 @@ public enum TerrainType {
 	Elevation, Log, Rubble, Web, //Shadowed Paths
 	Barricade, Chest, Fence, Fountain, Pond, Trench //Spreading War
 }
+public enum DensityPreference { FIRST, LOWEST, LOW, LOW_MEDIUM, MEDIAN, MEDIUM, MEDIUM_HIGH, HIGH, HIGHEST };
+public enum CorruptionTarget { NONE, ONE_HERO, MULTIPLE_HEROES, ALL_HEROES };
 
 public enum Difficulty { Adventure, Normal, Hard }
 public enum FinalStand { Damage, Fear }
