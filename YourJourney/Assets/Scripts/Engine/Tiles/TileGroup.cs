@@ -1021,6 +1021,13 @@ public class TileGroup
 		//only Start can be toggled true
 		if ( chapter.dataName == "Start" && chapter.isPreExplored )
 			tweener?.OnComplete( () => { RevealInteractiveTokens(); } );
+		else if(!Engine.currentScenario.scenarioTypeJourney)
+			tweener?.OnComplete(() =>
+			{
+				Colorize();
+				isExplored = true;
+				RevealInteractiveTokens();
+			});
 		else if ( chapter.dataName == "Start" && !chapter.isPreExplored )
 			tweener?.OnComplete( () =>
 			{
