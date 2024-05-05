@@ -40,6 +40,7 @@ public class HeroSelectionPanel : MonoBehaviour
 	CorruptionInteraction corruptionInteraction;
 	int corruption;
 	CorruptionTarget corruptionTarget;
+	bool[] corruptedHeroes;
 
 	Action<InteractionResult> originalAction;
 
@@ -60,15 +61,25 @@ public class HeroSelectionPanel : MonoBehaviour
 		dummy.alignment = TextAlignmentOptions.Top;
 	}
 
-	public void Show(CorruptionInteraction ii, List<Item> giveItems, int missingItems, Item item, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
+	public void Show(CorruptionInteraction ci, bool[] corruptedHeroes, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
 	{
-		corruptionInteraction = ii;
-		this.giveItem = item;
-		this.giveItems = giveItems;
-		this.missingItems = missingItems;
+		corruptionInteraction = ci;
+		this.corruption = ci.corruption;
+		this.corruptionTarget = ci.corruptionTarget;
+		this.corruptedHeroes = corruptedHeroes;
 		this.originalAction = originalAction;
 
 		Show(actions);
+
+		//Heroes that have already chosen corruption are removed from the dialog
+		for (int i=0; i<corruptedHeroes.Length; i++)
+        {
+            if (corruptedHeroes[i] || Bootstrap.isDead[i])
+            {
+				heroImage[i].gameObject.SetActive(false);
+				heroButtons[i].gameObject.SetActive(false);
+			}
+        }
 	}
 
 	public void Show(ItemInteraction ii, List<Item> giveItems, int missingItems, Item item, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
@@ -93,11 +104,6 @@ public class HeroSelectionPanel : MonoBehaviour
 		Show(actions);
 	}
 
-	public void Show(ItemInteraction ii,int corruption, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
-	{
-		this.corruption = corruption;
-	}
-
 	public void Show(Action<InteractionResult> actions )
 	{
 		CalculatePanelPosition();
@@ -111,7 +117,7 @@ public class HeroSelectionPanel : MonoBehaviour
         {
 			SetText(giveTitle);
         }
-		else
+		else if(corruption != 0 && corruptionTarget != CorruptionTarget.NONE)
         {
 			SetText(corruption);
         }

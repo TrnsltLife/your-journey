@@ -55,10 +55,14 @@ public class HeroItem : MonoBehaviour
     {
 		string finalStandText = "<font=\"Icon\">F</font> " + Translate("damage." + FinalStand.Fear.ToString(), FinalStand.Fear.ToString());
 		pPanel.ToggleVisible(false);
-		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("stand.text.ContinueStand", "{0}: You must perform a Last Stand against {1}?",
+		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("stand.text.CorruptionLastStand", "{0}: Because of your corruption you must perform a Last Stand against {1}.",
 			new List<string> { Bootstrap.gameStarter.heroes[heroIndex], finalStandText }), ButtonIcon.Continue, () =>
 			{
 				DoFinalStand(FinalStand.Fear);
+                if (Bootstrap.isDead[heroIndex])
+                {
+					//TODO if the last stand is failed we need to end the whole campaign somehow
+				}
 			});
 	}
 
@@ -77,7 +81,7 @@ public class HeroItem : MonoBehaviour
 				Engine.FindEngine().triggerManager.FireTrigger("Last Stand x" + Bootstrap.lastStandCounter[heroIndex]); //a trigger fired when the Last Stand Succeeded at this level for the first time. The number indicates this hero has succeeded in that many Last Stands, e.g. "Last Stand x2"
 			}
 			Bootstrap.lastStandCounter[heroIndex]++;
-			UpdateUI();
+			//UpdateUI();
 			pPanel.ToggleVisible(false);
 		});
 	}
@@ -109,6 +113,7 @@ public class HeroItem : MonoBehaviour
 
 		dButton.interactable = !Bootstrap.isDead[heroIndex];
 		fButton.interactable = !Bootstrap.isDead[heroIndex];
+
 		if ( Bootstrap.isDead[heroIndex] )
 		{
 			cg.alpha = .25f;

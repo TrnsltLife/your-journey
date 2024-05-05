@@ -22,6 +22,7 @@ public class Bootstrap
 	//this data is Reset for new games or restored from game state
 	public static int[] lastStandCounter;
 	public static bool[] isDead;
+	public static int[] corruptionCounter;
 	public static int loreCount, xpCount;
 	//utility data
 	public static int PlayerCount { get => gameStarter.heroes.Length; }
@@ -96,6 +97,8 @@ public class Bootstrap
 		isDead.Fill( false );
 		lastStandCounter = new int[5];
 		lastStandCounter.Fill( 1 );
+		corruptionCounter = new int[5];
+		corruptionCounter.Fill(0);
 		loreCount = xpCount = 0;
 		returnToCampaign = false;
 	}

@@ -574,65 +574,70 @@ public class InteractionManager : MonoBehaviour
 
 	void HandleCorruption(IInteraction it, Action<InteractionResult> action = null)
 	{
-		CorruptionInteraction ii = (CorruptionInteraction)it;
-		int corruption = ii.corruption;
-		CorruptionTarget target = ii.corruptionTarget;
+		CorruptionInteraction ci = (CorruptionInteraction)it;
 
-
-		//Loop until we've given selected the items we're supposed to (a random assortment out of the list of possible items)
-		/*
-		for (int i = 0; i < giveCount; i++)
-		{
-			if (giveableItems.Count > 0)
-			{
-				//Get a random item
-				int itemIndex = Bootstrap.random.Next(giveableItems.Count);
-
-				Item item = Items.FromID(giveableItems[itemIndex]);
-				if (Bootstrap.campaignState != null)
-				{
-					//Add the item to the party's list of owned trinkets for the current scenario; also to the giveItems list which will be used in the dialogs
-					int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
-					Bootstrap.campaignState.currentTrinkets[scenarioIndex].Add(item.id);
-				}
-				giveItems.Add(item);
-
-				//Remove the item we just gave from the giveable list so we don't try to give it again
-				giveableItems.Remove(item.id);
-			}
-			else
-			{
-				missingItems++;
-			}
-		}
+		bool[] corruptedHeroes = new bool[Bootstrap.gameStarter.heroes.Length]; //they start set to false
 
 		GetNewTextPanel().ShowTextInteraction(it, () =>
 		{
-			CorruptionFollowup(ii, giveItems, missingItems, action);
+			CorruptionFollowup(ci, corruptedHeroes, action);
 		});
-		*/
 	}
 
-	public void CorruptionFollowup(CorruptionInteraction ii, List<Item> giveItems, int missingItems, Action<InteractionResult> originalAction)
+	public void CorruptionFollowup(CorruptionInteraction ci, bool[] corruptedHeroes, Action<InteractionResult> originalAction)
 	{
-		if (giveItems.Count > 0)
+		if (ci.corruption != 0 && ci.corruptionTarget != CorruptionTarget.NONE)
 		{
-			Item item = giveItems[0];
-			giveItems.RemoveAt(0);
-			//Ask the players which hero to assign that item to for the current scenario
-			//GetNewHeroSelctionPanel will call this method ItemFollowup when it's done
-			GetNewHeroSelectionPanel().Show(ii, giveItems, missingItems, item, originalAction, (b) =>
+			//Ask the players which hero to assign the corruption to for the current scenario
+			//GetNewHeroSelectionPanel will call this method CorruptionFollowup when it's done
+			GetNewHeroSelectionPanel().Show(ci, corruptedHeroes, originalAction, (b) =>
 			{
 				//engine.triggerManager.FireTrigger(ii.triggerAfterName);
 
 				int selectedHero = b.value;
-
-				if (Bootstrap.campaignState != null)
+				corruptedHeroes[selectedHero] = true;
+				
+				//Increase corruption or force last stand
+                if (Bootstrap.corruptionCounter[selectedHero] + ci.corruption >= 4)
 				{
-					//Overwrite whatever the current trinket was for that hero with the trinket that's just been given
-					int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
-					Bootstrap.campaignState.currentCharacterSheets[scenarioIndex][selectedHero].trinketId = item.id;
+					//TODO - Need to force a Last Stand
+					//Otherwise fail the game
+
+					PartyPanel partyPanel = engine.camControl.partyPanel;
+					if (partyPanel != null)
+                    {
+						if(partyPanel.heroItems != null)
+                        {
+							HeroItem heroItem = partyPanel.heroItems[selectedHero];
+							if(heroItem != null)
+                            {
+								heroItem.CorruptionFinalStand();
+							}
+							else
+                            {
+								Debug.Log("partyPanel.heroItems[" + selectedHero + "] is null");
+                            }
+						}
+						else
+                        {
+							Debug.Log("partyPanel.heroItems is null");
+                        }
+					}
+					else
+                    {
+						Debug.Log("partyPanel object is null");
+                    }
 				}
+				else
+                {
+					Bootstrap.corruptionCounter[selectedHero] += ci.corruption;
+					if (Bootstrap.campaignState != null)
+					{
+						int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+						Bootstrap.campaignState.currentCharacterSheets[scenarioIndex][selectedHero].corruption += ci.corruption;
+					}
+				}
+				Debug.Log("Corruption of hero " + Bootstrap.gameStarter.heroes[selectedHero] + " is " + Bootstrap.corruptionCounter[selectedHero]);
 			});
 		}
 	}

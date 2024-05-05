@@ -38,13 +38,22 @@ public class PartyPanel : MonoBehaviour
 		testColors[4] = Color.yellow;
 		diffTextTranslation = diffText.GetComponent<TextTranslation>();
 		diffTextTranslation.Change("heroes.button." + Bootstrap.gameStarter.difficulty.ToString(), Bootstrap.gameStarter.difficulty.ToString());
+
+		foreach (HeroItem go in heroItems)
+		{
+			go.gameObject.SetActive(true);
+			go.pPanel = this;
+			go.gameObject.SetActive(false);
+		}
+
+		gameObject.SetActive(false);
 	}
 
 	public void Show()
 	{
 		CalculatePanelPosition();
 		if ( FindObjectOfType<ShadowPhaseManager>().doingShadowPhase
-	|| FindObjectOfType<ProvokeMessage>().provokeMode )
+		  || FindObjectOfType<ProvokeMessage>().provokeMode )
 			return;
 
 		FindObjectOfType<TileManager>().ToggleInput( true );
@@ -64,12 +73,6 @@ public class PartyPanel : MonoBehaviour
 		loreText.text = Translate("party.text.Lore", "Lore: " + totalLore.ToString(), new List<string> { totalLore.ToString() });
 		xpText.text = Translate("party.text.XP", "XP: " + totalXP.ToString(), new List<string> { totalXP.ToString() });
 
-		foreach ( HeroItem go in heroItems )
-		{
-			go.gameObject.SetActive( false );
-			go.pPanel = this;
-		}
-
 		for ( int i = 0; i < Bootstrap.gameStarter.heroes.Length; i++ )
 		{
 			heroItems[i].gameObject.SetActive( true );
@@ -81,6 +84,16 @@ public class PartyPanel : MonoBehaviour
 
 	public void ToggleVisible( bool visible )
 	{
+
+		if(visible)
+        {
+			for (int i = 0; i < Bootstrap.gameStarter.heroes.Length; i++)
+			{
+				heroItems[i].gameObject.SetActive(true);
+				heroItems[i].UpdateUI();
+			}
+		}
+
 		gameObject.SetActive( visible );
 	}
 

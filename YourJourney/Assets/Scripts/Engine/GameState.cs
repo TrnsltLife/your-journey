@@ -295,6 +295,9 @@ public class CampaignState
 	public List<string>[] startingCampaignTriggerState; //snapshot of campaignTriggerState at the beginning of a scenario; used for replays
 	public List<string>[] currentCampaignTriggerState; //snapshot of campaignTriggerState at the current saved/finished state in the scenario
 
+	public List<int>[] startingCorruption; //snapshot of corruption at the beginning of a scenario; used for replays
+	public List<int>[] currentCorruption; //snapshot of corruption at the current saved/finished state in the scenario
+
 	public CampaignState()
 	{
 		//empty ctor for json deserialization
