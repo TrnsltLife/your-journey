@@ -17,6 +17,7 @@ public class CampfireScreen : MonoBehaviour
 	public TextMeshProUGUI nameText, remainingPointsNumberText, stateText;
 	public Button[] heroButtons;
 	public Image[] heroImage;
+	public TextMeshProUGUI[] heroCorruption;
 	public Image maleSilhouette;
 	public Image femaleSilhouette;
 	public Image portraitBackground;
@@ -49,9 +50,6 @@ public class CampfireScreen : MonoBehaviour
 
 	List<string> startingCampaignStateTriggers; //loaded from campaignState
 	List<string> campaignTriggerState; //as updated behind the scenes on the campfire screen
-
-	List<int> startingCorruption; //loaded from campaignState
-	List<int> corruption; //as updated behind the scenes on the campfire screen
 
 	CampfireState campfireState;
 
@@ -156,7 +154,6 @@ public class CampfireScreen : MonoBehaviour
 			startingTrinkets = campaignState.startingTrinkets[0];
 			startingMounts = campaignState.startingMounts[0];
 			startingCampaignStateTriggers = campaignState.startingCampaignTriggerState[0];
-			startingCorruption = campaignState.startingCorruption[0];
 		}
 		else if (campfireState == CampfireState.VIEW)
 		{
@@ -165,7 +162,6 @@ public class CampfireScreen : MonoBehaviour
 			startingTrinkets = campaignState.currentTrinkets[campaignState.scenarioPlayingIndex];
 			startingMounts = campaignState.currentMounts[campaignState.scenarioPlayingIndex];
 			startingCampaignStateTriggers = campaignState.currentCampaignTriggerState[campaignState.scenarioPlayingIndex];
-			startingCorruption = campaignState.currentCorruption[campaignState.scenarioPlayingIndex];
 		}
 		else if (campfireState == CampfireState.UPGRADE)
 		{
@@ -177,7 +173,6 @@ public class CampfireScreen : MonoBehaviour
 				startingTrinkets = campaignState.startingTrinkets[0];
 				startingMounts = campaignState.startingMounts[0];
 				startingCampaignStateTriggers = campaignState.startingCampaignTriggerState[0];
-				startingCorruption = campaignState.startingCorruption[0];
 			}
 			else
 			{
@@ -186,7 +181,6 @@ public class CampfireScreen : MonoBehaviour
 				startingTrinkets = campaignState.currentTrinkets[previousIndex];
 				startingMounts = campaignState.currentMounts[previousIndex];
 				startingCampaignStateTriggers = campaignState.currentCampaignTriggerState[previousIndex];
-				startingCorruption = campaignState.currentCorruption[previousIndex];
 			}
 		}
 
@@ -199,7 +193,6 @@ public class CampfireScreen : MonoBehaviour
 			campfireTrinkets = campaignState.startingTrinkets[campaignState.scenarioPlayingIndex];
 			campfireMounts = campaignState.startingMounts[campaignState.scenarioPlayingIndex];
 			campaignTriggerState = campaignState.startingCampaignTriggerState[campaignState.scenarioPlayingIndex];
-			corruption = campaignState.startingCorruption[campaignState.scenarioPlayingIndex];
 		}
 		else
 		{
@@ -207,8 +200,12 @@ public class CampfireScreen : MonoBehaviour
 			campfireTrinkets = new List<int>(startingTrinkets);
 			campfireMounts = new List<int>(startingMounts);
 			campaignTriggerState = new List<string>(startingCampaignStateTriggers);
-			corruption = new List<int>(startingCorruption);
 		}
+
+		for(int i=0; i < characterSheets.Count; i++)
+        {
+			Debug.Log("LoadCharacterSheets " + i + " " + characterSheets[i].name + " corruption " + characterSheets[i].corruption);
+        }
 	}
 
 	public void ActivateDropdowns(bool active)
@@ -255,6 +252,9 @@ public class CampfireScreen : MonoBehaviour
 				heroImage[i].gameObject.SetActive(true);
 				heroButtons[i].gameObject.SetActive(true);
 				heroImage[i].GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Portraits/p" + campaignState.heroesIndex[i]);
+
+				int corruption = startingCharacterSheets[i].corruption;
+				heroCorruption[i].text = corruption.ToString(); // corruption > 0 ? corruption.ToString() : "";
 			}
 			else
             {
@@ -1080,7 +1080,6 @@ public class CampfireScreen : MonoBehaviour
 			campaignState.startingTrinkets[0] = new List<int>(campfireTrinkets);
 			campaignState.startingMounts[0] = new List<int>(campfireMounts);
 			campaignState.startingCampaignTriggerState[0] = new List<string>(campaignTriggerState);
-			campaignState.startingCorruption[0] = new List<int>(corruption);
 		}
 		else if (campfireState == CampfireState.UPGRADE)
 		{
@@ -1088,7 +1087,6 @@ public class CampfireScreen : MonoBehaviour
 			campaignState.startingTrinkets[campaignState.scenarioPlayingIndex] = new List<int>(campfireTrinkets);
 			campaignState.startingMounts[campaignState.scenarioPlayingIndex] = new List<int>(campfireMounts);
 			campaignState.startingCampaignTriggerState[campaignState.scenarioPlayingIndex] = new List<string>(campaignTriggerState);
-			campaignState.startingCorruption[campaignState.scenarioPlayingIndex] = new List<int>(corruption);
 		}
 
 		//Set the save flag on this scenario so CampfireScreen will load from this scenario's startCharacterSheets instead of the last scenario's currentCharacterSheets
@@ -1119,11 +1117,11 @@ public class CampfireScreen : MonoBehaviour
 		campaignState.currentTrinkets[campaignState.scenarioPlayingIndex] = campfireTrinkets;
 		campaignState.currentMounts[campaignState.scenarioPlayingIndex] = campfireMounts;
 		campaignState.currentCampaignTriggerState[campaignState.scenarioPlayingIndex] = campaignTriggerState;
-        campaignState.currentCorruption[campaignState.scenarioPlayingIndex] = corruption;
-		for(int i=0; i<Bootstrap.PlayerCount; i++)
+		Bootstrap.ResetCorruption();
+		for (int i=0; i<Bootstrap.PlayerCount; i++)
         {
-			Bootstrap.corruptionCounter[i] = campaignState.currentCorruption[campaignState.scenarioPlayingIndex][i];
-
+			Bootstrap.corruptionCounter[i] = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex][i].corruption;
+			Debug.Log("corruption assignment player " + i + "---> " + Bootstrap.corruptionCounter[i]);
 		}
 
 		StartGame();

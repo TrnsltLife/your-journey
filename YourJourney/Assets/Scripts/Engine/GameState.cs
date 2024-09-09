@@ -295,9 +295,6 @@ public class CampaignState
 	public List<string>[] startingCampaignTriggerState; //snapshot of campaignTriggerState at the beginning of a scenario; used for replays
 	public List<string>[] currentCampaignTriggerState; //snapshot of campaignTriggerState at the current saved/finished state in the scenario
 
-	public List<int>[] startingCorruption; //snapshot of corruption at the beginning of a scenario; used for replays
-	public List<int>[] currentCorruption; //snapshot of corruption at the current saved/finished state in the scenario
-
 	public CampaignState()
 	{
 		//empty ctor for json deserialization
@@ -463,6 +460,7 @@ public class PartyState
 	public string[] heroes { get; set; }
 	public int[] heroesIndex { get; set; }
 	public int[] lastStandCounter { get; set; }
+	public int[] corruptionCounter { get; set; }
 	public bool[] isDead { get; set; }
 	public int loreCount { get; set; }
 	public int xpCount { get; set; }
@@ -492,6 +490,7 @@ public class PartyState
 			heroes = Bootstrap.gameStarter.heroes,
 			heroesIndex = Bootstrap.gameStarter.heroesIndex,
 			lastStandCounter = Bootstrap.lastStandCounter,
+			corruptionCounter = Bootstrap.corruptionCounter,
 			isDead = Bootstrap.isDead,
 			fogList = engine.GetFogState(),
 			fileVersion = engine.scenario.fileVersion,
@@ -511,6 +510,7 @@ public class PartyState
 
 		Bootstrap.gameStarter.difficulty = difficulty;
 		Bootstrap.lastStandCounter = lastStandCounter;
+		Bootstrap.corruptionCounter = corruptionCounter;
 		Bootstrap.isDead = isDead;
 		Bootstrap.loreCount = loreCount;
 		Bootstrap.xpCount = xpCount;

@@ -635,6 +635,7 @@ public class InteractionManager : MonoBehaviour
 					{
 						int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
 						Bootstrap.campaignState.currentCharacterSheets[scenarioIndex][selectedHero].corruption += ci.corruption;
+						Debug.Log("currentCharacterSheets[" + scenarioIndex + "][" + selectedHero + "].corruption set to " + Bootstrap.campaignState.currentCharacterSheets[scenarioIndex][selectedHero].corruption);
 					}
 				}
 				Debug.Log("Corruption of hero " + Bootstrap.gameStarter.heroes[selectedHero] + " is " + Bootstrap.corruptionCounter[selectedHero]);

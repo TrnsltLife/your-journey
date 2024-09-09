@@ -6,9 +6,10 @@ using static LanguageManager;
 public class HeroItem : MonoBehaviour
 {
 	public int heroIndex;
-	public Text heroNameText, thresholdText;
+	public Text heroNameText, thresholdText, corruptionText;
 	public Button dButton, fButton;
 	public Image skullImage;
+	public Image corruptionImage;
 	public Image portraitImage;
 	[HideInInspector]
 	public PartyPanel pPanel;
@@ -91,6 +92,7 @@ public class HeroItem : MonoBehaviour
 		if ( heroIndex >= Bootstrap.gameStarter.heroes.Length )
 			return;
 
+		//skull for final stand threshold
 		//skullImage.gameObject.SetActive( Bootstrap.lastStandCounter[heroIndex] > 1 );
 		if ( Bootstrap.lastStandCounter[heroIndex] == 1 )
 		{
@@ -103,7 +105,20 @@ public class HeroItem : MonoBehaviour
 			thresholdText.gameObject.SetActive( true );
 		}
 
+		//corruption counter
+		if (Bootstrap.corruptionCounter[heroIndex] == 0)
+		{
+			corruptionImage.color = new Color(1, 1, 1, .05f);
+			corruptionText.gameObject.SetActive(false);
+		}
+		else
+		{
+			corruptionImage.color = Color.white;
+			corruptionText.gameObject.SetActive(true);
+		}
+
 		thresholdText.text = Bootstrap.lastStandCounter[heroIndex].ToString();
+		corruptionText.text = Bootstrap.corruptionCounter[heroIndex].ToString();
 		heroNameText.text = Bootstrap.gameStarter.heroes[heroIndex];
 
 		//Load portrait image based on the portrait index, e.g p0.png or p63.png

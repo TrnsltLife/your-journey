@@ -35,7 +35,7 @@ SpriteAtlas:
     - {fileID: 102900000, guid: 8d242c989899e954eaaf392790d9ad1c, type: 3}
     - {fileID: 102900000, guid: c80935fd8efbc4b4abb7edc027a64235, type: 3}
     - {fileID: 102900000, guid: ddca5c03c60fd6145b5dcad61a41bf74, type: 3}
-    totalSpriteSurfaceArea: 10172653
+    totalSpriteSurfaceArea: 10181117
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
@@ -71,6 +71,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: fc5f9543098b1f446820116dae391d5c, type: 3}
   - {fileID: 21300000, guid: ed4aa1638a4b82945af26a82acd379e2, type: 3}
   - {fileID: 21300000, guid: 4c6a0893d30108f4abc5c7b02e58dc14, type: 3}
+  - {fileID: 21300000, guid: f3bb01a3ca7a4b34bb90493f1948bb91, type: 3}
   - {fileID: 21300000, guid: 1c506fb3dbdbee54296d05be3a874fcb, type: 3}
   - {fileID: 21300000, guid: 4ed6d0d35adf04e4787177a238e978e9, type: 3}
   - {fileID: 21300000, guid: 0a5b4fd3cae2a2546b3a5021848bc530, type: 3}
@@ -223,6 +224,7 @@ SpriteAtlas:
   - party button
   - b1
   - frame_02_delay-0.1s
+  - corruption counter
   - frame_05_delay-0.1s
   - end turn frame
   - unselected
