@@ -17,7 +17,8 @@ public class CampfireScreen : MonoBehaviour
 	public TextMeshProUGUI nameText, remainingPointsNumberText, stateText;
 	public Button[] heroButtons;
 	public Image[] heroImage;
-	public TextMeshProUGUI[] heroCorruption;
+	public Text[] heroCorruption;
+	public Image[] heroCorruptionImage;
 	public Image maleSilhouette;
 	public Image femaleSilhouette;
 	public Image portraitBackground;
@@ -201,11 +202,6 @@ public class CampfireScreen : MonoBehaviour
 			campfireMounts = new List<int>(startingMounts);
 			campaignTriggerState = new List<string>(startingCampaignStateTriggers);
 		}
-
-		for(int i=0; i < characterSheets.Count; i++)
-        {
-			Debug.Log("LoadCharacterSheets " + i + " " + characterSheets[i].name + " corruption " + characterSheets[i].corruption);
-        }
 	}
 
 	public void ActivateDropdowns(bool active)
@@ -254,12 +250,21 @@ public class CampfireScreen : MonoBehaviour
 				heroImage[i].GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Portraits/p" + campaignState.heroesIndex[i]);
 
 				int corruption = startingCharacterSheets[i].corruption;
-				heroCorruption[i].text = corruption.ToString(); // corruption > 0 ? corruption.ToString() : "";
+				if (corruption > 0)
+				{
+					heroCorruptionImage[i].gameObject.SetActive(true);
+					heroCorruption[i].text = corruption.ToString();
+				}
+                else 
+				{
+					heroCorruptionImage[i].gameObject.SetActive(false);
+				}
 			}
 			else
             {
 				heroImage[i].gameObject.SetActive(false);
 				heroButtons[i].gameObject.SetActive(false);
+                heroCorruptionImage[i].gameObject.SetActive(false);
 			}
 		}
 
