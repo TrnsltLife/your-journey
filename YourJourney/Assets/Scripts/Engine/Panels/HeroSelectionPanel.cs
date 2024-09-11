@@ -10,6 +10,7 @@ public class HeroSelectionPanel : MonoBehaviour
 {
 	public TextMeshProUGUI mainText, selectionText, dummy;
 	public GameObject submitBtn;
+	public GameObject cancelBtn;
 	public CanvasGroup overlay;
 
 	CanvasGroup group;
@@ -41,6 +42,7 @@ public class HeroSelectionPanel : MonoBehaviour
 	int corruption;
 	CorruptionTarget corruptionTarget;
 	bool[] corruptedHeroes;
+	int corruptionStep;
 
 	Action<InteractionResult> originalAction;
 
@@ -61,12 +63,13 @@ public class HeroSelectionPanel : MonoBehaviour
 		dummy.alignment = TextAlignmentOptions.Top;
 	}
 
-	public void Show(CorruptionInteraction ci, bool[] corruptedHeroes, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
+	public void Show(CorruptionInteraction ci, bool[] corruptedHeroes, int step, Action<InteractionResult> originalAction, Action<InteractionResult> actions)
 	{
 		corruptionInteraction = ci;
 		this.corruption = ci.corruption;
 		this.corruptionTarget = ci.corruptionTarget;
 		this.corruptedHeroes = corruptedHeroes;
+		this.corruptionStep = step;
 		this.originalAction = originalAction;
 
 		Show(actions);
@@ -119,7 +122,17 @@ public class HeroSelectionPanel : MonoBehaviour
         }
 		else if(corruption != 0 && corruptionTarget != CorruptionTarget.NONE)
         {
-			SetText(corruption);
+
+			if (corruptionTarget == CorruptionTarget.MULTIPLE_HEROES)
+			{
+				cancelBtn.SetActive(true);
+			}
+			else
+			{
+				cancelBtn.SetActive(false);
+			}
+
+			SetText(corruptionTarget, corruption);
         }
 
 		SetImages();
@@ -150,6 +163,11 @@ public class HeroSelectionPanel : MonoBehaviour
 			Destroy( root.gameObject );
 		} );
 	}
+
+	public void ToggleVisible(bool visible)
+    {
+		gameObject?.SetActive(visible);
+    }
 
 	void SetImages()
     {
@@ -254,25 +272,55 @@ public class HeroSelectionPanel : MonoBehaviour
 		//rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, dialogHeight);
 	}
 
-	void SetText(int corruption)
+	void SetText(CorruptionTarget corruptionTarget, int corruption)
 	{
 		string text = "";
 		string text2 = "";
 
-		//TODO Translate
 		if (corruption > 0)
 		{
-			text = "One hero to gains " + corruption + " corruption token.\n\n";
-			text += "If the hero would gain a 4th corruption token, the hero must successfully perform a Last Stand or else perish.";
+			string number = corruption == 1 ? ".Singular" : ".Plural";
+			if(corruptionTarget == CorruptionTarget.ONE_HERO)
+			{
+				text = Translate("heroSelection.text.OneHeroGainsCorruption" + number, "One hero gains {0} corruption token(s).", new List<string> { corruption.ToString() }) + "\n\n";
+				text2 = Translate("heroSelection.text.ChooseHeroWhoGainsCorruption" + number, "Choose a hero to gain {0} corruption token(s).", new List<string> { corruption.ToString() });
+			}
+			else if(corruptionTarget == CorruptionTarget.ALL_HEROES)
+            {
+				text = Translate("heroSelection.text.AllHeroesGainCorruption" + number, "One by one, all heroes gain {0} corruption token(s).", new List<string> { corruption.ToString() }) + "\n\n";
+				text2 = Translate("heroSelection.text.ChooseWhoGainsCorruptionNext" + number, "Choose the next hero to gain {0} corruption token(s).", new List<string> { corruption.ToString() });
+			}
+			else if(corruptionTarget == CorruptionTarget.MULTIPLE_HEROES)
+            {
+				text = Translate("heroSelection.text.ChooseWhoGainsCorruption" + number, "Choose which heroes must gain {0} corruption token(s).", new List<string> { corruption.ToString() }) + "\n\n";
+				//TODO Put a text block here from the CorruptionInteraction that tells which heroes should be chosen to gain corruption
+				text2 = Translate("heroSelection.text.ChooseWhoGainsCorruptionNextOrDone" + number, "Choose the next hero to gain {0} corruption token(s), or click Done if no more heroes must be corrupted.", new List<string> { corruption.ToString() });
+			}
 
-			text2 = "Choose a hero to gain " + corruption + " corruption token.";
+			text += Translate("heroSelection.text.4thCorruptionToken", "If the hero would gain a 4th corruption token, the hero must successfully perform a Last Stand or else perish.");
 		}
 		else if (corruption < 0)
 		{
-			text = "One hero removes " + corruption + " corruption token.";
-
-			text2 = "Choose a hero to remove " + corruption + " corruption token.";
+			int positive = corruption * -1;
+			string number = positive == 1 ? ".Singular" : ".Plural";
+			if (corruptionTarget == CorruptionTarget.ONE_HERO)
+			{
+				text = Translate("heroSelection.text.OneHeroRemovesCorruption" + number, "One hero removes {0} corruption token(s).", new List<string> { positive.ToString() }) + "\n\n";
+				text2 = Translate("heroSelection.text.ChooseHeroWhoRemovesCorruption" + number, "Choose a hero to remove {0} corruption token(s).", new List<string> { positive.ToString() });
+			}
+			else if (corruptionTarget == CorruptionTarget.ALL_HEROES)
+			{
+				text = Translate("heroSelection.text.AllHeroesRemoveCorruption" + number, "One by one, all heroes remove {0} corruption token(s).", new List<string> { positive.ToString() }) + "\n\n";
+				text2 = Translate("heroSelection.text.ChooseWhoRemovesCorruptionNext" + number, "Choose the next hero to remove {0} corruption token(s).", new List<string> { positive.ToString() });
+			}
+			else if (corruptionTarget == CorruptionTarget.MULTIPLE_HEROES)
+			{
+				text = Translate("heroSelection.text.ChooseWhoRemovesCorruption" + number, "Choose which heroes will remove {0} corruption token(s).", new List<string> { positive.ToString() }) + "\n\n";
+				//TODO Put a text block here from the CorruptionInteraction that tells which heroes should be chosen to remove corruption
+				text2 = Translate("heroSelection.text.ChooseWhoRemovesCorruptionNextOrDone" + number, "Choose the next hero to remove {0} corruption token(s), or click Done if no more heroes will remove corruption.", new List<string> { positive.ToString() });
+			}
 		}
+		//text2 += " [Step " + corruptionStep + "]";
 
 		mainText.text = text;
 		dummy.text = text;
@@ -357,5 +405,19 @@ public class HeroSelectionPanel : MonoBehaviour
 			//Call back to InteractionManager.TitleFollowup to trigger the HeroSelectionPanel for the next title, or do final lore/xp/threat rewards, or do a fallbackTrigger
 			FindObjectOfType<InteractionManager>().TitleFollowup(titleInteraction, giveTitles, missingTitles, originalAction);
 		}
+		else if(corruption != 0)
+        {
+			//Don't do CorruptionFollowup here. It will be called after a possible Last Stand via the buttonActions?.Invoke... above.
+		}
 	}
+
+	public void OnCancel()
+    {
+		//Record the hero's name in the Chronicle
+		Scenario.ChroniclePS("\n<font=\"Icon\">O</font>[" + "None" + "]");
+
+		//"Return" -1 instead of the selected hero to the InteractionManager, indicating no more heroes should be selected
+		buttonActions?.Invoke( new InteractionResult() { value = -1 } );
+		Hide();
+    }
 }

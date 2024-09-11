@@ -52,14 +52,14 @@ public class HeroItem : MonoBehaviour
 			});
 	}
 
-	public void CorruptionFinalStand()
+	public void CorruptionFinalStand(InteractionManager.CorruptionFollowupData cfd = null)
     {
 		string finalStandText = "<font=\"Icon\">F</font> " + Translate("damage." + FinalStand.Fear.ToString(), FinalStand.Fear.ToString());
 		pPanel.ToggleVisible(false);
 		FindObjectOfType<InteractionManager>().GetNewTextPanel().ShowOkContinue(Translate("stand.text.CorruptionLastStand", "{0}: Because of your corruption you must perform a Last Stand against {1}.",
 			new List<string> { Bootstrap.gameStarter.heroes[heroIndex], finalStandText }), ButtonIcon.Continue, () =>
 			{
-				DoFinalStand(FinalStand.Fear);
+				DoFinalStand(FinalStand.Fear, cfd);
                 if (Bootstrap.isDead[heroIndex])
                 {
 					//TODO if the last stand is failed we need to end the whole campaign somehow
@@ -67,7 +67,7 @@ public class HeroItem : MonoBehaviour
 			});
 	}
 
-	public void DoFinalStand(FinalStand finalStandType)
+	public void DoFinalStand(FinalStand finalStandType, InteractionManager.CorruptionFollowupData cfd = null)
     {
 		FindObjectOfType<InteractionManager>().GetNewDamagePanel().ShowFinalStand(Bootstrap.lastStandCounter[heroIndex], finalStandType, (pass) =>
 		{
@@ -84,6 +84,12 @@ public class HeroItem : MonoBehaviour
 			Bootstrap.lastStandCounter[heroIndex]++;
 			//UpdateUI();
 			pPanel.ToggleVisible(false);
+
+			//Send data back to InteractionManager to potentially relaunch the HeroSelectionPanel for adding more Corruption, if needed
+			if(cfd != null)
+            {
+				FindObjectOfType<InteractionManager>().CorruptionFollowup(cfd.corruptionInteraction, cfd.corruptedHeroes, cfd.step + 1, cfd.originalAction);
+			}
 		});
 	}
 
