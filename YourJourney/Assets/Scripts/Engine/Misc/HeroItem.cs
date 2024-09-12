@@ -62,7 +62,7 @@ public class HeroItem : MonoBehaviour
 				DoFinalStand(FinalStand.Fear, cfd);
                 if (Bootstrap.isDead[heroIndex])
                 {
-					//TODO if the last stand is failed we need to end the whole campaign somehow
+					//I thought if the last stand is failed we need to end the whole campaign somehow. But reading the rules, apparently that's not the case.
 				}
 			});
 	}

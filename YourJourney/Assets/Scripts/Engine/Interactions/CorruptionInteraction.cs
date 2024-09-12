@@ -8,6 +8,7 @@ public class CorruptionInteraction : InteractionBase
 {
 	public int corruption;
 	public CorruptionTarget corruptionTarget;
+	public string instructionText;
 
 	public override InteractionType interactionType { get { return InteractionType.Corruption; } set { } }
 

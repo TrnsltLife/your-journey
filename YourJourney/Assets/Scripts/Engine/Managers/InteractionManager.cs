@@ -574,7 +574,6 @@ public class InteractionManager : MonoBehaviour
 
 	void HandleCorruption(IInteraction it, Action<InteractionResult> action = null)
 	{
-		//TODO this system isn't working for CorruptionFollowup when a Last Stand can be triggered while the HeroSelectionPanel is still up for more picks
 		CorruptionInteraction ci = (CorruptionInteraction)it;
 
 		bool[] corruptedHeroes = new bool[Bootstrap.gameStarter.heroes.Length]; //they start set to false
@@ -760,7 +759,6 @@ public class InteractionManager : MonoBehaviour
 
 	void HandleTitle(IInteraction it, Action<InteractionResult> action = null)
 	{
-		//TODO
 		TitleInteraction ti = (TitleInteraction)it;
 		int giveCount = ti.randomizedTitlesCount;
 		if (giveCount <= 0) { giveCount = 1; } //Sometimes randomizedItemCount from the editor might be 0; but always give at least one title.

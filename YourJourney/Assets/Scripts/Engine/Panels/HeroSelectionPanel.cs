@@ -43,6 +43,7 @@ public class HeroSelectionPanel : MonoBehaviour
 	CorruptionTarget corruptionTarget;
 	bool[] corruptedHeroes;
 	int corruptionStep;
+	string instructionText;
 
 	Action<InteractionResult> originalAction;
 
@@ -71,6 +72,7 @@ public class HeroSelectionPanel : MonoBehaviour
 		this.corruptedHeroes = corruptedHeroes;
 		this.corruptionStep = step;
 		this.originalAction = originalAction;
+		this.instructionText = ci.instructionText;
 
 		Show(actions);
 
@@ -203,7 +205,6 @@ public class HeroSelectionPanel : MonoBehaviour
         string text = "";
 		string text2 = "";
 
-		//TODO Translate
         string icon = "t"; //Start out with "t" for TRINKET
         string iconText = "<font=\"Icon\">" + icon + "</font> ";
         string itemName = Translate("item." + item.seriesName + "." + item.tier + "." + item.dataName, item.dataName);
@@ -277,46 +278,65 @@ public class HeroSelectionPanel : MonoBehaviour
 		string text = "";
 		string text2 = "";
 
+		if (instructionText != null && instructionText.Trim().Length > 0)
+		{
+			text = Interpret(corruptionInteraction.TranslationKey("instructionText"), corruptionInteraction.instructionText);
+		}
+
 		if (corruption > 0)
 		{
-			string number = corruption == 1 ? ".Singular" : ".Plural";
+			string number = (corruption == 1 ? ".Singular" : ".Plural");
 			if(corruptionTarget == CorruptionTarget.ONE_HERO)
 			{
-				text = Translate("heroSelection.text.OneHeroGainsCorruption" + number, "One hero gains {0} corruption token(s).", new List<string> { corruption.ToString() }) + "\n\n";
+				if (text.Length == 0)
+				{
+					text = Translate("heroSelection.text.OneHeroGainsCorruption" + number, "One hero gains {0} corruption token(s).", new List<string> { corruption.ToString() });
+				}
 				text2 = Translate("heroSelection.text.ChooseHeroWhoGainsCorruption" + number, "Choose a hero to gain {0} corruption token(s).", new List<string> { corruption.ToString() });
 			}
 			else if(corruptionTarget == CorruptionTarget.ALL_HEROES)
             {
-				text = Translate("heroSelection.text.AllHeroesGainCorruption" + number, "One by one, all heroes gain {0} corruption token(s).", new List<string> { corruption.ToString() }) + "\n\n";
+				if (text.Length == 0)
+				{
+					text = Translate("heroSelection.text.AllHeroesGainCorruption" + number, "One by one, all heroes gain {0} corruption token(s).", new List<string> { corruption.ToString() });
+				}
 				text2 = Translate("heroSelection.text.ChooseWhoGainsCorruptionNext" + number, "Choose the next hero to gain {0} corruption token(s).", new List<string> { corruption.ToString() });
 			}
 			else if(corruptionTarget == CorruptionTarget.MULTIPLE_HEROES)
             {
-				text = Translate("heroSelection.text.ChooseWhoGainsCorruption" + number, "Choose which heroes must gain {0} corruption token(s).", new List<string> { corruption.ToString() }) + "\n\n";
-				//TODO Put a text block here from the CorruptionInteraction that tells which heroes should be chosen to gain corruption
+				if (text.Length == 0)
+				{
+					text = Translate("heroSelection.text.ChooseWhoGainsCorruption" + number, "Choose which heroes must gain {0} corruption token(s).", new List<string> { corruption.ToString() });
+				}
 				text2 = Translate("heroSelection.text.ChooseWhoGainsCorruptionNextOrDone" + number, "Choose the next hero to gain {0} corruption token(s), or click Done if no more heroes must be corrupted.", new List<string> { corruption.ToString() });
 			}
-
-			text += Translate("heroSelection.text.4thCorruptionToken", "If the hero would gain a 4th corruption token, the hero must successfully perform a Last Stand or else perish.");
 		}
 		else if (corruption < 0)
 		{
 			int positive = corruption * -1;
-			string number = positive == 1 ? ".Singular" : ".Plural";
+			string number = (positive == 1 ? ".Singular" : ".Plural");
 			if (corruptionTarget == CorruptionTarget.ONE_HERO)
 			{
-				text = Translate("heroSelection.text.OneHeroRemovesCorruption" + number, "One hero removes {0} corruption token(s).", new List<string> { positive.ToString() }) + "\n\n";
+				if (text.Length == 0)
+				{
+					text = Translate("heroSelection.text.OneHeroRemovesCorruption" + number, "One hero removes {0} corruption token(s).", new List<string> { positive.ToString() });
+				}
 				text2 = Translate("heroSelection.text.ChooseHeroWhoRemovesCorruption" + number, "Choose a hero to remove {0} corruption token(s).", new List<string> { positive.ToString() });
 			}
 			else if (corruptionTarget == CorruptionTarget.ALL_HEROES)
 			{
-				text = Translate("heroSelection.text.AllHeroesRemoveCorruption" + number, "One by one, all heroes remove {0} corruption token(s).", new List<string> { positive.ToString() }) + "\n\n";
+				if (text.Length == 0)
+				{
+					text = Translate("heroSelection.text.AllHeroesRemoveCorruption" + number, "One by one, all heroes remove {0} corruption token(s).", new List<string> { positive.ToString() });
+				}
 				text2 = Translate("heroSelection.text.ChooseWhoRemovesCorruptionNext" + number, "Choose the next hero to remove {0} corruption token(s).", new List<string> { positive.ToString() });
 			}
 			else if (corruptionTarget == CorruptionTarget.MULTIPLE_HEROES)
 			{
-				text = Translate("heroSelection.text.ChooseWhoRemovesCorruption" + number, "Choose which heroes will remove {0} corruption token(s).", new List<string> { positive.ToString() }) + "\n\n";
-				//TODO Put a text block here from the CorruptionInteraction that tells which heroes should be chosen to remove corruption
+				if (text.Length == 0)
+				{
+					text = Translate("heroSelection.text.ChooseWhoRemovesCorruption" + number, "Choose which heroes will remove {0} corruption token(s).", new List<string> { positive.ToString() });
+				}
 				text2 = Translate("heroSelection.text.ChooseWhoRemovesCorruptionNextOrDone" + number, "Choose the next hero to remove {0} corruption token(s), or click Done if no more heroes will remove corruption.", new List<string> { positive.ToString() });
 			}
 		}

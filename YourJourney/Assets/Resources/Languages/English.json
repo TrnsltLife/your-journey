@@ -198,9 +198,8 @@
 	"heroSelection.text.ChooseWhoGainsCorruptionNext.Plural":"Choose the next hero to gain {0} corruption tokens.",
 	"heroSelection.text.ChooseWhoGainsCorruption.Singular": "Choose which heroes must gain {0} corruption token.",
 	"heroSelection.text.ChooseWhoGainsCorruption.Plural": "Choose the next hero to gain {0} corruption tokens.",
-	"heroSelection.text.ChooseWhoGainsCorruptionNextOrDone.Singular":"Choose the next hero to gain {0} corruption token, or click Done if no more heroes must be corrupted..",
-	"heroSelection.text.ChooseWhoGainsCorruptionNextOrDone.Plural":"Choose the next hero to gain {0} corruption tokens, or click Done if no more heroes must be corrupted..",
-	"heroSelection.text.4thCorruptionToken": "If the hero would gain a 4th corruption token, the hero must successfully perform a Last Stand or else perish.",
+	"heroSelection.text.ChooseWhoGainsCorruptionNextOrDone.Singular":"Choose the next hero to gain {0} corruption token, or click Done if no more heroes must be corrupted.",
+	"heroSelection.text.ChooseWhoGainsCorruptionNextOrDone.Plural":"Choose the next hero to gain {0} corruption tokens, or click Done if no more heroes must be corrupted.",
 	"heroSelection.text.OneHeroRemovesCorruption.Singular": "One hero removes {0} corruption token.",
 	"heroSelection.text.OneHeroRemovesCorruption.Plural": "Choose a hero to remove {0} corruption tokens.",
 	"heroSelection.text.ChooseHeroWhoRemovesCorruption.Singular": "Choose a hero to remove {0} corruption token.",
@@ -213,6 +212,7 @@
 	"heroSelection.text.ChooseWhoRemovesCorruption.Plural": "Choose which heroes will remove {0} corruption tokens.",
 	"heroSelection.text.ChooseWhoRemovesCorruptionNextOrDone.Singular": "Choose the next hero to remove {0} corruption token, or click Done if no more heroes will remove corruption.",
 	"heroSelection.text.ChooseWhoRemovesCorruptionNextOrDone.Plural": "Choose the next hero to remove {0} corruption tokens, or click Done if no more heroes will remove corruption.",
+
 
 	"interaction.Search": "Search",
 	"interaction.Human": "Human",
