@@ -10,8 +10,8 @@ using UnityEngine;
 /// </summary>
 public class Bootstrap
 {
-	public static readonly string AppVersion = "0.34";
-	public static readonly string FormatVersion = "1.34";
+	public static readonly string AppVersion = "0.35";
+	public static readonly string FormatVersion = "1.35";
 
 	//REQUIRED for playing ANY scenario, bootstraps the scenario
 	public static GameStarter gameStarter;
@@ -22,6 +22,7 @@ public class Bootstrap
 	//this data is Reset for new games or restored from game state
 	public static int[] lastStandCounter;
 	public static bool[] isDead;
+	public static int[] corruptionCounter = new int[5];
 	public static int loreCount, xpCount;
 	//utility data
 	public static int PlayerCount { get => gameStarter.heroes.Length; }
@@ -90,6 +91,7 @@ public class Bootstrap
 	/// </summary>
 	public static void ResetVars()
 	{
+		Debug.Log("Bootstrap.ResetVars()");
 		foreach ( string s in gameStarter.heroes )
 			Debug.Log( "Hero:" + s );
 		isDead = new bool[5];
@@ -98,6 +100,13 @@ public class Bootstrap
 		lastStandCounter.Fill( 1 );
 		loreCount = xpCount = 0;
 		returnToCampaign = false;
+	}
+
+	public static void ResetCorruption()
+    {
+		Debug.Log("Bootstrap.ResetCorruption()");
+		corruptionCounter = new int[5];
+		corruptionCounter.Fill(0);
 	}
 
 	public static Scenario DEBUGLoadLevel()

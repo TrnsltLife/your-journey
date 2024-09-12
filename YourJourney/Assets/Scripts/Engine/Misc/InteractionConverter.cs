@@ -72,6 +72,9 @@ public class InteractionConverter : JsonConverter
 				case 14:
 					interaction = item.ToObject<StartInteraction>();
 					break;
+				case 15:
+					interaction = item.ToObject<CorruptionInteraction>();
+					break;
 				default:
 					throw new Exception( "Interaction Type not supported: " + item["interactionType"].Value<int>() );
 			}

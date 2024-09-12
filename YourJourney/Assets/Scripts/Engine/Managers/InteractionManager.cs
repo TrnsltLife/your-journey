@@ -131,6 +131,8 @@ public class InteractionManager : MonoBehaviour
 			return (TitleInteraction)interaction;
 		else if (interaction.interactionType == InteractionType.Start)
 			return (StartInteraction)interaction;
+		else if (interaction.interactionType == InteractionType.Corruption)
+			return (CorruptionInteraction)interaction;
 
 		throw new Exception( "Couldn't create Interaction from: " + interaction.dataName );
 	}
@@ -373,6 +375,10 @@ public class InteractionManager : MonoBehaviour
         {
 			//Do nothing
         }
+		else if (it.interactionType == InteractionType.Corruption)
+		{
+			HandleCorruption(it, action);
+		}
 		else
 			GetNewTextPanel().ShowOkContinue( $"Data Error (ShowInteraction)\r\nCould not find Interaction with type '{it.interactionType}'.", ButtonIcon.Continue );
 	}
@@ -566,6 +572,96 @@ public class InteractionManager : MonoBehaviour
 		FindObjectOfType<LorePanel>().AddReward( it.loreReward, it.xpReward, it.threatReward );
 	}
 
+	void HandleCorruption(IInteraction it, Action<InteractionResult> action = null)
+	{
+		CorruptionInteraction ci = (CorruptionInteraction)it;
+
+		bool[] corruptedHeroes = new bool[Bootstrap.gameStarter.heroes.Length]; //they start set to false
+
+		GetNewTextPanel().ShowTextInteraction(it, () =>
+		{
+			CorruptionFollowup(ci, corruptedHeroes, 0, action);
+		});
+	}
+
+	public class CorruptionFollowupData
+    {
+		public CorruptionInteraction corruptionInteraction;
+		public bool[] corruptedHeroes;
+		public int step;
+		public Action<InteractionResult> originalAction;
+    }
+
+	public void CorruptionFollowup(CorruptionInteraction ci, bool[] corruptedHeroes, int step, Action<InteractionResult> originalAction)
+	{
+		int corruptedCount = corruptedHeroes.Where(it => it == true).Count();
+		if (ci.corruption != 0 && ci.corruptionTarget != CorruptionTarget.NONE &&
+			(
+				(corruptedCount == 0 && ci.corruptionTarget == CorruptionTarget.ONE_HERO) ||
+				(corruptedCount < Bootstrap.gameStarter.heroes.Length && (ci.corruptionTarget == CorruptionTarget.ALL_HEROES || ci.corruptionTarget == CorruptionTarget.MULTIPLE_HEROES))
+			)
+		)
+		{
+			//Ask the players which hero to assign the corruption to for the current scenario
+			HeroSelectionPanel heroPanel = GetNewHeroSelectionPanel();
+			heroPanel.Show(ci, corruptedHeroes, step, originalAction, (b) =>
+			{
+				int selectedHero = b.value;
+
+				if (ci.corruptionTarget == CorruptionTarget.MULTIPLE_HEROES && selectedHero == -1)
+				{
+					//No hero selected. Set all heroes to true (dealt with) and then recurse back to CorruptionFollowup in order to trigger the end of the sequence.
+					corruptedHeroes.Fill(true);
+					FindObjectOfType<InteractionManager>().CorruptionFollowup(ci, corruptedHeroes, step + 1, originalAction);
+				}
+				else //Apply corruption to selected hero.
+				{
+					corruptedHeroes[selectedHero] = true;
+
+					//Increase corruption or force last stand
+					if (Bootstrap.corruptionCounter[selectedHero] + ci.corruption >= 4)
+					{
+						//Force a Last Stand
+						//Otherwise fail the game
+						CorruptionFollowupData cfd = new CorruptionFollowupData(){
+							corruptionInteraction = ci, 
+							corruptedHeroes = corruptedHeroes, 
+							step = step, 
+							originalAction = originalAction};
+
+						PartyPanel partyPanel = engine.camControl.partyPanel;
+						if (partyPanel != null && partyPanel.heroItems != null)
+						{
+							HeroItem heroItem = partyPanel.heroItems[selectedHero];
+							if (heroItem != null)
+							{
+								heroItem.CorruptionFinalStand(cfd);
+							}
+						}
+					}
+					else
+					{
+						Bootstrap.corruptionCounter[selectedHero] += ci.corruption;
+						if (Bootstrap.campaignState != null)
+						{
+							int scenarioIndex = Bootstrap.campaignState.scenarioPlayingIndex;
+							Bootstrap.campaignState.currentCharacterSheets[scenarioIndex][selectedHero].corruption += ci.corruption;
+							Debug.Log("currentCharacterSheets[" + scenarioIndex + "][" + selectedHero + "].corruption set to " + Bootstrap.campaignState.currentCharacterSheets[scenarioIndex][selectedHero].corruption);
+						}
+						FindObjectOfType<InteractionManager>().CorruptionFollowup(ci, corruptedHeroes, step + 1, originalAction);
+					}
+					Debug.Log("Corruption of hero " + Bootstrap.gameStarter.heroes[selectedHero] + " is " + Bootstrap.corruptionCounter[selectedHero]);
+				}
+			});
+		}
+		else
+        {
+			//Once there is no more corruption to assign, finish up the interaction
+			originalAction?.Invoke(new InteractionResult() { removeToken = true }); //cause Tile to remove token
+			engine.triggerManager.FireTrigger(ci.triggerAfterName);
+		}
+	}
+
 	void HandleItem(IInteraction it, Action<InteractionResult> action = null)
 	{
 		ItemInteraction ii = (ItemInteraction)it;
@@ -663,7 +759,6 @@ public class InteractionManager : MonoBehaviour
 
 	void HandleTitle(IInteraction it, Action<InteractionResult> action = null)
 	{
-		//TODO
 		TitleInteraction ti = (TitleInteraction)it;
 		int giveCount = ti.randomizedTitlesCount;
 		if (giveCount <= 0) { giveCount = 1; } //Sometimes randomizedItemCount from the editor might be 0; but always give at least one title.

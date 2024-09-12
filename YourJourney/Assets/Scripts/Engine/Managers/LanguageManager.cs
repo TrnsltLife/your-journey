@@ -195,14 +195,17 @@ public class LanguageManager : MonoBehaviour
 			string langCode = translation.dataName;
 			string langName = translation.langName;
 
-			scenarioLanguages.Add(langCode, langName);
+			if (langCode != null)
+			{
+				scenarioLanguages.Add(langCode, langName);
 
-			Dictionary<string, string> dict = new Dictionary<string, string>();
-			scenarioTranslations.Add(langCode, dict);
-			foreach(var item in translation.translationItems)
-            {
-				dict.Add(item.key, item.text);
-            }
+				Dictionary<string, string> dict = new Dictionary<string, string>();
+				scenarioTranslations.Add(langCode, dict);
+				foreach (var item in translation.translationItems)
+				{
+					dict.Add(item.key, item.text);
+				}
+			}
         }
     }
 

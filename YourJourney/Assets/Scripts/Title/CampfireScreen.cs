@@ -17,6 +17,8 @@ public class CampfireScreen : MonoBehaviour
 	public TextMeshProUGUI nameText, remainingPointsNumberText, stateText;
 	public Button[] heroButtons;
 	public Image[] heroImage;
+	public Text[] heroCorruption;
+	public Image[] heroCorruptionImage;
 	public Image maleSilhouette;
 	public Image femaleSilhouette;
 	public Image portraitBackground;
@@ -246,11 +248,23 @@ public class CampfireScreen : MonoBehaviour
 				heroImage[i].gameObject.SetActive(true);
 				heroButtons[i].gameObject.SetActive(true);
 				heroImage[i].GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Portraits/p" + campaignState.heroesIndex[i]);
+
+				int corruption = startingCharacterSheets[i].corruption;
+				if (corruption > 0)
+				{
+					heroCorruptionImage[i].gameObject.SetActive(true);
+					heroCorruption[i].text = corruption.ToString();
+				}
+                else 
+				{
+					heroCorruptionImage[i].gameObject.SetActive(false);
+				}
 			}
 			else
             {
 				heroImage[i].gameObject.SetActive(false);
 				heroButtons[i].gameObject.SetActive(false);
+                heroCorruptionImage[i].gameObject.SetActive(false);
 			}
 		}
 
@@ -1108,6 +1122,12 @@ public class CampfireScreen : MonoBehaviour
 		campaignState.currentTrinkets[campaignState.scenarioPlayingIndex] = campfireTrinkets;
 		campaignState.currentMounts[campaignState.scenarioPlayingIndex] = campfireMounts;
 		campaignState.currentCampaignTriggerState[campaignState.scenarioPlayingIndex] = campaignTriggerState;
+		Bootstrap.ResetCorruption();
+		for (int i=0; i<Bootstrap.PlayerCount; i++)
+        {
+			Bootstrap.corruptionCounter[i] = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex][i].corruption;
+			Debug.Log("corruption assignment player " + i + "---> " + Bootstrap.corruptionCounter[i]);
+		}
 
 		StartGame();
 	}
