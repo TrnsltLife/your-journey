@@ -1126,7 +1126,6 @@ public class CampfireScreen : MonoBehaviour
 		for (int i=0; i<Bootstrap.PlayerCount; i++)
         {
 			Bootstrap.corruptionCounter[i] = campaignState.currentCharacterSheets[campaignState.scenarioPlayingIndex][i].corruption;
-			Debug.Log("corruption assignment player " + i + "---> " + Bootstrap.corruptionCounter[i]);
 		}
 
 		StartGame();
