@@ -2,12 +2,13 @@
 
 ## [Your Journey Patreon](http://www.patreon.com/YourJourneyRPG)
 
-# Your Journey - v0.34 - Windows and Mac
+# Your Journey - v0.35 - Windows and Mac
 The companion playback app for the Journeys in Middle Earth Scenario Editor, forked from [GlowPuff's original project](https://github.com/GlowPuff/your-journey) with new tiles from [Celstra](https://github.com/Celstra/JiMEditor). 
 
 #### Download the latest release
-[Download the Newest Release!](https://github.com/TrnsltLife/your-journey/releases/tag/v0.34) 
+[Download the Newest Release!](https://github.com/TrnsltLife/your-journey/releases/tag/v0.35) 
 
+- Corruption events can now add (or remove) one or more corruption tokens from one or more heroes. Corruption is tracked on the Party Panel and the Campfire screen.
 - Failing a Last Stand will now end the scenario in failure at the start of the Shadow Phase
 - French, German, Greek, Italian, Polish, Spanish and Ukrainian translations of the UI are now partially available!
 - Full support for party tracking throughout the campaign: Items, Trinkets, Mounts, Titles, Skills, and Multi-Classing!
@@ -20,7 +21,7 @@ The companion playback app for the Journeys in Middle Earth Scenario Editor, for
 - Chronicle accessible from the Party Panel.
 
 #### Installation instructions - Windows
-1. Unzip the YourJourney_Win_v0.34.zip file somewhere and run "Your Journey.exe".
+1. Unzip the YourJourney_Win_v0.35.zip file somewhere and run "Your Journey.exe".
 2. Put your .jime scenario files (like [The Watch at Weathertop](https://drive.google.com/file/d/1Rr2HZlZ-ba17b714xOql2_Dgg5pnyWIg/view?usp=sharing) by [Noldorion](https://boardgamegeek.com/user/Noldorion)) in the "Your Journey" folder in your Documents folder (Windows users). You can also grab [The Search for the Citadel](https://github.com/TrnsltLife/YourJourneyScenarios/releases/tag/v0.27-citadel) which is a test scenario that demonstrates a translated scenario in French.
 3. Hit the "New Game" button at the title.
 4. Create a save slot on the next screen (just start typing when it asks for a name, then press enter).
@@ -30,7 +31,7 @@ The companion playback app for the Journeys in Middle Earth Scenario Editor, for
 8. Click the "Begin Journey" button to start playing!
 
 #### Installation instructions - Mac
-1. Download YourJourney_Mac_v0.34.app.zip file somewhere and run "YourJourney_v0.34". If it tells you it can't run the software because it can't verify there aren't any viruses, try again and tell it to Open anyways.
+1. Download YourJourney_Mac_v0.35.app.zip file somewhere and run "YourJourney_v0.35". If it tells you it can't run the software because it can't verify there aren't any viruses, try again and tell it to Open anyways.
 2. Put your .jime scenario files (like [The Watch at Weathertop](https://drive.google.com/file/d/1Rr2HZlZ-ba17b714xOql2_Dgg5pnyWIg/view?usp=sharing) by [Noldorion](https://boardgamegeek.com/user/Noldorion)) in the "Your Journey" folder in your User folder (Mac users), e.g. /Users/(your-user-name)/Your Journey/Weathertop.jime.
 3. Hit the "New Game" button at the title.
 4. Create a save slot on the next screen (just start typing when it asks for a name, then press enter).
@@ -38,11 +39,6 @@ The companion playback app for the Journeys in Middle Earth Scenario Editor, for
 6. Choose your characters by clicking on the top half; change their names by clicking on the bottom half, typing, and pressing enter.
 7. Change the difficulty level by clicking on the "Normal" button.
 8. Click the "Begin Journey" button to start playing!
-
-
-## LIMITATIONS:
-* The corruption mechanic is not implemented.
-* For standalone scenarios, you have to manage your inventory and skill cards yourself, based on the Lore and XP you can see on the Party Panel or at the end of an adventure.
 
 ## The Scenario Editor
 The editor is available in [a separate repository](https://github.com/TrnsltLife/JiMEditor).
