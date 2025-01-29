@@ -146,6 +146,7 @@ public class Scenario
         foreach(var translation in translationObserver)
 		{
 			string langCode = translation.dataName;
+			if (langCode == null || langCode == "") { continue; }
 			Dictionary<string, string> wordsDict = new Dictionary<string, string>();
 			foreach(var item in translation.translationItems)
             {

@@ -155,6 +155,19 @@ public class CampaignItem
 	public List<int> collections { get; set; }
 	public string coverImage { get; set; }
 	public string specialInstructions { get; set; }
+	public Dictionary<string, Dictionary<string, string>> translations { get; set; }
+
+	public string Translated(string key, string defaultValue)
+	{
+		if (translations != null && translations.ContainsKey(LanguageManager.currentLanguageCode))
+		{
+			if (translations[LanguageManager.currentLanguageCode].ContainsKey(key))
+			{
+				return translations[LanguageManager.currentLanguageCode][key];
+			}
+		}
+		return defaultValue;
+	}
 }
 
 public class StateItem

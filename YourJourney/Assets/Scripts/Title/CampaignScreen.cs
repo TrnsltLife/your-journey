@@ -43,12 +43,13 @@ public class CampaignScreen : MonoBehaviour
 		var lore = campaignState.scenarioLore.Aggregate( ( acc, cur ) => acc + cur );
 		xpLoreText.text = lore + " / " + xp;
 		replayText.text = "";
-		currentScenarioText.text = campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].scenarioName;
-		scenarioVersionText.text = campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].scenarioVersion;
-		Debug.Log("scenarioVersion: " + campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].scenarioVersion);
+		CampaignItem currentScenario = campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex];
+		currentScenarioText.text = currentScenario.Translated("scenario.scenarioName", currentScenario.scenarioName);
+		scenarioVersionText.text = currentScenario.scenarioVersion;
+		Debug.Log("scenarioVersion: " + currentScenario.scenarioVersion);
 
 		tm = FindObjectOfType<TitleManager>();
-		tm.LoadScenarioImage(campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].coverImage);
+		tm.LoadScenarioImage(currentScenario.coverImage);
 
 		OnShowStory();
 
@@ -58,7 +59,11 @@ public class CampaignScreen : MonoBehaviour
 		{
 			var go = Instantiate( fileItemButtonPrefab, itemContainer ).GetComponent<FileItemButton>();
 			go.transform.localPosition = new Vector3( 0, ( -110 * i ) );
-			go.Init( i, campaign.scenarioCollection[i].scenarioName,
+
+			CampaignItem item = campaign.scenarioCollection[i];
+
+			string translatedScenarioName = campaign.scenarioCollection[i].Translated("scenario.scenarioName", campaign.scenarioCollection[i].scenarioName);
+			go.Init( i, translatedScenarioName,
 				"", //TODO collections?
 				ProjectType.Standalone, ( index ) => OnSelectScenario( index ) );
 			if (campaignState.currentScenarioIndex != i || finishedCampaign)
@@ -165,9 +170,10 @@ public class CampaignScreen : MonoBehaviour
 		coverImage = campaign.scenarioCollection[selectedIndex].coverImage ?? campaign.coverImage; //scenario image, or campaign image as a fallback
 		tm.LoadScenarioImage(coverImage);
 
-		scenarioVersionText.text = campaignState.campaign.scenarioCollection[selectedIndex].scenarioVersion;
-		Debug.Log("update scenarioName: " + campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].scenarioName +
-			", scenarioVersion: " + campaignState.campaign.scenarioCollection[campaignState.currentScenarioIndex].scenarioVersion);
+		CampaignItem ci = campaignState.campaign.scenarioCollection[selectedIndex];
+		scenarioVersionText.text = ci.scenarioVersion;
+		Debug.Log("update scenarioName: " + ci.scenarioName +
+			", scenarioVersion: " + ci.scenarioVersion);
 
 		//if selected scenario has been played (fail or success) activated replay option
 		if ( campaignState.scenarioStatus[index] != ScenarioStatus.NotPlayed )
@@ -341,6 +347,7 @@ public class CampaignScreen : MonoBehaviour
 
 	public void OnShowStory(int scenarioIndex)
     {
-		storyBoxFormElement.storyText.text = campaign.scenarioCollection[scenarioIndex].specialInstructions;
+		CampaignItem ci = campaign.scenarioCollection[scenarioIndex];
+		storyBoxFormElement.storyText.text = ci.Translated("scenario.instructions", ci.specialInstructions);
 	}
 }

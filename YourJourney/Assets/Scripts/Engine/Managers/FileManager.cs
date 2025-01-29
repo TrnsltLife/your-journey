@@ -221,6 +221,7 @@ public class FileManager
 					item.collections = scenario.collectionObserver.ToList();
 					item.coverImage = scenario.coverImage;
 					item.scenarioVersion = scenario.scenarioVersion;
+					item.translations = scenario.TranslationForTitleScreens();
 					//Debug.Log("setting version for " + scenario.scenarioName + " " + item.scenarioVersion);
 					foreach ( int col in scenario.collectionObserver )
                     {
@@ -264,6 +265,7 @@ public class FileManager
 				item.coverImage = scenario.coverImage;
 				item.scenarioVersion = scenario.scenarioVersion;
 				item.specialInstructions = scenario.specialInstructions;
+				item.translations = scenario.TranslationForTitleScreens();
 				//Debug.Log("setting coverImage for " + scenario.scenarioName + " " + item.coverImage);
 			}
 

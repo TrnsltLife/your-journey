@@ -131,7 +131,9 @@ public class ChapterManager : MonoBehaviour
 			if (!c.noFlavorText)
 			{
 				var im = FindObjectOfType<InteractionManager>().GetNewTextPanel();
-				im.ShowOkContinue(c.flavorBookData.pages[0], ButtonIcon.Continue, () =>
+				string flavor = c.flavorBookData.pages.Count > 0 ? Interpret("chapter." + c.dataName + ".exploredText", c.flavorBookData.pages[0]) : "";
+
+				im.ShowOkContinue(flavor, ButtonIcon.Continue, () =>
 				 {
 					 StartCoroutine(FinishChapterTriggerCoroutine(c, firstChapter));
 				 });
