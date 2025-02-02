@@ -109,10 +109,11 @@ public class TitleManager : MonoBehaviour
 		loadBcg = loadButton.GetComponent<CanvasGroup>();
 		loadingText = scenarioOverlayText.GetComponent<TextMeshProUGUI>();
 
-		selectJourney.AddScenarioPrefabs();
-
 		//find campaign packages and unzip them into folders
 		FileManager.UnpackCampaigns();
+
+		//load scenarios and campaigns
+		selectJourney.AddScenarioPrefabs();
 
 		if ( Bootstrap.returnToCampaign )
 		{
