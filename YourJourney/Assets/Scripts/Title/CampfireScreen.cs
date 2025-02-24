@@ -21,6 +21,8 @@ public class CampfireScreen : MonoBehaviour
 	public Image[] heroCorruptionImage;
 	public Image maleSilhouette;
 	public Image femaleSilhouette;
+	public Image[] maleSilhouettes;
+	public Image[] femaleSilhouettes;
 	public Image portraitBackground;
 	public float heroImageWidth;
 	public float portraitMaxWidth;
@@ -277,15 +279,20 @@ public class CampfireScreen : MonoBehaviour
     {
 		int j = campaignState.heroesIndex[index];
 		Hero hero = Heroes.list[j];
-		if(hero?.sex == Sex.FEMALE)
-        {
-			maleSilhouette.gameObject.SetActive(false);
-			femaleSilhouette.gameObject.SetActive(true);
-        }
+		int raceCount = Enum.GetNames(typeof(Race)).Length;
+		Race race = hero?.race != null ? hero.race : Race.MAN;
+		for (int r = 0; r < raceCount; r++)
+		{
+			maleSilhouettes[r].gameObject.SetActive(false);
+			femaleSilhouettes[r].gameObject.SetActive(false);
+		}
+		if (hero?.sex == Sex.FEMALE)
+		{
+            femaleSilhouettes[(int)race].gameObject.SetActive(true);
+		}
 		else
-        {
-			maleSilhouette.gameObject.SetActive(true);
-			femaleSilhouette.gameObject.SetActive(false);
+		{
+			maleSilhouettes[(int)race].gameObject.SetActive(true);
 		}
     }
 
@@ -366,6 +373,7 @@ public class CampfireScreen : MonoBehaviour
 		dropdown.ClearOptions();
 		dropdown.AddOptions(optionList);
 		dropdown.SetValueWithoutNotify(selectedIndex);
+		OnRoleSelect();
 	}
 
 	public void PopulateTitleDropdown()
@@ -410,6 +418,44 @@ public class CampfireScreen : MonoBehaviour
 		}
 	}
 
+	public void AddSpecialItems(List<Item> itemList, Slot slot)
+    {
+		//Special treatment for Snow horse. Add it to the list for characters who can have it.
+		ItemSeries mountSeries = Heroes.FromID(characterSheets[selectedHero].portraitIndex).mount;
+		if (slot == Slot.MOUNT && mountSeries != ItemSeries.NONE)
+		{
+			itemList.Add(Items.FromSeriesID(mountSeries)[0]);
+		}
+
+		//Special teatment for North-Took Steed. Add it to the list if the character is named Isumbras or Isumbras Took: https://boardgamegeek.com/thread/3379694/new-custom-hero-isumbras
+		if (slot == Slot.MOUNT && new string[] { "Isumbras", "Isumbras Took" }.Contains(characterSheets[selectedHero].name))
+		{
+			itemList.Add(Items.FromSeriesID(ItemSeries.NORTH_TOOK_STEED)[0]);
+		}
+
+		//Special treatment for Trusted Steed if a hero is playing the Horse Lord role this adventure
+		if (slot == Slot.MOUNT && characterSheets[selectedHero].role == Role.HORSE_LORD)
+		{
+			itemList.Add(Items.FromSeriesID(ItemSeries.TRUSTED_STEED)[0]);
+		}
+
+		//Special treatment for Quickbeam custom character
+		if (characterSheets[selectedHero].portraitIndex == 17 || characterSheets[selectedHero].name == "Quickbeam")
+        {
+			if(slot == Slot.ARMOR)
+            {
+                itemList.Add(Items.FromSeriesID(ItemSeries.ANCIENT_BARK)[0]);
+            }
+			else if(slot == Slot.HAND)
+            {
+				itemList.Add(Items.FromSeriesID(ItemSeries.MIGHTY_LIMB)[0]);
+				itemList.Add(Items.FromSeriesID(ItemSeries.MIGHTY_LIMB)[0]);
+			}
+		}
+
+		//Trinket: Hammer and Tongs (Smith) is equipped after setup. Custom trinkets: The One (Ringbearer), Seeing Stone (Seer) are also equipped after setup.
+	}
+
 	public void PopulateItemSetupDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int hand, int tier)
     {
 		//populate dropdown
@@ -424,12 +470,7 @@ public class CampfireScreen : MonoBehaviour
 			itemList.Add(Items.list[0]); //None
 		}
 
-		//Special treatment for Snow horse. Add it to the list for characters who can have it.
-		ItemSeries mountSeries = Heroes.FromID(characterSheets[selectedHero].portraitIndex).mount;
-		if (slot == Slot.MOUNT && mountSeries != ItemSeries.NONE)
-        {
-            itemList.Add(Items.FromSeriesID(mountSeries)[0]);
-        }
+		AddSpecialItems(itemList, slot);
 
 		int handedLimit = 2;
 		if(hand == 1) { handedLimit = maxHanded - hand2Handed; }
@@ -546,7 +587,9 @@ public class CampfireScreen : MonoBehaviour
 				.ToList();
 
 			//Debug.Log("availableTrinkets: " + String.Join(", ", availableTrinkets.ConvertAll(it => it.id + "/" + it.seriesName + "/" + it.tier)));
-			
+
+			AddSpecialItems(itemList, slot);
+
 			foreach(var startingTrinket in availableTrinkets)
             {
 				Item currentTrinket = Items.FromID(characterSheets[selectedHero].trinketId);
@@ -555,12 +598,7 @@ public class CampfireScreen : MonoBehaviour
 		}
 		else if (slot == Slot.MOUNT)
 		{
-			//Special treatment for Snow horse. Add it to the list for characters who can have it.
-			ItemSeries mountSeries = Heroes.FromID(characterSheets[selectedHero].portraitIndex).mount;
-			if (slot == Slot.MOUNT && mountSeries != ItemSeries.NONE)
-			{
-				itemList.Add(Items.FromSeriesID(mountSeries)[0]);
-			}
+			AddSpecialItems(itemList, slot);
 
 			List<Item> availableMounts = startingMounts
 				.ConvertAll(it => Items.FromID(it))
@@ -829,6 +867,10 @@ public class CampfireScreen : MonoBehaviour
     {
 		int index = roleDropdown.GetComponent<TMP_Dropdown>().value;
 		characterSheets[selectedHero].role = roleList[index].role;
+
+		//Certain custom roles now give access to special mounts and trinkets, so we need to repopulate those dropdowns when the role changes
+		PopulateItemDropdown(trinketDropdown, trinketList, Slot.TRINKET, 0, 1);
+		PopulateItemDropdown(mountDropdown, mountList, Slot.MOUNT, 0, 0);
 	}
 
 	public void OnItemSelect(string slotHand)
