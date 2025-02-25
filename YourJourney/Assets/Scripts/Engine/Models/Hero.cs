@@ -8,7 +8,7 @@ using UnityEngine;
 using static LanguageManager;
 
 public enum Sex { NONE, MALE, FEMALE };
-public enum Race { NONE, ELF, MAN, DWARF, HALFLING, WIZARD, WEREBEAR };
+public enum Race { NONE, ELF, MAN, DWARF, HALFLING, WIZARD, WEREBEAR, ENT };
 public class Hero
 {
     public int id;
@@ -16,6 +16,8 @@ public class Hero
     public Sex sex;
     public Race race;
     public int maxHanded = 2;
+    //TODO could add threat to keep track of special threat rules
+    //TODO could add icon to keep track of what icon (collection, mount, threat number) to put on the Hero Select screen. Currently hardcoded in Hero Select screen array in Unity UI.
 
     //Suggested starting role
     public Role role;

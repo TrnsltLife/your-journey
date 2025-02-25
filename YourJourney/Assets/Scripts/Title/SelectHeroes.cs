@@ -27,7 +27,7 @@ public class SelectHeroes : MonoBehaviour
 	int lineupOffset = 0;
 	int lineupTotal = 0;
 	int lineupSize = 6;
-	public static readonly int maxHeroes = 5;
+	public static readonly int maxHeroes = 6;
 	int heroCount = 0;
 
 

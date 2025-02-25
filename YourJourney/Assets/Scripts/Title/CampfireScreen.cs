@@ -422,25 +422,25 @@ public class CampfireScreen : MonoBehaviour
     {
 		//Special treatment for Snow horse. Add it to the list for characters who can have it.
 		ItemSeries mountSeries = Heroes.FromID(characterSheets[selectedHero].portraitIndex).mount;
-		if (slot == Slot.MOUNT && mountSeries != ItemSeries.NONE)
+		if(slot == Slot.MOUNT && mountSeries != ItemSeries.NONE)
 		{
 			itemList.Add(Items.FromSeriesID(mountSeries)[0]);
 		}
 
 		//Special teatment for North-Took Steed. Add it to the list if the character is named Isumbras or Isumbras Took: https://boardgamegeek.com/thread/3379694/new-custom-hero-isumbras
-		if (slot == Slot.MOUNT && new string[] { "Isumbras", "Isumbras Took" }.Contains(characterSheets[selectedHero].name))
+		if(slot == Slot.MOUNT && new string[] { "Isumbras", "Isumbras Took" }.Contains(characterSheets[selectedHero].name))
 		{
 			itemList.Add(Items.FromSeriesID(ItemSeries.NORTH_TOOK_STEED)[0]);
 		}
 
 		//Special treatment for Trusted Steed if a hero is playing the Horse Lord role this adventure
-		if (slot == Slot.MOUNT && characterSheets[selectedHero].role == Role.HORSE_LORD)
+		if(slot == Slot.MOUNT && characterSheets[selectedHero].role == Role.HORSE_LORD)
 		{
 			itemList.Add(Items.FromSeriesID(ItemSeries.TRUSTED_STEED)[0]);
 		}
 
 		//Special treatment for Quickbeam custom character
-		if (characterSheets[selectedHero].portraitIndex == 17 || characterSheets[selectedHero].name == "Quickbeam")
+		if(characterSheets[selectedHero].portraitIndex == 17 || characterSheets[selectedHero].name == "Quickbeam")
         {
 			if(slot == Slot.ARMOR)
             {
@@ -449,8 +449,27 @@ public class CampfireScreen : MonoBehaviour
 			else if(slot == Slot.HAND)
             {
 				itemList.Add(Items.FromSeriesID(ItemSeries.MIGHTY_LIMB)[0]);
-				itemList.Add(Items.FromSeriesID(ItemSeries.MIGHTY_LIMB)[0]);
+				itemList.Add(Items.FromSeriesID(ItemSeries.ROCK)[0]);
 			}
+			else if(slot == Slot.MOUNT)
+            {
+				itemList.Clear();
+				itemList.Add(Items.list[0]); //None
+			}
+		}
+
+		//Let the four Rohirrim custom characters pick any of the standard horse mounts
+        if(slot == Slot.MOUNT && new int[] { 18, 19, 20, 21 }.Contains(characterSheets[selectedHero].portraitIndex))
+        {
+			List<Item> availableItems = new Item[]{Items.FromSeriesID(ItemSeries.FRIENDLY_PONY)[0],
+				Items.FromSeriesID(ItemSeries.SWIFT_STEED)[0],
+				Items.FromSeriesID(ItemSeries.TRAVELLERS_HORSE)[0],
+				Items.FromSeriesID(ItemSeries.WAR_CHARGER)[0]
+			}.Where(item =>
+				item.tier == 0 &&
+				Items.ItemAvailable(item.id, characterSheets, selectedHero, 0)
+			).ToList();
+			itemList.AddRange(availableItems);
 		}
 
 		//Trinket: Hammer and Tongs (Smith) is equipped after setup. Custom trinkets: The One (Ringbearer), Seeing Stone (Seer) are also equipped after setup.
@@ -469,8 +488,6 @@ public class CampfireScreen : MonoBehaviour
 		{
 			itemList.Add(Items.list[0]); //None
 		}
-
-		AddSpecialItems(itemList, slot);
 
 		int handedLimit = 2;
 		if(hand == 1) { handedLimit = maxHanded - hand2Handed; }
@@ -492,6 +509,10 @@ public class CampfireScreen : MonoBehaviour
 			).ToList();
 			itemList.AddRange(availableItems);
 		}
+
+
+		AddSpecialItems(itemList, slot);
+
 
 		int i = 0;
 		foreach (var item in itemList)
@@ -588,7 +609,7 @@ public class CampfireScreen : MonoBehaviour
 
 			//Debug.Log("availableTrinkets: " + String.Join(", ", availableTrinkets.ConvertAll(it => it.id + "/" + it.seriesName + "/" + it.tier)));
 
-			AddSpecialItems(itemList, slot);
+			//AddSpecialItems(itemList, slot);
 
 			foreach(var startingTrinket in availableTrinkets)
             {
@@ -598,7 +619,7 @@ public class CampfireScreen : MonoBehaviour
 		}
 		else if (slot == Slot.MOUNT)
 		{
-			AddSpecialItems(itemList, slot);
+			//AddSpecialItems(itemList, slot);
 
 			List<Item> availableMounts = startingMounts
 				.ConvertAll(it => Items.FromID(it))

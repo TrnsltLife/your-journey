@@ -51,6 +51,21 @@ public class Roles
 		new RoleData(Role.SMITH) {collection=3, dataName="Smith", skillCount= 12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
 		new RoleData(Role.SOLDIER) {collection=5, dataName="Soldier", skillCount= 12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
 		new RoleData(Role.TRAVELLER) {collection=3, dataName="Traveller", skillCount= 12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
-		new RoleData(Role.TRICKSTER) {collection=5, dataName="Trickster", skillCount= 12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}}
+		new RoleData(Role.TRICKSTER) {collection=5, dataName="Trickster", skillCount= 12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
+
+		//Custom Roles
+		new RoleData(Role.CHIEFTAIN) {collection=7, dataName="Chieftain", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
+		new RoleData(Role.COUNSELOR) {collection=7, dataName="Counselor", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 7, 7, 12, 12, 16, 16, 20}},
+		new RoleData(Role.DARKFIGHTER) {collection=7, dataName="Darkfighter", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
+		new RoleData(Role.DEFENDER) {collection=7, dataName="Defender", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
+		new RoleData(Role.GARDENER) {collection=7, dataName="Gardener", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
+		new RoleData(Role.HORSE_LORD) {collection=7, dataName="Horse Lord", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 12, 12, 12}},
+		new RoleData(Role.RANGER) {collection=7, dataName="Ranger", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
+		new RoleData(Role.RINGBEARER) {collection=7, dataName="Ringbearer", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
+		new RoleData(Role.RING_BEARER) {collection=7, dataName="Ring-Bearer", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 12, 12, 16}},
+		new RoleData(Role.SEER) {collection=7, dataName="Seer", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
+		new RoleData(Role.SHEPHERD) {collection=7, dataName="Shepherd", skillCount=6, indexOffset=2, skillCost= new int[]{0, 0, 3, 6, 8, 8}},
+		new RoleData(Role.TRACKER) {collection=7, dataName="Tracker", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
+		new RoleData(Role.WARRIOR) {collection=7, dataName="Warrior", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
 	};
 }

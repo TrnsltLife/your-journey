@@ -22,7 +22,7 @@ public class Bootstrap
 	//this data is Reset for new games or restored from game state
 	public static int[] lastStandCounter;
 	public static bool[] isDead;
-	public static int[] corruptionCounter = new int[5];
+	public static int[] corruptionCounter = new int[6];
 	public static int loreCount, xpCount;
 	//utility data
 	public static int PlayerCount { get => gameStarter.heroes.Length; }
@@ -94,9 +94,9 @@ public class Bootstrap
 		Debug.Log("Bootstrap.ResetVars()");
 		foreach ( string s in gameStarter.heroes )
 			Debug.Log( "Hero:" + s );
-		isDead = new bool[5];
+		isDead = new bool[6];
 		isDead.Fill( false );
-		lastStandCounter = new int[5];
+		lastStandCounter = new int[6];
 		lastStandCounter.Fill( 1 );
 		loreCount = xpCount = 0;
 		returnToCampaign = false;
@@ -105,7 +105,7 @@ public class Bootstrap
 	public static void ResetCorruption()
     {
 		Debug.Log("Bootstrap.ResetCorruption()");
-		corruptionCounter = new int[5];
+		corruptionCounter = new int[6];
 		corruptionCounter.Fill(0);
 	}
 

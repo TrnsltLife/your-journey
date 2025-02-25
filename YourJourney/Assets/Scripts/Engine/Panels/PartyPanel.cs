@@ -29,7 +29,7 @@ public class PartyPanel : MonoBehaviour
 	void Awake()
 	{
 		CalculatePanelPosition();
-		testColors = new Color[5];
+		testColors = new Color[6];
 		//mit/agi/wis/spi/wit
 		testColors[0] = Color.red;
 		testColors[1] = Color.green;

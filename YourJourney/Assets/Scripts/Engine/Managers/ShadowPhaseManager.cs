@@ -318,6 +318,18 @@ public class ShadowPhaseManager : MonoBehaviour
 		//add up threat
 		//2*hero count + # unexplored tiles + 1 per threat token
 		int hc = 2 * Bootstrap.gameStarter.heroes.Length;
+
+		//Custom threat for custom characters Alatar and Pallando: https://boardgamegeek.com/thread/2862327/alatar-and-pallando-homebrew-concept-together-with
+		hc += Bootstrap.gameStarter.heroes.Any(hero => hero == "Alatar") ? 2 : 0; //Alatar has double threat, i.e. 4 instead of 2
+		hc -= Bootstrap.gameStarter.heroes.Any(hero => hero == "Pallando") ? 2 : 0; //Pallando has no threat, i.e. 0 instead of 2
+
+		//Custom threat for when both Twins are used (hero index 30 and 31) for Elladan and Elrohir: https://boardgamegeek.com/thread/3237511/custom-hero-elladan-and-elrohir-and-custom-role-ra/page/3
+		//The two heroes are supposed to be treated as a single hero, but you can keep track of their inventory separately
+		if(Bootstrap.gameStarter.heroesIndex.Any(index => index == 30) && Bootstrap.gameStarter.heroesIndex.Any(index => index == 31))
+        {
+			hc -= 2;
+        }
+
 		int ut = 0;
 		if (Bootstrap.gameStarter.difficulty != Difficulty.Adventure)
 		{

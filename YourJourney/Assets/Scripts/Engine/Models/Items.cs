@@ -342,6 +342,95 @@ public  class Items
 		new Item(213){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.SWIFT_STEED, seriesName="Swift Steed", dataName="Swift Steed", originalName="Swift Steed", tier=0, trait="Creature", upgrade=0, handed=0, ranged=0},
 		new Item(214){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.TRAVELLERS_HORSE, seriesName="Traveller's Horse", dataName="Traveller's Horse", originalName="Traveller's Horse", tier=0, trait="Creature", upgrade=0, handed=0, ranged=0},
 		new Item(215){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.WAR_CHARGER, seriesName="War Charger", dataName="War Charger", originalName="War Charger", tier=0, stats=new string[]{"Might", "Wisdom"}, trait="Creature", upgrade=0, handed=0, ranged=0},
-		new Item(216){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.WITNESS_OF_MARANWE, seriesName="Witness of Maranwe", dataName="Witness of Maranwe", originalName="Witness of Maranwe", tier=0, stats=new string[]{}, upgrade=0, handed=0, ranged=0}
+		new Item(216){collection=5, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.WITNESS_OF_MARANWE, seriesName="Witness of Maranwe", dataName="Witness of Maranwe", originalName="Witness of Maranwe", tier=0, stats=new string[]{}, upgrade=0, handed=0, ranged=0},
+
+		//North-Took Steed
+		new Item(217){collection=7, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.NORTH_TOOK_STEED, seriesName="North-Took Steed", dataName="North-Took Steed", originalName="North-Took Steed", tier=-1, trait="Creature", upgrade=0, handed=0, ranged=0},
+		//Trusted Steed (Mount)
+		new Item(218){collection=7, slotId=Slot.MOUNT, slot="Mount", seriesId=ItemSeries.TRUSTED_STEED, seriesName="Trusted Steed", dataName="Trusted Steed", originalName="Trusted Steed", tier=-1, trait="Creature", upgrade=0, handed=0, ranged=0},
+
+		//Ancient Bark
+		new Item(219){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.ANCIENT_BARK, seriesName="Ancient Bark", dataName="Ancient Bark", originalName="Ancient Bark", tier=0, stats=new string[]{}, upgrade=0, handed=0, ranged=0},
+
+		//Herbs and Poultices
+		new Item(220){collection=7, slotId=Slot.TRINKET, slot="Trinket", seriesId=ItemSeries.HERBS_AND_POULTICES, seriesName="Herbs and Poultices", dataName="Herbs and Poultices", originalName="Herbs and Poultices", tier=0, stats=new string[]{}, upgrade=0, tokens=4, ranged=0},
+
+		//Pouch
+		new Item(221){collection=7, slotId=Slot.HAND, slot="Support", seriesId=ItemSeries.POUCH, seriesName="Pouch", dataName="Pouch", originalName="Pouch", tier=1, stats=new string[]{}, upgrade=25, handed=1, ranged=0},
+		new Item(222){collection=7, slotId=Slot.HAND, slot="Support", seriesId=ItemSeries.POUCH, seriesName="Pouch", dataName="Traveler's Pouch", originalName="Traveler's Pouch", tier=2, stats=new string[]{}, upgrade=59, handed=1, ranged=0},
+		new Item(223){collection=7, slotId=Slot.HAND, slot="Support", seriesId=ItemSeries.POUCH, seriesName="Pouch", dataName="Bag of Olórin", originalName="Bag of Olórin", tier=3, stats=new string[]{}, upgrade=86, handed=1, ranged=0},
+		new Item(224){collection=7, slotId=Slot.HAND, slot="Support", seriesId=ItemSeries.POUCH, seriesName="Pouch", dataName="Imladric Satchel", originalName="Imladric Satchel", tier=3, stats=new string[]{}, upgrade=86, handed=1, ranged=0},
+		new Item(225){collection=7, slotId=Slot.HAND, slot="Support", seriesId=ItemSeries.POUCH, seriesName="Pouch", dataName="Yavanna's Blessing", originalName="Yavanna's Blessing", tier=4, stats=new string[]{}, upgrade=0, handed=1, ranged=0},
+
+		//Robes
+		new Item(226){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.ROBES, seriesName="Robes", dataName="Robes", originalName="Robes", tier=1, stats=new string[]{}, upgrade=28, handed=0, ranged=0},
+		new Item(227){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.ROBES, seriesName="Robes", dataName="Rhosgobel Robes", originalName="Rhosgobel Robes", tier=2, stats=new string[]{}, upgrade=61, handed=0, ranged=0},
+		new Item(228){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.ROBES, seriesName="Robes", dataName="Guise of the Maiar", originalName="Guise of the Maiar", tier=3, stats=new string[]{}, upgrade=99, handed=0, ranged=0},
+		new Item(229){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.ROBES, seriesName="Robes", dataName="Fearless Phantom", originalName="Fearless Phantom", tier=3, stats=new string[]{}, upgrade=99, handed=0, ranged=0},
+		new Item(230){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.ROBES, seriesName="Robes", dataName="Wings of Alatrenar", originalName="Wings of Alatrenar", tier=4, stats=new string[]{}, upgrade=0, handed=0, ranged=0},
+
+		//Rock
+		new Item(231){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.ROCK, seriesName="Rock", dataName="Rock", originalName="Rock", tier=0, stats=new string[]{"Might", "Spirit"}, upgrade=0, handed=1, ranged=1},
+
+		//Rod
+		new Item(232){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.ROD, seriesName="Rod", dataName="Rod", originalName="Rod", tier=1, stats=new string[]{"Wisdom"}, upgrade=29, handed=1, ranged=0},
+		new Item(233){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.ROD, seriesName="Rod", dataName="Nature's Rod", originalName="Nature's Rod", tier=2, stats=new string[]{"Wisdom", "Wit"}, upgrade=56, handed=1, ranged=0},
+		new Item(234){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.ROD, seriesName="Rod", dataName="Aiwendil's Fortune", originalName="Aiwendil's Fortune", tier=3, stats=new string[]{ "Wisdom", "Wit"}, upgrade=87, handed=1, ranged=0},
+		new Item(235){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.ROD, seriesName="Rod", dataName="Curomo's Wrath", originalName="Curomo's Wrath", tier=3, stats=new string[]{ "Wisdom", "Wit"}, upgrade=87, handed=1, ranged=0},
+		new Item(236){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.ROD, seriesName="Rod", dataName="Will-giver", originalName="Will-giver", tier=4, stats=new string[]{ "Wisdom", "Wit"}, upgrade=0, handed=1, ranged=0},
+
+		//Mighty Limb
+		new Item(237){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.MIGHTY_LIMB, seriesName="Mighty Limb", dataName="Mighty Limb", originalName="Mighty Limb", tier=0, stats=new string[]{"Might"}, upgrade=0, handed=1, ranged=0},
+
+		//The One
+		new Item(238){collection=7, slotId=Slot.TRINKET, slot="Trinket", seriesId=ItemSeries.THE_ONE, seriesName="The One", dataName="The One", originalName="The One", tier=0, stats=new string[]{}, upgrade=0, tokens=4, ranged=0},
+
+		//Club
+		new Item(239){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CLUB, seriesName="Club", dataName="Club", originalName="Club", tier=1, stats=new string[]{"Might"}, upgrade=22, handed=1, ranged=0},
+		new Item(240){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CLUB, seriesName="Club", dataName="Heavy Club", originalName="Heavy Club", tier=2, stats=new string[]{"Might"}, upgrade=49, handed=1, ranged=0},
+		new Item(241){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CLUB, seriesName="Club", dataName="The Bullroarer", originalName="The Bullroarer", tier=3, stats=new string[]{"Might", "Wit"}, upgrade=78, handed=1, ranged=0},
+		new Item(242){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CLUB, seriesName="Club", dataName="Galdor's Safeguard", originalName="Galdor's Safeguard", tier=3, stats=new string[]{"Might", "Agility"}, upgrade=78, handed=1, ranged=0},
+		new Item(243){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CLUB, seriesName="Club", dataName="Freca's Demise", originalName="Freca's Demise", tier=4, stats=new string[]{"Might", "Agility"}, upgrade=0, handed=1, ranged=0},
+
+		//Knife Upgrades
+		new Item(244){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.KNIFE, seriesName="Knife", dataName="Throwing Knife", originalName="Throwing Knife", tier=2, stats=new string[]{"Agility", "Wit"}, upgrade=49, handed=1, ranged=1},
+		new Item(245){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.KNIFE, seriesName="Knife", dataName="Hunter's Companion", originalName="Hunter's Companion", tier=3, stats=new string[]{"Agility", "Wit"}, upgrade=80, handed=1, ranged=1},
+
+		//Padded Armor Upgrades
+		new Item(246){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.PADDED_ARMOR, seriesName="Padded Armor", dataName="Thain's Vest", originalName="Thain's Vest", tier=2, stats=new string[]{}, upgrade=60, handed=0, ranged=0},
+		new Item(247){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.PADDED_ARMOR, seriesName="Padded Armor", dataName="Unbending Fate", originalName="Unbending Fate", tier=3, stats=new string[]{}, upgrade=99, handed=0, ranged=0},
+
+		//Walking Stick Upgrades
+		new Item(248){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.WALKING_STICK, seriesName="Walking Stick", dataName="Lightbringer", originalName="Lightbringer", tier=2, stats=new string[]{"Wisdom", "Spirit"}, upgrade=55, handed=1, ranged=0},
+		new Item(249){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.WALKING_STICK, seriesName="Walking Stick", dataName="Light of Eärendil", originalName="Light of Eärendil", tier=3, stats=new string[]{"Wisdom", "Spirit"}, upgrade=85, handed=1, ranged=0},
+
+		//Seeing Stone
+		new Item(250){collection=7, slotId=Slot.TRINKET, slot="Trinket", seriesId=ItemSeries.SEEING_STONE, seriesName="Seeing Stone", dataName="The One", originalName="Seeing Stone", tier=0, stats=new string[]{}, upgrade=0, tokens=4, ranged=0},
+
+		//Curved Sword
+		new Item(251){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CURVED_SWORD, seriesName="Curved Sword", dataName="Curved Sword", originalName="Curved Sword", tier=1, stats=new string[]{"Agility"}, upgrade=25, handed=1, ranged=0},
+		new Item(252){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CURVED_SWORD, seriesName="Curved Sword", dataName="Harondorian Scimitar", originalName="Harondorian Scimitar", tier=2, stats=new string[]{"Agility"}, upgrade=57, handed=1, ranged=0},
+		new Item(253){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CURVED_SWORD, seriesName="Curved Sword", dataName="Southern Blade", originalName="Southern Blade", tier=2, stats=new string[]{"Agility", "Might"}, upgrade=57, handed=1, ranged=0},
+		new Item(254){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CURVED_SWORD, seriesName="Curved Sword", dataName="Nomad Sword", originalName="Nomad Sword", tier=2, stats=new string[]{"Agility", "Wisdom"}, upgrade=88, handed=1, ranged=0},
+		new Item(255){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CURVED_SWORD, seriesName="Curved Sword", dataName="Sand-Heaver", originalName="Sand-Heaver", tier=3, stats=new string[]{"Agility"}, upgrade=88, handed=1, ranged=0},
+		new Item(256){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CURVED_SWORD, seriesName="Curved Sword", dataName="Hyarmenanga", originalName="Hyarmenanga", tier=3, stats=new string[]{"Agility", "Might"}, upgrade=88, handed=1, ranged=0},
+		new Item(257){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CURVED_SWORD, seriesName="Curved Sword", dataName="Dawn Bringer", originalName="Dawn Bringer", tier=3, stats=new string[]{"Agility", "Wisdom"}, upgrade=57, handed=1, ranged=0},
+		new Item(258){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.CURVED_SWORD, seriesName="Curved Sword", dataName="Orontril", originalName="Orontril", tier=4, stats=new string[]{"Wild"}, upgrade=0, handed=1, ranged=0},
+
+		//Hauberk
+		new Item(259){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.HAUBERK, seriesName="Hauberk", dataName="Hauberk", originalName="Hauberk", tier=1, stats=new string[]{}, upgrade=28, handed=0, ranged=0},
+		new Item(260){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.HAUBERK, seriesName="Hauberk", dataName="Hauberk of Mail", originalName="Hauberk of Mail", tier=2, stats=new string[]{}, upgrade=65, handed=0, ranged=0},
+		new Item(261){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.HAUBERK, seriesName="Hauberk", dataName="Guard's Pride", originalName="Guard's Pride", tier=3, stats=new string[]{}, upgrade=92, handed=0, ranged=0},
+		new Item(262){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.HAUBERK, seriesName="Hauberk", dataName="War Herald", originalName="War Herald", tier=3, stats=new string[]{}, upgrade=92, handed=0, ranged=0},
+		new Item(263){collection=7, slotId=Slot.ARMOR, slot="Armor", seriesId=ItemSeries.HAUBERK, seriesName="Hauberk", dataName="Defender of Meduseld", originalName="Defender of Meduseld", tier=4, stats=new string[]{}, upgrade=0, handed=0, ranged=0},
+
+		//Broadsword
+		new Item(264){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.BROADSWORD, seriesName="Broadsword", dataName="Broadsword", originalName="Broadsword", tier=1, stats=new string[]{"Might"}, upgrade=32, handed=2, ranged=0},
+		new Item(265){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.BROADSWORD, seriesName="Broadsword", dataName="Heavy Broadsword", originalName="Heavy Broadsword", tier=2, stats=new string[]{"Might"}, upgrade=70, handed=2, ranged=0},
+		new Item(266){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.BROADSWORD, seriesName="Broadsword", dataName="Sleek Broadsword", originalName="Sleek Broadsword", tier=2, stats=new string[]{ "Might", "Agility"}, upgrade=70, handed=2, ranged=0},
+		new Item(267){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.BROADSWORD, seriesName="Broadsword", dataName="Iron-Hand", originalName="Iron-Hand", tier=3, stats=new string[]{"Might"}, upgrade=99, handed=2, ranged=0},
+		new Item(268){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.BROADSWORD, seriesName="Broadsword", dataName="Night-Stalker", originalName="Night-Stalker", tier=3, stats=new string[]{ "Might", "Agility"}, upgrade=99, handed=2, ranged=0},
+		new Item(269){collection=7, slotId=Slot.HAND, slot="Weapon", seriesId=ItemSeries.BROADSWORD, seriesName="Broadsword", dataName="Horse-Lord's Ire", originalName="Horse-Lord's Ire", tier=4, stats=new string[]{"Might", "Agility"}, upgrade=0, handed=2, ranged=0},
+
 	};
 }
