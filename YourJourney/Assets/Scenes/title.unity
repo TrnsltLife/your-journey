@@ -2638,7 +2638,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -525, y: 115}
+  m_AnchoredPosition: {x: -432, y: 115}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &69600190
@@ -2723,7 +2723,7 @@ MonoBehaviour:
   m_fontSizeMin: 3
   m_fontSizeMax: 40
   m_fontStyle: 0
-  m_textAlignment: 514
+  m_textAlignment: 513
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0.6
@@ -2754,7 +2754,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 17.151287, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 69600191}
     characterCount: 1
@@ -3496,7 +3496,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 315, y: 115}
+  m_AnchoredPosition: {x: 406, y: 115}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &89121570
@@ -3581,7 +3581,7 @@ MonoBehaviour:
   m_fontSizeMin: 3
   m_fontSizeMax: 40
   m_fontStyle: 0
-  m_textAlignment: 514
+  m_textAlignment: 513
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0.6
@@ -3612,7 +3612,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 18.41867, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 89121571}
     characterCount: 1
@@ -15412,7 +15412,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -805, y: 115}
+  m_AnchoredPosition: {x: -712, y: 115}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &463844293
@@ -15497,7 +15497,7 @@ MonoBehaviour:
   m_fontSizeMin: 3
   m_fontSizeMax: 40
   m_fontStyle: 0
-  m_textAlignment: 514
+  m_textAlignment: 513
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0.6
@@ -15528,7 +15528,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 18.422182, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 463844294}
     characterCount: 1
@@ -37987,7 +37987,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 35, y: 115}
+  m_AnchoredPosition: {x: 124, y: 115}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1115512385
@@ -38072,7 +38072,7 @@ MonoBehaviour:
   m_fontSizeMin: 3
   m_fontSizeMax: 40
   m_fontStyle: 0
-  m_textAlignment: 514
+  m_textAlignment: 513
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0.6
@@ -38103,7 +38103,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 21.022839, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 1115512386}
     characterCount: 1
@@ -49037,6 +49037,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 162053b44491a3d4598b902066619cfa, type: 3}
   - {fileID: 21300000, guid: 352bb584b6bf8a042897947336d69c04, type: 3}
   - {fileID: 21300000, guid: f6b711bc4179ea742a5636e37a6adc5d, type: 3}
+  - {fileID: 21300000, guid: bfb1eb045a87309409fd0b494731b382, type: 3}
   heroName:
   - Ranger Chief
   - Ranger Heroine
@@ -49092,12 +49093,12 @@ MonoBehaviour:
   - Border Ranger
   - Warrior
   - Paladin
-  - Female Ranger
-  - Ranger
+  - Idraen
+  - Halbarad
   - Ranger
   - Archer
-  - Blade Master
-  - Adventurer
+  - Amarthiul
+  - Thurindir
   - Elven Archer
   - Elven Archer
   - Glory Finder
@@ -49109,10 +49110,11 @@ MonoBehaviour:
   - Elf Assassin
   - Friend of Beasts
   - Hound Master
+  - Wizard
   heroCollection:
   - r
   - r
-  - r
+  - rO
   - r
   - r
   - r
@@ -49123,9 +49125,9 @@ MonoBehaviour:
   - p
   - w
   - w
+  - wO
   - w
-  - w
-  - '  wm'
+  - wmTO
   - w
   - /
   - m
@@ -49138,27 +49140,38 @@ MonoBehaviour:
   - 
   - 
   - 
+  - /
+  - 
+  - /
+  - /
+  - /O
+  - /O
+  - O
+  - /Om
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - /OT
+  - 
+  - 
+  - /
+  - ' /'
   - 
   - 
   - /
   - /
-  - /
-  - /
-  - 
-  - /
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
   - 
   - 
   - /
@@ -49171,16 +49184,6 @@ MonoBehaviour:
   - 
   - 
   - 
-  - 
-  - /
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - /
-  - /
 --- !u!1 &1450109798
 GameObject:
   m_ObjectHideFlags: 0
@@ -58870,7 +58873,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -245, y: 115}
+  m_AnchoredPosition: {x: -156, y: 115}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1689101843
@@ -58919,7 +58922,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: r
+  m_text: ' rO'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dae596359fc526f48a2fc2a593eb3566, type: 2}
   m_sharedMaterial: {fileID: 3315310041400491883, guid: dae596359fc526f48a2fc2a593eb3566,
@@ -58955,7 +58958,7 @@ MonoBehaviour:
   m_fontSizeMin: 3
   m_fontSizeMax: 40
   m_fontStyle: 0
-  m_textAlignment: 514
+  m_textAlignment: 513
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0.6
@@ -58986,13 +58989,13 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 19.73879, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 1689101844}
-    characterCount: 1
+    characterCount: 4
     spriteCount: 0
-    spaceCount: 0
-    wordCount: 1
+    spaceCount: 2
+    wordCount: 2
     linkCount: 0
     lineCount: 1
     pageCount: 1
@@ -71553,7 +71556,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 595, y: 115}
+  m_AnchoredPosition: {x: 686, y: 115}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2099481178
@@ -71638,7 +71641,7 @@ MonoBehaviour:
   m_fontSizeMin: 3
   m_fontSizeMax: 40
   m_fontStyle: 0
-  m_textAlignment: 514
+  m_textAlignment: 513
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0.6
@@ -71669,7 +71672,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 18.427467, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 2099481179}
     characterCount: 1

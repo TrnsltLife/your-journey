@@ -36,7 +36,7 @@ internal class Heroes
 
         new Hero(18){name="Rider-king", sex = Sex.MALE, race=Race.MAN, role=Role.HORSE_LORD},
         new Hero(19){name="Horse lord", sex = Sex.MALE, race=Race.MAN, role=Role.HORSE_LORD},
-        new Hero(20){name="Mounted princess", sex = Sex.FEMALE, race=Race.MAN, maxHanded=3, role=Role.SHIELDMAIDEN },
+        new Hero(20){name="Mounted princess", sex = Sex.FEMALE, race=Race.MAN, role=Role.SHIELDMAIDEN },
         new Hero(21){name="Mounted warrior", sex = Sex.MALE, race=Race.MAN, role=Role.HORSE_LORD },
         new Hero(22){name="Alatar", sex = Sex.MALE, race=Race.WIZARD, role=Role.DARKFIGHTER, armor=ItemSeries.TRAVEL_GARB, hand1=ItemSeries.CURVED_SWORD, hand2=ItemSeries.WALKING_STICK },
         new Hero(23){name="Pallando", sex = Sex.MALE, race=Race.WIZARD, role=Role.SEER, armor=ItemSeries.CLOAK, hand1=ItemSeries.STAFF },
@@ -76,12 +76,12 @@ internal class Heroes
         new Hero(52){name="Warrior", sex = Sex.MALE, race=Race.ELF },
         new Hero(53){name="Paladin", sex = Sex.MALE, race=Race.ELF },
 
-        new Hero(54){name="Female ranger", sex = Sex.FEMALE, race=Race.MAN },
-        new Hero(55){name="Ranger", sex = Sex.MALE, race=Race.MAN },
+        new Hero(54){name="Idraen", sex = Sex.FEMALE, race=Race.MAN },
+        new Hero(55){name="Halbarad", sex = Sex.MALE, race=Race.MAN, role=Role.CHIEFTAIN },
         new Hero(56){name="Ranger", sex = Sex.MALE, race=Race.MAN },
         new Hero(57){name="Archer", sex = Sex.MALE, race=Race.MAN },
-        new Hero(58){name="Blade master", sex = Sex.MALE, race=Race.MAN },
-        new Hero(59){name="Adventurer", sex = Sex.MALE, race=Race.MAN },
+        new Hero(58){name="Amarthiul", sex = Sex.MALE, race=Race.MAN, role=Role.WARRIOR, armor=ItemSeries.HAUBERK, hand1=ItemSeries.BROADSWORD },
+        new Hero(59){name="Thurindir", sex = Sex.MALE, race=Race.MAN, role=Role.TRACKER, hand1=ItemSeries.KNIFE },
 
         new Hero(60){name="Elven archer", sex = Sex.MALE, race=Race.ELF },
         new Hero(61){name="Elven archer", sex = Sex.MALE, race=Race.ELF },
@@ -95,6 +95,7 @@ internal class Heroes
         new Hero(68){name="Elf assassin", sex = Sex.MALE, race=Race.ELF },
         new Hero(69){name="Friend of beasts", sex = Sex.MALE, race=Race.MAN, role=Role.BEAST_FRIEND},
         new Hero(70){name="Hound master", sex = Sex.MALE, race=Race.ELF, role=Role.BEAST_FRIEND },
+        new Hero(71){name="Wizard", sex = Sex.MALE, race=Race.WIZARD, role=Role.MEDDLER, armor=ItemSeries.CLOAK, hand1=ItemSeries.WALKING_STICK, hand2=ItemSeries.SWORD},
 
     };
 }
