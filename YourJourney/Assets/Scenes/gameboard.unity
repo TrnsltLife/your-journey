@@ -7967,7 +7967,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91ac9b6f09f11aa4287667150526f8f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  heroIndex: 3
+  heroIndex: 5
   heroNameText: {fileID: 2136285951}
   thresholdText: {fileID: 1241840377}
   corruptionText: {fileID: 364260092}
