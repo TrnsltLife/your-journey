@@ -63,6 +63,9 @@ public class TileTextureManager : MonoBehaviour
 
 	public static TileManager tileManager = null;
 
+	public static string currentTileTexturePack = "";
+	public static string currentTileTexturePackPath = "";
+
     //monsterSkinFileNames:
     //The string values indicate the filename for the corresponding tile texture image
     public static string[] tileTextureLabels = new string[] {"100A", "100B", "101A", "101B", "102A-SP", "102B-SP", "103A-SW", "103B-SW", "104A-SW", "104B-SW",
@@ -99,23 +102,16 @@ public class TileTextureManager : MonoBehaviour
 	public static void LoadDefaultTileTextures()
 	{
         defaultTileMaterials = new Dictionary<string, Material>();
-		Debug.Log("Loading static builtin tile texture packs");
         foreach (var label in tileTextureLabels)
 		{
-			Debug.Log("Load default tile texture: " + label);
             TileAndSide tileAndSide = TileAndSide.FromLabel(label);
 			if(tileAndSide != null)
 			{
 				GameObject tilePrefab = tileManager.GetPrefab(tileAndSide.side, tileAndSide.index);
-				Debug.Log("tilePrefab: " + tilePrefab.name);
                 Transform tileTransform = tilePrefab.transform.Find("tile");
-                Debug.Log("tileTransform: " + tileTransform.name);
                 MeshRenderer renderer = tileTransform.GetComponent<MeshRenderer>();
-                Debug.Log("renderer: " + renderer.name);
                 Material originalMaterial = renderer.sharedMaterial;
-                Debug.Log("originalMaterial: " + originalMaterial.name);
                 Texture originalTexture = originalMaterial.mainTexture; //TODO is this OK or do I need to clone it
-                Debug.Log("originalTexture: " + originalTexture.name);
                 if (tilePrefab != null)
 				{
                     defaultTileMaterials.Add(tileAndSide.ToString(),
@@ -151,8 +147,8 @@ public class TileTextureManager : MonoBehaviour
 		}
 	}
 
-	public static void ApplyTileTextures()
-	{
+    public static void ApplyAllTileTextures()
+    {
         foreach (var tileTextureKV in tileTextures)
         {
             Texture customTexture = tileTextureKV.Value;
@@ -161,20 +157,47 @@ public class TileTextureManager : MonoBehaviour
             if (customTexture != null)
             {
                 Tile tile = tileManager.GetTile(tileAndSide.side, tileAndSide.index);
-				if (tile != null)
-				{
-					Transform tileTransform = tile.gameObject.transform.Find("tile");
-					MeshRenderer renderer = tileTransform.GetComponent<MeshRenderer>();
+                if (tile != null)
+                {
+                    Transform tileTransform = tile.gameObject.transform.Find("tile");
+                    MeshRenderer renderer = tileTransform.GetComponent<MeshRenderer>();
                     float sepiaValue = renderer.material.GetFloat("_sepiaValue");
 
                     // Make a copy of the material so we don't modify the original
                     Material newMaterial = new Material(renderer.material);
-					newMaterial.mainTexture = customTexture;
+                    newMaterial.mainTexture = customTexture;
                     newMaterial.SetFloat("_sepiaValue", sepiaValue);
                     renderer.material = newMaterial;
-				}
+                }
             }
         }
+    }
+
+    public static void ApplyTileTextures()
+	{
+		foreach (var tileGroup in tileManager.GetAllTileGroups())
+		{
+			foreach (var tile in tileGroup.tileList)
+			{
+				Texture customTexture = LoadTileTexture(tile.baseTile.idNumber, tile.baseTile.tileSide);
+
+				if (customTexture != null)
+				{
+					if (tile != null)
+					{
+						Transform tileTransform = tile.gameObject.transform.Find("tile");
+						MeshRenderer renderer = tileTransform.GetComponent<MeshRenderer>();
+						float sepiaValue = renderer.material.GetFloat("_sepiaValue");
+
+						// Make a copy of the material so we don't modify the original
+						Material newMaterial = new Material(renderer.material);
+						newMaterial.mainTexture = customTexture;
+						newMaterial.SetFloat("_sepiaValue", sepiaValue);
+						renderer.material = newMaterial;
+					}
+				}
+			}
+		}
     }
 
     public static void ApplyTileTexture(Tile tile)
@@ -226,7 +249,46 @@ public class TileTextureManager : MonoBehaviour
 		return tileTexturePackDirectories;
 	}
 
-	public static void LoadTileTextures(string tileTexturePackName)
+    /// <summary>
+    /// Set the tile texture pack to use for the gameboard, and then apply the textures to only the tiles that are currently on the board.
+    /// </summary>
+    /// <param name="tileTexturePackName"></param>
+    public static void SetTileTexturePack(string tileTexturePackName)
+    {
+        if (string.IsNullOrEmpty(tileTexturePackName)) return;
+        currentTileTexturePack = tileTexturePackName;
+        currentTileTexturePackPath = Path.Combine(FileManager.BasePath(false), "Tiles", tileTexturePackName);
+        ApplyTileTextures();
+    }
+
+	/// <summary>
+	/// Used to load the tile texture for a single tile
+	/// </summary>
+	/// <param name="index"></param>
+	/// <param name="side"></param>
+	/// <returns></returns>
+	public static Texture LoadTileTexture(int index, string side)
+	{
+        string label = index.ToString() + side;
+		string filename = null;
+		foreach (var tileLabel in tileTextureLabels)
+		{
+			if (tileLabel.StartsWith(label))
+			{
+                filename = tileLabel + ".png";
+                break;
+            }
+		}
+
+        if (Directory.Exists(currentTileTexturePackPath))
+        {
+            var filepath = Path.Combine(currentTileTexturePackPath, filename);
+            tileTextures[label] = LoadTileTexture(filepath);
+        }
+		return tileTextures[label];
+    }
+
+    public static void LoadTileTextures(string tileTexturePackName)
 	{
         RestoreOriginalTileTextures();
 
