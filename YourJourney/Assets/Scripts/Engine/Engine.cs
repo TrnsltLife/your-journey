@@ -122,8 +122,14 @@ public class Engine : MonoBehaviour
 		SkinsManager.LoadSkins(Bootstrap.GetSkinpack());
 		OnSkinpackUpdate(Bootstrap.GetSkinpack());
 
-		//Load Translations
-		LanguageManager.LoadLanguage(Bootstrap.GetLanguage());
+        //Load Tile Textures
+        var tileTextureManager = GetComponent<TileTextureManager>();
+        tileTextureManager.Awake(); //not sure why this is needed but it is. Otherwise it hasn't awoken before the next call which then fails because of a null pointer.
+        TileTextureManager.LoadTileTextures(Bootstrap.GetTileTexturePack());
+        OnTileTextureUpdate(Bootstrap.GetTileTexturePack());
+
+        //Load Translations
+        LanguageManager.LoadLanguage(Bootstrap.GetLanguage());
 		OnLanguageUpdate(Bootstrap.GetLanguage());
 		LanguageManager.AssignScenarioTranslations(scenario.translationObserver.ToList());
 
@@ -481,7 +487,7 @@ public class Engine : MonoBehaviour
 
 	public void OnShowSettings()
 	{
-		settingsDialog.Show("settings.QuitToTitle", "Quit to Title", OnLanguageUpdate, OnQuit, OnSkinpackUpdate );
+		settingsDialog.Show("settings.QuitToTitle", "Quit to Title", OnLanguageUpdate, OnQuit, OnSkinpackUpdate, OnTileTextureUpdate );
 	}
 
 	public void OnQuit()
@@ -511,7 +517,19 @@ public class Engine : MonoBehaviour
 		monsterManager.UpdateSkins();
     }
 
-	public void OnLanguageUpdate(string languageName)
+	public void OnTileTextureUpdate(string tileTexturePackName)
+	{
+        Debug.Log("Engine.OnTileTextureUpdate(" + tileTexturePackName + ")");
+        TileTextureManager.LoadTileTextures(tileTexturePackName);
+
+		//TODO: Update any existing Tiles?
+
+		//TODO: Update all the Tile prefabs
+		//MonsterManager monsterManager = FindObjectOfType<MonsterManager>();
+		// monsterManager.UpdateSkins();
+    }
+
+    public void OnLanguageUpdate(string languageName)
 	{
 		//Debug.Log("Engine.OnLanguageUpdate(" + languageName + ")");
 		LanguageManager.LoadLanguage(languageName);

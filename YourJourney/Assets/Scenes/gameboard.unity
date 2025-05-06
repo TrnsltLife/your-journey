@@ -9119,6 +9119,7 @@ GameObject:
   - component: {fileID: 965560143}
   - component: {fileID: 965560145}
   - component: {fileID: 965560146}
+  - component: {fileID: 965560147}
   m_Layer: 0
   m_Name: Engine
   m_TagString: Untagged
@@ -9517,6 +9518,18 @@ MonoBehaviour:
       sprite: {fileID: 21300000, guid: 531b7dae24dc2a54ea4cf15a83519486, type: 3}
     - name: orc-hunter-1
       sprite: {fileID: 21300000, guid: 98b77c7b77dc72a40adc4c743dfdfc2e, type: 3}
+--- !u!114 &965560147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965560135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d846c82e1def46249bb5dc6826902770, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &966050120
 GameObject:
   m_ObjectHideFlags: 0

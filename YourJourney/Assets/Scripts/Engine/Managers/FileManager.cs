@@ -242,8 +242,10 @@ public class FileManager
 
 	public static Campaign LoadCampaign( string campaignGUID )
 	{
-		if ( campaignGUID == "Saves" || campaignGUID == "Skins" || campaignGUID == "Languages")
+		if (new string[] { "Exports", "Languages", "Saves", "Skins", "Tiles" }.Contains(campaignGUID))
+		{
 			return null;
+		}
 
 		string campaignPath = Path.Combine(BasePath(false), campaignGUID);
 		string json = "";

@@ -159,8 +159,12 @@ public class Bootstrap
     {
 		return PlayerPrefs.GetString("language", SettingsDialog.defaultLanguage);
     }
+    public static string GetTileTexturePack()
+    {
+        return PlayerPrefs.GetString("tileTexturePack", SettingsDialog.defaultTileTexturePack);
+    }
 
-	public static Tuple<int, int, int, int, int, int, string, Tuple<string>> LoadSettings()
+    public static Tuple<int, int, int, int, int, int, string, Tuple<string, string>> LoadSettings()
 	{
 		int music = PlayerPrefs.GetInt( "music", 1 );
 		int vignette = PlayerPrefs.GetInt( "vignette", 1 );
@@ -170,14 +174,15 @@ public class Bootstrap
 		int fullscreen = PlayerPrefs.GetInt("fullscreen", 1);
 		string skinpack = PlayerPrefs.GetString("skinpack", SettingsDialog.defaultSkinpack);
 		string language = PlayerPrefs.GetString("language", SettingsDialog.defaultLanguage);
+		string tileTexturePack = PlayerPrefs.GetString("tileTexturePack", SettingsDialog.defaultTileTexturePack);
 
-		LanguageManager.DiscoverLanguageFiles();
+        LanguageManager.DiscoverLanguageFiles();
 		LanguageManager.UpdateCurrentLanguage(language);
 
-		return new Tuple<int, int, int, int, int, int, string, Tuple<string>>( music, vignette, color, width, height, fullscreen, skinpack, new Tuple<string>(language) );
+		return new Tuple<int, int, int, int, int, int, string, Tuple<string, string>>( music, vignette, color, width, height, fullscreen, skinpack, new Tuple<string, string>(language, tileTexturePack) );
 	}
 
-	public static void SaveSettings( Tuple<int, int, int, int, int, int, string, Tuple<string>> prefs )
+	public static void SaveSettings( Tuple<int, int, int, int, int, int, string, Tuple<string, string>> prefs )
 	{
 		PlayerPrefs.SetInt( "music", prefs.Item1 );
 		PlayerPrefs.SetInt( "vignette", prefs.Item2 );
@@ -187,5 +192,6 @@ public class Bootstrap
 		PlayerPrefs.SetInt("fullscreen", prefs.Item6);
 		PlayerPrefs.SetString("skinpack", prefs.Item7);
 		PlayerPrefs.SetString("language", prefs.Rest.Item1);
-	}
+		PlayerPrefs.SetString("tileTexturePack", prefs.Rest.Item2);
+    }
 }

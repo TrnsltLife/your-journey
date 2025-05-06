@@ -979,14 +979,25 @@ public class TileGroup
 	/// </summary>
 	TokenType HandlePersistentTokenSwap( string eventName )
 	{
+		Debug.Log("HandlePersistentTokenSwap " + eventName);
 		IInteraction persEvent = GlowEngine.FindObjectOfType<InteractionManager>().GetInteractionByName( eventName );
 		if(persEvent == null) { return TokenType.None; }
+
+		Debug.Log("HandlePersistentTokenSwap for " + persEvent.dataName + " trigger: " + persEvent.triggerName + " triggerAfter: " + persEvent.triggerAfterName);
 
 		if ( persEvent is PersistentInteraction )
 		{
 			string delname = ( (PersistentInteraction)persEvent ).eventToActivate;
-			IInteraction delEvent = GlowEngine.FindObjectOfType<InteractionManager>().GetInteractionByName( delname );
-			return delEvent.tokenType;
+			if (delname != null)
+			{
+				Debug.Log("HandlePersistentTokenSwap eventToActivate: " + delname);
+				IInteraction delEvent = GlowEngine.FindObjectOfType<InteractionManager>().GetInteractionByName(delname);
+				if (delEvent != null)
+				{
+					return delEvent.tokenType;
+				}
+			}
+			Debug.Log("Error. Something's wrong with this HandlePersistentTokenSwap event.");
 		}
 
 		return persEvent.tokenType;
