@@ -56,7 +56,7 @@ public class TileTextureManager : MonoBehaviour
 		public Texture texture;
 	}
 
-	public static Dictionary<string, TileTextureEntry> defaultTileTextures;
+	public static Dictionary<string, Material> defaultTileMaterials;
 
 	public static int tileCount = 124; //120 hex tiles + 4 battle tiles
     public static List<String> tileTexturePackDirectories = new List<String>(); //list of directories that contain tile texture packs
@@ -86,7 +86,7 @@ public class TileTextureManager : MonoBehaviour
         //Debug.Log("SkinsManager Awake!");
         tileManager = FindObjectOfType<TileManager>();
         LoadDefaultTileTextures();
-		foreach(var tileTextureEntry in defaultTileTextures)
+		foreach(var tileTextureEntry in defaultTileMaterials)
         {
             //Debug.Log(tileTexturerEntry.name);
         }
@@ -98,7 +98,7 @@ public class TileTextureManager : MonoBehaviour
 
 	public static void LoadDefaultTileTextures()
 	{
-        defaultTileTextures = new Dictionary<string, TileTextureEntry>();
+        defaultTileMaterials = new Dictionary<string, Material>();
 		Debug.Log("Loading static builtin tile texture packs");
         foreach (var label in tileTextureLabels)
 		{
@@ -118,11 +118,8 @@ public class TileTextureManager : MonoBehaviour
                 Debug.Log("originalTexture: " + originalTexture.name);
                 if (tilePrefab != null)
 				{
-                    defaultTileTextures.Add(tileAndSide.ToString(),
-						new TileTextureEntry() { 
-							name = label,
-							texture = originalTexture
-						}
+                    defaultTileMaterials.Add(tileAndSide.ToString(),
+						originalMaterial
 					);
 				}
             }
@@ -131,18 +128,25 @@ public class TileTextureManager : MonoBehaviour
 
     public static void RestoreOriginalTileTextures()
 	{
-        foreach (var tileTextureKV in defaultTileTextures)
+        foreach (var tileMaterialKV in defaultTileMaterials)
 		{
-			Texture originalTexture = tileTextureKV.Value.texture;
-			TileAndSide tileAndSide = TileAndSide.FromLabel(tileTextureKV.Value.name);
+			Material originalMaterial = tileMaterialKV.Value;
+			TileAndSide tileAndSide = TileAndSide.FromLabel(tileMaterialKV.Key);
 
-			if (originalTexture != null)
+			if (originalMaterial != null)
 			{
-				GameObject tilePrefab = tileManager.GetPrefab(tileAndSide.side, tileAndSide.index);
-				Transform tileTransform = tilePrefab.transform.Find("tile");
-				MeshRenderer renderer = tileTransform.GetComponent<MeshRenderer>();
-				Material originalMaterial = renderer.sharedMaterial;
-				originalMaterial.mainTexture = originalTexture;
+				Tile tile = tileManager.GetTile(tileAndSide.side, tileAndSide.index);
+				if (tile != null)
+				{
+					Transform tileTransform = tile.gameObject.transform.Find("tile");
+					MeshRenderer renderer = tileTransform.GetComponent<MeshRenderer>();
+                    float sepiaValue = renderer.material.GetFloat("_sepiaValue");
+
+                    // Make a copy of the material so we don't modify the original
+                    Material newMaterial = new Material(originalMaterial);
+                    newMaterial.SetFloat("_sepiaValue", sepiaValue);
+                    renderer.material = newMaterial;
+				}
 			}
 		}
 	}
@@ -156,16 +160,48 @@ public class TileTextureManager : MonoBehaviour
 
             if (customTexture != null)
             {
-                GameObject tilePrefab = tileManager.GetPrefab(tileAndSide.side, tileAndSide.index);
-                Transform tileTransform = tilePrefab.transform.Find("tile");
-                MeshRenderer renderer = tileTransform.GetComponent<MeshRenderer>();
-                Material originalMaterial = renderer.sharedMaterial;
-                originalMaterial.mainTexture = customTexture;
+                Tile tile = tileManager.GetTile(tileAndSide.side, tileAndSide.index);
+				if (tile != null)
+				{
+					Transform tileTransform = tile.gameObject.transform.Find("tile");
+					MeshRenderer renderer = tileTransform.GetComponent<MeshRenderer>();
+                    float sepiaValue = renderer.material.GetFloat("_sepiaValue");
+
+                    // Make a copy of the material so we don't modify the original
+                    Material newMaterial = new Material(renderer.material);
+					newMaterial.mainTexture = customTexture;
+                    newMaterial.SetFloat("_sepiaValue", sepiaValue);
+                    renderer.material = newMaterial;
+				}
             }
         }
     }
 
-	public static Texture TileTexture(int tileIndex, string tileSide)
+    public static void ApplyTileTexture(Tile tile)
+    {
+		if(tile == null) return;
+
+        string side = tile.baseTile.tileSide;
+		int index = tile.baseTile.idNumber;
+
+		Texture customTexture;
+		tileTextures.TryGetValue(index.ToString() + side, out customTexture);
+
+        if (customTexture != null)
+        {
+            Transform tileTransform = tile.gameObject.transform.Find("tile");
+            MeshRenderer renderer = tileTransform.GetComponent<MeshRenderer>();
+            float sepiaValue = renderer.material.GetFloat("_sepiaValue");
+
+            // Make a copy of the material so we don't modify the original
+            Material newMaterial = new Material(renderer.material);
+            newMaterial.mainTexture = customTexture;
+			newMaterial.SetFloat("_sepiaValue", sepiaValue);
+            renderer.material = newMaterial;
+        }
+    }
+
+    public static Texture TileTexture(int tileIndex, string tileSide)
     {
 		return tileTextures[tileIndex.ToString() + tileSide];
     }
@@ -225,30 +261,15 @@ public class TileTextureManager : MonoBehaviour
 			foreach(var filepath in Directory.GetFiles(tileTexturePackPath))
             {
 				string name = Path.GetFileNameWithoutExtension(filepath);
-                TileSideAndPrefab tileSideAndPrefab = FindTilePrefab(name);
-				if(tileSideAndPrefab != null && tileSideAndPrefab.prefab != null)
+                TileAndSide tileAndSide = TileAndSide.FromLabel(name);
+				if(tileAndSide != null)
                 {
-					tileTextures[tileSideAndPrefab.Label()] = LoadTileTexture(filepath);
+					tileTextures[tileAndSide.ToString()] = LoadTileTexture(filepath);
                 }
             }
 			ApplyTileTextures();
         }
 	}
-
-	public static TileSideAndPrefab FindTilePrefab(string filename)
-    {
-		for(int i = 0; i< tileTextureLabels.Length; i++)
-        {
-            if (filename.StartsWith(tileTextureLabels[i]))
-			{
-				TileAndSide tileAndSide = TileAndSide.FromLabel(filename);
-                GameObject prefab = tileManager.GetPrefab(tileAndSide.side, tileAndSide.index);
-				TileSideAndPrefab tileSideAndPrefab = new TileSideAndPrefab() { index = tileAndSide.index, side = tileAndSide.side, prefab = prefab };
-                return tileSideAndPrefab;
-			}
-        }
-		return null;
-    }
 
 	private static Texture2D LoadTileTexture(string filepath)
 	{

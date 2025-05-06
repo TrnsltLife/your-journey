@@ -36,6 +36,21 @@ public class TileManager : MonoBehaviour
 		interactionManager = FindObjectOfType<InteractionManager>();
 	}
 
+	public Tile GetTile(string side, int id)
+	{
+		foreach(var tileGroup in tileGroupList)
+		{
+            foreach (var tile in tileGroup.tileList)
+            {
+                if (tile.baseTile.idNumber == id && tile.baseTile.tileSide == side)
+                {
+                    return tile;
+                }
+            }
+        }
+		return null;
+	}
+
 	//take an id (101) and return its prefab
 	public GameObject GetPrefab( string side, int id )
 	{

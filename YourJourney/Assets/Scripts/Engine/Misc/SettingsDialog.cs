@@ -117,7 +117,7 @@ public class SettingsDialog : MonoBehaviour
 		skinpackDropdown.SetValueWithoutNotify(selectedSkinpackIndex);
 
         //populate tileTexturePack dropdown
-        string savedtileTexturePack = settings.Item7;
+        string savedtileTexturePack = settings.Rest.Item2;
         tileTexturePackList = TileTextureManager.LoadTileTexturePackDirectories();
         tileTexturePackDropdownList = new List<TMP_Dropdown.OptionData>();
         int selectedtileTexturePackIndex = 0;

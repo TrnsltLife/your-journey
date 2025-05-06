@@ -105,17 +105,18 @@ public class TileGroup
 			//instantiate the tile prefab
 			string side = tileroot.tileSide == "Random" ? ( Random.Range( 1, 101 ) < 50 ? "A" : "B" ) : tileroot.tileSide;
 			Tile tile = Object.Instantiate( tileManager.GetPrefab( side, tileroot.idNumber ), go.transform ).GetComponent<Tile>();
-			tile.gameObject.SetActive( false );
+            tile.gameObject.SetActive( false );
 			tile.baseTile = tileroot;
 			tile.tileGroup = this;
 			tile.chapter = c;
+            TileTextureManager.ApplyTileTexture(tile);
 
-//Show ball/sphere/marker for anchor and connection points for debugging
-//tile.gameObject.SetActive(true);
-//tile.RevealAllAnchorConnectorTokens();
+            //Show ball/sphere/marker for anchor and connection points for debugging
+            //tile.gameObject.SetActive(true);
+            //tile.RevealAllAnchorConnectorTokens();
 
-			//rotate go object
-			tile.transform.parent.localRotation = Quaternion.Euler( 0, tileroot.angle, 0 );
+            //rotate go object
+            tile.transform.parent.localRotation = Quaternion.Euler( 0, tileroot.angle, 0 );
 			//set go's parent
 			tile.transform.parent.transform.parent = containerObject;
 			containerObject.name += " " + tileroot.idNumber.ToString();
@@ -195,22 +196,23 @@ public class TileGroup
 			goc.name = bt.idNumber.ToString();
 
 			Tile tile = Object.Instantiate( tileManager.GetPrefab( bt.tileSide, bt.idNumber ), goc.transform ).GetComponent<Tile>();
-			//Tile tile = tileManager.GetPrefab( h.tileSide, h.idNumber );
-			//set its data
-			//tile.Init();
-			tile.gameObject.SetActive( false );
+            //Tile tile = tileManager.GetPrefab( h.tileSide, h.idNumber );
+            //set its data
+            //tile.Init();
+            tile.gameObject.SetActive( false );
 			//tile.transform.parent = goc.transform;
 			//tile.transform.localPosition = Vector3.zero;
 			tile.chapter = c;
 			tile.baseTile = bt;
 			tile.tileGroup = this;
+            TileTextureManager.ApplyTileTexture(tile);
 
-//Show ball/sphere/marker for anchor and connection points for debugging
-//tile.gameObject.SetActive(true);
-//tile.RevealAllAnchorConnectorTokens();
+            //Show ball/sphere/marker for anchor and connection points for debugging
+            //tile.gameObject.SetActive(true);
+            //tile.RevealAllAnchorConnectorTokens();
 
-			//Set the tile position/coordinates
-			if ( i > 0 )
+            //Set the tile position/coordinates
+            if ( i > 0 )
 			{
 				Vector3 convertedSpace = Vector3.zero;
 				if (tile.baseTile.tileType == TileType.Hex) { convertedSpace = ConvertHexEditorSpaceToGameSpace(tile); }
