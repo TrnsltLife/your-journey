@@ -78,13 +78,21 @@ public class Engine : MonoBehaviour
 		Vignette v;
 		ColorGrading cg;
 		if ( volume.profile.TryGetSettings( out v ) )
-			v.active = settings.Item2 == 1;
-		if ( volume.profile.TryGetSettings( out cg ) )
-			cg.active = settings.Item3 == 1;
-		music.enabled = settings.Item1 == 1;
+            v.active = settings.vignette == 1;
+        if ( volume.profile.TryGetSettings( out cg ) )
+            cg.active = settings.color == 1;
+        music.enabled = settings.music == 1;
+        if (settings.width > 0 && settings.height > 0)
+        {
+            Screen.SetResolution(settings.width, settings.height, settings.fullscreen == 1);
+        }
+        else
+        {
+            Screen.fullScreen = (settings.fullscreen == 1);
+        }
 
-		//load scenario file
-		if ( debug )
+        //load scenario file
+        if ( debug )
 			scenario = Bootstrap.DEBUGLoadLevel();
 		else
 		{

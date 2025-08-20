@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -244,10 +245,10 @@ public class GameState
 	/// </summary>
 	public static string GetFullSavePath( string filename = "" )
 	{
-		string mydocs = Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments );
-		string basePath = Path.Combine( mydocs, "Your Journey", "Saves" );
+		string basePath = FileManager.BasePath(false);
+		basePath = Path.Combine(basePath, "Saves");
 
-		if ( !Directory.Exists( basePath ) )
+        if ( !Directory.Exists( basePath ) )
 		{
 			var di = Directory.CreateDirectory( basePath );
 			if ( di == null )
@@ -258,9 +259,9 @@ public class GameState
 		}
 
 		if ( !string.IsNullOrEmpty( filename ) )
-			basePath = Path.Combine( mydocs, "Your Journey", "Saves", filename );
+            basePath = Path.Combine(basePath, filename);
 
-		return basePath;
+        return basePath;
 	}
 }
 

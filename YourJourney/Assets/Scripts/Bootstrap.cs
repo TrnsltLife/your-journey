@@ -164,34 +164,41 @@ public class Bootstrap
         return PlayerPrefs.GetString("tileTexturePack", SettingsDialog.defaultTileTexturePack);
     }
 
-    public static Tuple<int, int, int, int, int, int, string, Tuple<string, string>> LoadSettings()
-	{
-		int music = PlayerPrefs.GetInt( "music", 1 );
-		int vignette = PlayerPrefs.GetInt( "vignette", 1 );
-		int color = PlayerPrefs.GetInt( "color", 1 );
-		int width = PlayerPrefs.GetInt("width", Screen.currentResolution.width);
-		int height = PlayerPrefs.GetInt("height", Screen.currentResolution.height);
-		int fullscreen = PlayerPrefs.GetInt("fullscreen", 1);
-		string skinpack = PlayerPrefs.GetString("skinpack", SettingsDialog.defaultSkinpack);
-		string language = PlayerPrefs.GetString("language", SettingsDialog.defaultLanguage);
-		string tileTexturePack = PlayerPrefs.GetString("tileTexturePack", SettingsDialog.defaultTileTexturePack);
+    public static Settings LoadSettings()
+    {
+        Settings settings = new Settings
+        {
+            music = PlayerPrefs.GetInt("music", 1),
+            vignette = PlayerPrefs.GetInt("vignette", 1),
+            color = PlayerPrefs.GetInt("color", 1),
+            width = PlayerPrefs.GetInt("width", Screen.currentResolution.width),
+            height = PlayerPrefs.GetInt("height", Screen.currentResolution.height),
+            fullscreen = PlayerPrefs.GetInt("fullscreen", 1),
+            skinpack = PlayerPrefs.GetString("skinpack", SettingsDialog.defaultSkinpack),
+            language = PlayerPrefs.GetString("language", SettingsDialog.defaultLanguage),
+            tileTexturePack = PlayerPrefs.GetString("tileTexturePack", SettingsDialog.defaultTileTexturePack)
+        };
 
+        // keep your existing side effects
         LanguageManager.DiscoverLanguageFiles();
-		LanguageManager.UpdateCurrentLanguage(language);
+        LanguageManager.UpdateCurrentLanguage(settings.language);
 
-		return new Tuple<int, int, int, int, int, int, string, Tuple<string, string>>( music, vignette, color, width, height, fullscreen, skinpack, new Tuple<string, string>(language, tileTexturePack) );
-	}
+        return settings;
+    }
 
-	public static void SaveSettings( Tuple<int, int, int, int, int, int, string, Tuple<string, string>> prefs )
-	{
-		PlayerPrefs.SetInt( "music", prefs.Item1 );
-		PlayerPrefs.SetInt( "vignette", prefs.Item2 );
-		PlayerPrefs.SetInt( "color", prefs.Item3 );
-		PlayerPrefs.SetInt( "width", prefs.Item4 );
-		PlayerPrefs.SetInt ("height", prefs.Item5 );
-		PlayerPrefs.SetInt("fullscreen", prefs.Item6);
-		PlayerPrefs.SetString("skinpack", prefs.Item7);
-		PlayerPrefs.SetString("language", prefs.Rest.Item1);
-		PlayerPrefs.SetString("tileTexturePack", prefs.Rest.Item2);
+    public static void SaveSettings(Settings settings)
+    {
+        PlayerPrefs.SetInt("music", settings.music);
+        PlayerPrefs.SetInt("vignette", settings.vignette);
+        PlayerPrefs.SetInt("color", settings.color);
+        PlayerPrefs.SetInt("width", settings.width);
+        PlayerPrefs.SetInt("height", settings.height);
+        PlayerPrefs.SetInt("fullscreen", settings.fullscreen);
+
+        PlayerPrefs.SetString("skinpack", settings.skinpack ?? "");
+        PlayerPrefs.SetString("language", settings.language ?? "");
+        PlayerPrefs.SetString("tileTexturePack", settings.tileTexturePack ?? "");
+
+        PlayerPrefs.Save(); // ensures it’s flushed to disk
     }
 }

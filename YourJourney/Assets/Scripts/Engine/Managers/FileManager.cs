@@ -102,7 +102,10 @@ public class FileManager
 	public static string BasePath(bool createIfNotExists)
     {
 		string mydocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-		string basePath = Path.Combine(mydocs, "Your Journey");
+#if UNITY_ANDROID && !UNITY_EDITOR
+		mydocs = AndroidUtils.androidBasePathOr(mydocs);
+#endif
+        string basePath = Path.Combine(mydocs, "Your Journey");
 		if (createIfNotExists && !Directory.Exists(basePath))
 		{
 			Directory.CreateDirectory(basePath);
@@ -336,7 +339,6 @@ public class FileManager
 	/// </summary>
 	public static string GetFullPath( string filename )
 	{
-		string mydocs = Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments );
 		string filePath = Path.Combine( BasePath(false), filename );
 
 		return filePath;
@@ -344,7 +346,6 @@ public class FileManager
 
 	public static string GetFullPathWithCampaign( string filename, string campaignGUID )
 	{
-		string mydocs = Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments );
 		string filePath = Path.Combine( BasePath(false), campaignGUID, filename );
 
 		return filePath;

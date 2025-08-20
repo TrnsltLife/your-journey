@@ -68,16 +68,17 @@ public class SettingsDialog : MonoBehaviour
 
 		//populate checkboxes
 		var settings = Bootstrap.LoadSettings();
-		musicToggle.isOn = settings.Item1 == 1;
-		vignetteToggle.isOn = settings.Item2 == 1;
-		colorToggle.isOn = settings.Item3 == 1;
-		fullscreenToggle.isOn = settings.Item6 == 1;
+        musicToggle.isOn = settings.music == 1;
+        vignetteToggle.isOn = settings.vignette == 1;
+        colorToggle.isOn = settings.color == 1;
+        fullscreenToggle.isOn = settings.fullscreen == 1;
 
-		//populate resolutions dropdown
-		Resolution savedResolution = new Resolution();
-		savedResolution.width = settings.Item4;
-		savedResolution.height = settings.Item5;
-		resolutions = Screen.resolutions;
+        //populate resolutions dropdown
+        Resolution savedResolution = new Resolution();
+        savedResolution.width = settings.width;
+        savedResolution.height = settings.height;
+
+        resolutions = Screen.resolutions;
 		resolutionList = new List<TMP_Dropdown.OptionData>();
 		int selectedIndex = 0;
 		foreach (var res in resolutions)
@@ -92,9 +93,9 @@ public class SettingsDialog : MonoBehaviour
 		resolutionDropdown.AddOptions(resolutionList);
 		resolutionDropdown.SetValueWithoutNotify(selectedIndex);
 
-		//populate skinpack dropdown
-		string savedSkinpack = settings.Item7;
-		skinpackList = SkinsManager.LoadSkinpackDirectories();
+        //populate skinpack dropdown
+        string savedSkinpack = settings.skinpack;
+        skinpackList = SkinsManager.LoadSkinpackDirectories();
 		skinpackDropdownList = new List<TMP_Dropdown.OptionData>();
 		int selectedSkinpackIndex = 0;
 
@@ -117,7 +118,7 @@ public class SettingsDialog : MonoBehaviour
 		skinpackDropdown.SetValueWithoutNotify(selectedSkinpackIndex);
 
         //populate tileTexturePack dropdown
-        string savedtileTexturePack = settings.Rest.Item2;
+        string savedtileTexturePack = settings.tileTexturePack;
         tileTexturePackList = TileTextureManager.LoadTileTexturePackDirectories();
         tileTexturePackDropdownList = new List<TMP_Dropdown.OptionData>();
         int selectedtileTexturePackIndex = 0;
@@ -138,9 +139,9 @@ public class SettingsDialog : MonoBehaviour
         tileTexturePackDropdown.SetValueWithoutNotify(selectedtileTexturePackIndex);
 
         //populate language dropdown
-        string savedLanguage = settings.Rest.Item1;
-		//Debug.Log("Saved language is: " + savedLanguage);
-		languageList = LanguageManager.DiscoverLanguageFiles();
+        string savedLanguage = settings.language;
+        //Debug.Log("Saved language is: " + savedLanguage);
+        languageList = LanguageManager.DiscoverLanguageFiles();
 		languageDropdownList = new List<TMP_Dropdown.OptionData>();
 		int selectedLanguageIndex = 0;
 		//languageDropdownList.Add(new TMP_Dropdown.OptionData(defaultLanguage));
@@ -163,41 +164,48 @@ public class SettingsDialog : MonoBehaviour
 	public void OnClose()
 	{
 		//save settings
-		Bootstrap.SaveSettings( new Tuple<int, int, int, int, int, int, string, Tuple<string, string>>(
-			musicToggle.isOn ? 1 : 0,
-			vignetteToggle.isOn ? 1 : 0,
-			colorToggle.isOn ? 1 : 0,
-			GetSelectedResolution().width,
-			GetSelectedResolution().height,
-			fullscreenToggle.isOn ? 1 : 0,
-			GetSelectedSkinpack(),
-			new Tuple<string, string>(GetSelectedLanguage(), GetSelectedTileTexturePack())));
+		Settings settings = new Settings
+		{
+            music = musicToggle.isOn ? 1 : 0,
+            vignette = vignetteToggle.isOn ? 1 : 0,
+            color = colorToggle.isOn ? 1 : 0,
+            width = GetSelectedResolution().width,
+            height = GetSelectedResolution().height,
+            fullscreen = fullscreenToggle.isOn ? 1 : 0,
+            skinpack = GetSelectedSkinpack(),
+            language = GetSelectedLanguage(), 
+			tileTexturePack = GetSelectedTileTexturePack()
+		};
+        Bootstrap.SaveSettings(settings);
 
-		settingsCanvasGroup.DOFade( 0, .25f ).OnComplete( () =>
+        settingsCanvasGroup.DOFade( 0, .25f ).OnComplete( () =>
 		{
 			settingsCanvasGroup.gameObject.SetActive( false );
 		} );
-	}
+    }
 
-	public void OnQuit()
+    public void OnQuit()
 	{
-		//Debug.Log("OnQuit");
-		//save settings
-		Bootstrap.SaveSettings( new Tuple<int, int, int, int, int, int, string, Tuple<string, string>>(
-			musicToggle.isOn ? 1 : 0,
-			vignetteToggle.isOn ? 1 : 0,
-			colorToggle.isOn ? 1 : 0,
-			GetSelectedResolution().width,
-			GetSelectedResolution().height,
-			fullscreenToggle.isOn ? 1 : 0,
-			GetSelectedSkinpack(),
-			new Tuple<string, string>(GetSelectedLanguage(), GetSelectedTileTexturePack())
-			));
+        //Debug.Log("OnQuit");
+        //save settings
+        Settings settings = new Settings
+        {
+            music = musicToggle.isOn ? 1 : 0,
+            vignette = vignetteToggle.isOn ? 1 : 0,
+            color = colorToggle.isOn ? 1 : 0,
+            width = GetSelectedResolution().width,
+            height = GetSelectedResolution().height,
+            fullscreen = fullscreenToggle.isOn ? 1 : 0,
+            skinpack = GetSelectedSkinpack(),
+            language = GetSelectedLanguage(),
+            tileTexturePack = GetSelectedTileTexturePack()
+        };
+        Bootstrap.SaveSettings(settings);
 
-		if (quitAction != null)
+        if (quitAction != null)
 		{
-			//Debug.Log("Quit Action");
-			settingsCanvasGroup.DOFade(0, .25f).OnComplete(() =>
+            //Debug.Log("Quit Action");
+            settingsCanvasGroup.DOFade(0, .25f).OnComplete(() =>
 			{
 				settingsCanvasGroup.gameObject.SetActive(false);
 				quitAction();
@@ -205,8 +213,8 @@ public class SettingsDialog : MonoBehaviour
 		}
 		else
 		{
-			//Debug.Log("Quit App");
-			Application.Quit();
+            //Debug.Log("Quit App");
+            Application.Quit();
 		}
 	}
 
@@ -240,7 +248,12 @@ public class SettingsDialog : MonoBehaviour
 	public void OnResolution()
     {
 		Resolution res = GetSelectedResolution();
-		Screen.SetResolution(res.width, res.height, fullscreenToggle.isOn);
+		if(res.width == 0 || res.height == 0)
+        {
+            //Invalid resolution selected, not changing resolution.
+            return;
+        }
+        Screen.SetResolution(res.width, res.height, fullscreenToggle.isOn);
 		CalculateDialogPosition();
 	}
 
@@ -279,12 +292,19 @@ public class SettingsDialog : MonoBehaviour
 
 	private Resolution GetSelectedResolution()
     {
-		int index = resolutionDropdown.GetComponent<TMP_Dropdown>().value;
-		string[] resString = resolutionDropdown.options[index].text.Split('x');
-		Resolution res = new Resolution();
-		res.width = Int32.Parse(resString[0]);
-		res.height = Int32.Parse (resString[1]);
-		return res;
+        int index = resolutionDropdown.GetComponent<TMP_Dropdown>().value;
+        Resolution res = new Resolution();
+		try
+		{
+			string[] resString = resolutionDropdown.options[index].text.Split('x');
+			if (resString.Length == 2)
+			{
+				res.width = Int32.Parse(resString[0]);
+				res.height = Int32.Parse(resString[1]);
+			}
+		}
+		catch (Exception e) { }
+        return res;
 	}
 
 	private string GetSelectedSkinpack()
