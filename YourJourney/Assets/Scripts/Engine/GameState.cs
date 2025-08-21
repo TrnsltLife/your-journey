@@ -51,7 +51,6 @@ public class GameState
 		interactionState = engine.interactionManager.GetState();
 		camState = GlowEngine.FindObjectOfType<CamControl>().GetState();
 
-		//string basePath = Path.Combine( Environment.ExpandEnvironmentVariables( "%userprofile%" ), "Documents", "Your Journey", "Saves" );
 		string basePath = GetFullSavePath();
 		if ( basePath is null )
 			return;
@@ -136,9 +135,6 @@ public class GameState
 	/// </summary>
 	public static GameState LoadState( string filename, Scenario s = null )
 	{
-		//string basePath = Path.Combine( Environment.ExpandEnvironmentVariables( "%userprofile%" ), "Documents", "Your Journey", "Saves" );
-		//string inpath = Path.Combine( basePath, filename );
-
 		try
 		{
 			string json = "";

@@ -8,7 +8,11 @@ public class NameGameDialog : MonoBehaviour
 	public CanvasGroup canvasGroup;
 	public TextMeshProUGUI gameName;
 
-	RectTransform rect;
+#if UNITY_ANDROID && !UNITY_EDITOR
+	private TouchScreenKeyboard keyboard;
+#endif
+
+    RectTransform rect;
 	Vector2 ap;
 	Vector3 sp;
 	Action<string> onYes = null;
@@ -39,11 +43,24 @@ public class NameGameDialog : MonoBehaviour
 
 		rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		canvasGroup.gameObject.transform.DOMoveY( sp.y, .75f );
-	}
 
-	public void OnYes()
+#if UNITY_ANDROID && !UNITY_EDITOR
+		keyboard = TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default, false, false, false, true );
+		TouchScreenKeyboard.hideInput = true;
+#endif
+    }
+
+    public void OnYes()
 	{
-		if ( string.IsNullOrEmpty( gameName.text.Trim() ) )
+#if UNITY_ANDROID && !UNITY_EDITOR
+		if (keyboard != null )
+		{
+			gameName.text = keyboard.text;
+		}
+		keyboard = null;
+#endif
+
+        if ( string.IsNullOrEmpty( gameName.text.Trim() ) )
 			return;
 
 		isChangingName = false;
@@ -57,7 +74,11 @@ public class NameGameDialog : MonoBehaviour
 
 	public void OnNo()
 	{
-		isChangingName = false;
+#if UNITY_ANDROID && !UNITY_EDITOR
+		keyboard = null;
+#endif
+
+        isChangingName = false;
 		onNo?.Invoke();
 
 		canvasGroup.DOFade( 0, .25f ).OnComplete( () =>
@@ -70,36 +91,43 @@ public class NameGameDialog : MonoBehaviour
 	{
 		if ( isChangingName )
 		{
-			//if ( Input.GetKeyDown( KeyCode.Escape ) )
-			//{
-			//	isChangingName = false;
-			//	gameName.color = Color.white;
-			//	gameName.text = tempName;
-			//	return;
-			//}
-
-			foreach ( char c in Input.inputString )
+#if UNITY_ANDROID && !UNITY_EDITOR
+			if (keyboard != null )
 			{
-				if ( c == '\b' ) // has backspace/delete been pressed?
-				{
-					if ( gameName.text.Length != 0 )
-					{
-						gameName.text = gameName.text.Substring( 0, gameName.text.Length - 1 );
-					}
-				}
-				else if ( ( c == '\n' ) || ( c == '\r' ) ) // enter/return
-				{
-					if ( !string.IsNullOrEmpty( gameName.text.Trim() ) )
-					{
-						//valid string
-						OnYes();
-					}
-				}
-				else
-				{
-					gameName.text += c;
-				}
+				gameName.text = keyboard.text;
 			}
-		}
-	}
+#else
+            //if ( Input.GetKeyDown( KeyCode.Escape ) )
+            //{
+            //	isChangingName = false;
+            //	gameName.color = Color.white;
+            //	gameName.text = tempName;
+            //	return;
+            //}
+
+            foreach (char c in Input.inputString)
+            {
+                if (c == '\b') // has backspace/delete been pressed?
+                {
+                    if (gameName.text.Length != 0)
+                    {
+                        gameName.text = gameName.text.Substring(0, gameName.text.Length - 1);
+                    }
+                }
+                else if ((c == '\n') || (c == '\r')) // enter/return
+                {
+                    if (!string.IsNullOrEmpty(gameName.text.Trim()))
+                    {
+                        //valid string
+                        OnYes();
+                    }
+                }
+                else
+                {
+                    gameName.text += c;
+                }
+            }
+#endif
+        }
+    }
 }

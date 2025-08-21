@@ -37,7 +37,11 @@ public class SelectHeroes : MonoBehaviour
 	int nameIndex = -1;
 	TitleMetaData titleMetaData;
 
-	public void ActivateScreen( TitleMetaData metaData )
+#if UNITY_ANDROID && !UNITY_EDITOR
+	private TouchScreenKeyboard keyboard;
+#endif
+
+    public void ActivateScreen( TitleMetaData metaData )
 	{
 		titleMetaData = metaData;
 		gameObject.SetActive( true );
@@ -68,11 +72,16 @@ public class SelectHeroes : MonoBehaviour
 		if ( nameIndex != -1 )
 		{
 			heroNameText[nameIndex].color = Color.white;
-			heroNameText[nameIndex].text = tempName;
-			heroName[lineupOffset + nameIndex] = tempName;
-		}
 
-		if (heroCount < maxHeroes || selectedHeroes[lineupIndex]) //Process the click if there are still hero slots left or if we're deselecting
+            //This would reset the name to the original name if the user clicks out of one name change to select a different hero. This is too confusing though.
+            //heroNameText[nameIndex].text = tempName;
+            //heroName[lineupOffset + nameIndex] = tempName;
+
+            //Instead, save the name when the user clicks enter or clicks out of the name field.
+            Bootstrap.SaveHeroName(lineupOffset + nameIndex, heroNameText[nameIndex].text);
+        }
+
+        if (heroCount < maxHeroes || selectedHeroes[lineupIndex]) //Process the click if there are still hero slots left or if we're deselecting
 		{
 			ColorBlock cb = heroButtons[index].colors;
 			selectedHeroes[lineupIndex] = !selectedHeroes[lineupIndex];
@@ -191,9 +200,14 @@ public class SelectHeroes : MonoBehaviour
 		heroNameText[index].color = Color.green;
 		tempName = heroNameText[nameIndex].text;
 		heroNameText[nameIndex].text = "";
-	}
 
-	public void OnNext()
+#if UNITY_ANDROID && !UNITY_EDITOR
+		keyboard = TouchScreenKeyboard.Open(tempName, TouchScreenKeyboardType.Default, false, false, false, true );
+		TouchScreenKeyboard.hideInput = false;
+#endif
+    }
+
+    public void OnNext()
 	{
 		beginButton.interactable = backButton.interactable = false;
 		List<CharacterSheet> characterSheets = titleMetaData?.campaignState?.startingCharacterSheets?[0]; //get List<CharacterSheet> at index [0], i.e. the first scenario. May be null.
@@ -286,7 +300,29 @@ public class SelectHeroes : MonoBehaviour
 	{
 		if ( isChangingName )
 		{
-			if ( Input.GetKeyDown( KeyCode.Escape ) )
+#if UNITY_ANDROID && !UNITY_EDITOR
+			if (keyboard != null && keyboard.active)
+			{
+				heroNameText[nameIndex].text = keyboard.text;
+				heroName[lineupOffset + nameIndex] = keyboard.text;
+			}
+			else
+			{
+				isChangingName = false;
+				heroNameText[nameIndex].color = Color.white;
+				if (string.IsNullOrEmpty(heroNameText[nameIndex].text))
+				{
+					//If the name is empty, reset it to the original tempName
+					heroNameText[nameIndex].text = tempName;
+					heroName[lineupOffset + nameIndex] = tempName;
+				}
+				else
+				{
+					Bootstrap.SaveHeroName(lineupOffset + nameIndex, heroNameText[nameIndex].text);
+				}
+			}
+#else
+            if ( Input.GetKeyDown( KeyCode.Escape ) )
 			{
 				isChangingName = false;
 				heroNameText[nameIndex].color = Color.white;
@@ -311,7 +347,8 @@ public class SelectHeroes : MonoBehaviour
 					heroNameText[nameIndex].color = Color.white;
 					if (string.IsNullOrEmpty(heroNameText[nameIndex].text))
 					{
-						heroNameText[nameIndex].text = tempName;
+                        //If the name is empty, reset it to the original tempName
+                        heroNameText[nameIndex].text = tempName;
 						heroName[lineupOffset + nameIndex] = tempName;
 					}
 					else
@@ -325,6 +362,7 @@ public class SelectHeroes : MonoBehaviour
 					heroName[lineupOffset + nameIndex] = heroNameText[nameIndex].text;
 				}
 			}
-		}
-	}
+#endif
+        }
+    }
 }
