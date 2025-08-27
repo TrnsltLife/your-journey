@@ -108,7 +108,11 @@ public class TitleManager : MonoBehaviour
         if ( volume.profile.TryGetSettings( out cg ) )
             cg.active = settings.color == 1;
         music.enabled = settings.music == 1;
-		if (settings.width > 0 && settings.height > 0)
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+		Screen.fullScreen = (settings.fullscreen == 1);
+#else
+        if (settings.width > 0 && settings.height > 0)
 		{
 			Screen.SetResolution(settings.width, settings.height, settings.fullscreen == 1);
 		}
@@ -116,6 +120,7 @@ public class TitleManager : MonoBehaviour
 		{
 			Screen.fullScreen = (settings.fullscreen == 1);
         }
+#endif
 
 		newBcg = newButton.GetComponent<CanvasGroup>();
 		loadBcg = loadButton.GetComponent<CanvasGroup>();

@@ -12,8 +12,8 @@ public class CamControl : MonoBehaviour
 	public PostProcessProfile postProcProf;
 	public PartyPanel partyPanel;
 	public ChroniclePanel chroniclePanel;
-
-	CombatPanel combatPanel;
+	public CombatPanel combatPanel;
+	public SettingsDialog settingsDialog;
 	Camera cam;
 
 	//old Z = -2.40108
@@ -36,7 +36,7 @@ public class CamControl : MonoBehaviour
 		cam.transform.LookAt( transform );
 		targetZoom = cam.transform.localPosition;
 		DOF = Vector3.one;
-		combatPanel = FindObjectOfType<CombatPanel>();
+		//combatPanel = FindObjectOfType<CombatPanel>();
 	}
 
 	public void AdjustSettings(bool isJourneyMap)
@@ -102,7 +102,7 @@ public class CamControl : MonoBehaviour
 		else if (combatPanel.gameObject.activeInHierarchy) return;
 		else if (partyPanel.gameObject.activeInHierarchy) return;
 		else if (chroniclePanel.gameObject.activeInHierarchy) return;
-		else if (FindObjectOfType<Engine>().settingsDialog.gameObject.activeInHierarchy) return;
+		else if (settingsDialog.gameObject.activeInHierarchy) return;
 		else if (FindObjectOfType<ProvokeMessage>().provokeMode) return;
 
 		/*

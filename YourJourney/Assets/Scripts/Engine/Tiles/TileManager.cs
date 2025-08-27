@@ -20,7 +20,7 @@ public class TileManager : MonoBehaviour
 	public ChroniclePanel chroniclePanel;
 	public SettingsDialog settingsDialog;
 
-	CombatPanel combatPanel;
+	public CombatPanel combatPanel;
 	ProvokeMessage provokePanel;
 	InteractionManager interactionManager;
 	bool disableInput = false;

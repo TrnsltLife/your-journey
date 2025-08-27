@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -78,18 +79,32 @@ public class SettingsDialog : MonoBehaviour
         savedResolution.width = settings.width;
         savedResolution.height = settings.height;
 
-        resolutions = Screen.resolutions;
 		resolutionList = new List<TMP_Dropdown.OptionData>();
-		int selectedIndex = 0;
-		foreach (var res in resolutions)
-		{
-			resolutionList.Add(new TMP_Dropdown.OptionData(res.width + "x" + res.height));
-			if(res.width == savedResolution.width && res.height == savedResolution.height)
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+		//Android doesn't return a Screen.resolutions list properly, but it can get the default resolution from Display.main
+        Resolution androidResolution = new Resolution();
+        androidResolution.width = Display.main.systemWidth;
+        androidResolution.height = Display.main.systemHeight;
+		resolutions = new Resolution[1] { androidResolution };
+        resolutionList.Add(new TMP_Dropdown.OptionData(androidResolution.width + "x" + androidResolution.height));
+#else
+		//This gets a list of resolutions on desktop OSes
+        resolutions = Screen.resolutions;
+#endif
+
+        int selectedIndex = 0;
+        foreach (var res in resolutions)
+        {
+            resolutionList.Add(new TMP_Dropdown.OptionData(res.width + "x" + res.height));
+            if (res.width == savedResolution.width && res.height == savedResolution.height)
             {
-				selectedIndex = resolutionList.Count - 1;
+                selectedIndex = resolutionList.Count - 1;
             }
-		}
-		resolutionDropdown.ClearOptions();
+        }
+
+
+        resolutionDropdown.ClearOptions();
 		resolutionDropdown.AddOptions(resolutionList);
 		resolutionDropdown.SetValueWithoutNotify(selectedIndex);
 
@@ -253,7 +268,12 @@ public class SettingsDialog : MonoBehaviour
             //Invalid resolution selected, not changing resolution.
             return;
         }
+#if UNITY_ANDROID && !UNITY_EDITOR
+		//Don't try to change the resolution on Android, it breaks things
+		Screen.fullScreen = fullscreenToggle.isOn;
+#else
         Screen.SetResolution(res.width, res.height, fullscreenToggle.isOn);
+#endif
 		CalculateDialogPosition();
 	}
 

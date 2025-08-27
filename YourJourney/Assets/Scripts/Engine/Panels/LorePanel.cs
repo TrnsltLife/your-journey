@@ -13,6 +13,7 @@ public class LorePanel : MonoBehaviour
 	bool busy = false;
 	int loreacc = 0, xpacc = 0, threatacc = 0;
 	float scalar;
+	float moveBackAmount = 600f;
 	private void Start()
 	{
 		scalar = canvas.scaleFactor;
@@ -53,7 +54,7 @@ public class LorePanel : MonoBehaviour
 
 			var s = DOTween.Sequence();
 			s.Append( panelTF.DOMoveX( 1920f * scalar, .25f ) );
-			s.Append( panelTF.DOMoveX( ( 1920f * scalar ) + ( 405f * scalar ), .25f ).SetDelay( 4 ) );
+			s.Append( panelTF.DOMoveX( ( 1920f * scalar ) + (moveBackAmount * scalar ), .25f ).SetDelay( 4 ) );
 			s.OnComplete( () => busy = false );
 			s.Play();
 		}
@@ -107,7 +108,7 @@ public class LorePanel : MonoBehaviour
 
 			var s = DOTween.Sequence();
 			s.Append( panelTF.DOMoveX( 1920f * scalar, .25f ) );
-			s.Append( panelTF.DOMoveX( ( 1920f * scalar ) + ( 405f * scalar ), .25f ).SetDelay( 4 ) );
+			s.Append( panelTF.DOMoveX( ( 1920f * scalar ) + (moveBackAmount * scalar ), .25f ).SetDelay( 4 ) );
 			s.OnComplete( () => busy = false );
 			s.Play();
 		}

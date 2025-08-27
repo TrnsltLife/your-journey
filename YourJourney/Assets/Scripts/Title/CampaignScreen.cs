@@ -10,7 +10,6 @@ public class CampaignScreen : MonoBehaviour
 	public SelectSaveSlot selectSaveSlot;
 	public SelectHeroes selectHeroes;
 	public CampfireScreen campfireScreen;
-	public StoryBox storyBox; //pop-up window, no longer used
 	public StoryBox storyBoxFormElement;
 	public Image finalFader;
 	public Button continueButton, backButton, continueReplayButton;
@@ -278,20 +277,6 @@ public class CampaignScreen : MonoBehaviour
 		CampfireState campfireState = selectedIndex == 0 ? CampfireState.SETUP : CampfireState.UPGRADE;
 		Debug.Log("REPLAY SCENARIO - CAMPFIRE " + campfireState.ToString());
 		LoadCampfireScreen(campfireState);
-
-		/*
-		if ( !string.IsNullOrEmpty( scenario.specialInstructions ) )
-		{
-			storyBox.Show( scenario.specialInstructions, () =>
-			{
-				LoadCampfireScreen(campfireState);
-			});
-		}
-		else
-		{
-			LoadCampfireScreen(campfireState);
-		}
-		*/
 	}
 
 	public void OnContinueReplay()
@@ -342,7 +327,6 @@ public class CampaignScreen : MonoBehaviour
 	public void OnShowStory()
 	{
 		storyBoxFormElement.storyText.text = campaignState.campaign.storyText;
-		//storyBox.Show( campaignState.campaign.storyText, null );
 	}
 
 	public void OnShowStory(int scenarioIndex)
