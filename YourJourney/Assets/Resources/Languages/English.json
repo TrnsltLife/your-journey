@@ -248,6 +248,9 @@
 	"party.button.Close": "Close",
 	"party.text.XP": "XP: {0}",
 	"party.text.Lore": "Lore: {0}",
+	"party.button.CloseChronicle": "Close",
+	"party.button.NextRound": "Next",
+	"party.button.PreviousRound": "Previous",
 
 	"test.button.Failure": "Failure",
 	"test.button.Success": "Success",

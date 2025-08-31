@@ -465,7 +465,8 @@ public class PartyState
 	public int xpStartValue { get; set; }
 	public int threatThreshold { get; set; }
 	public List<string> chronicle { get; set; }
-	public Queue<Threat> threatStack { get; set; }
+    public List<List<string>> chronicles { get; set; }
+    public Queue<Threat> threatStack { get; set; }
 	public List<FogState> fogList { get; set; } = new List<FogState>();
 
 	public static PartyState GetState( Engine engine )
@@ -491,7 +492,7 @@ public class PartyState
 			isDead = Bootstrap.isDead,
 			fogList = engine.GetFogState(),
 			fileVersion = engine.scenario.fileVersion,
-			chronicle = engine.scenario.chronicle
+			chronicles = engine.scenario.chronicles
 		};
 	}
 
@@ -512,7 +513,7 @@ public class PartyState
 		Bootstrap.loreCount = loreCount;
 		Bootstrap.xpCount = xpCount;
 
-		Engine.currentScenario.chronicle = chronicle;
+		Engine.currentScenario.chronicles = chronicles;
 	}
 }
 

@@ -394,6 +394,7 @@ public class ShadowPhaseManager : MonoBehaviour
 
 		FindObjectOfType<MonsterManager>().ReadyAll();
 		//ACTION PHASE announcement
+		Scenario.AddChronicleRound();
 		phaseNotification.Show( Translate("dialog.text.ActionPhase", "Action Phase") );
 
 		DOTween.To( () => alphaValue, x =>
