@@ -139,8 +139,8 @@ public class Engine : MonoBehaviour
         //Load Tile Textures
         var tileTextureManager = GetComponent<TileTextureManager>();
         tileTextureManager.Awake(); //not sure why this is needed but it is. Otherwise it hasn't awoken before the next call which then fails because of a null pointer.
-		//TileTextureManager.LoadTileTextures(Bootstrap.GetTileTexturePack());
-		TileTextureManager.SetTileTexturePack(Bootstrap.GetTileTexturePack());
+		TileTextureManager.LoadTileTextures(Bootstrap.GetTileTexturePack()); //This is needed to re-enable tile textures when loading the game
+		//TileTextureManager.SetTileTexturePack(Bootstrap.GetTileTexturePack()); //This line doesn't work to re-enable tile textures, because it queries tiles on-screen, and presumably they haven't been loaded/instantiated yet at this point
         OnTileTextureUpdate(Bootstrap.GetTileTexturePack());
 
         //Load Translations
@@ -548,12 +548,6 @@ public class Engine : MonoBehaviour
         Debug.Log("Engine.OnTileTextureUpdate(" + tileTexturePackName + ")");
         //TileTextureManager.LoadTileTextures(tileTexturePackName);
         TileTextureManager.SetTileTexturePack(tileTexturePackName);
-
-        //TODO: Update any existing Tiles?
-
-        //TODO: Update all the Tile prefabs
-        //MonsterManager monsterManager = FindObjectOfType<MonsterManager>();
-        // monsterManager.UpdateSkins();
     }
 
     public void OnLanguageUpdate(string languageName)

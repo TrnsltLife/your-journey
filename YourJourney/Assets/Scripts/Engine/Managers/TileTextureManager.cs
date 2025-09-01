@@ -147,6 +147,7 @@ public class TileTextureManager : MonoBehaviour
 		}
 	}
 
+
     public static void ApplyAllTileTextures()
     {
         foreach (var tileTextureKV in tileTextures)
@@ -258,7 +259,14 @@ public class TileTextureManager : MonoBehaviour
         if (string.IsNullOrEmpty(tileTexturePackName)) return;
         currentTileTexturePack = tileTexturePackName;
         currentTileTexturePackPath = Path.Combine(FileManager.BasePath(false), "Tiles", tileTexturePackName);
-        ApplyTileTextures();
+		if (tileTexturePackName.StartsWith("*"))
+		{
+			RestoreOriginalTileTextures();
+		}
+		else
+		{
+			ApplyTileTextures();
+		}
     }
 
 	/// <summary>
