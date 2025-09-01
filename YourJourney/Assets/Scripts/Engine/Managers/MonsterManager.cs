@@ -15,8 +15,12 @@ public class MonsterManager : MonoBehaviour
 	public Sprite[] banners, eliteBanners;
 	public RectTransform sbRect;
 
+	public static readonly int SCROLL_INCREMENT = 175;
+	public static readonly int INITIAL_SCROLL_OFFSET = -517;
+
+
 	Queue<Sprite> bannerQueue, eliteBannerQueue;
-	int scrollOffset = -517;
+	int scrollOffset = INITIAL_SCROLL_OFFSET;
 	bool scrollReady = true;
 	[HideInInspector]
 	public RectTransform attachRect;
@@ -100,7 +104,7 @@ public class MonsterManager : MonoBehaviour
 		m.currentHealth = new int[3] { m.health, m.health, m.health };
 		GameObject go = Instantiate( monsterButtonPrefab, buttonAttach );
 
-		go.transform.localPosition = new Vector3( ( 175 * monsterList.Count ), 25, 0 );
+		go.transform.localPosition = new Vector3( (SCROLL_INCREMENT * monsterList.Count ), 25, 0 );
 		go.GetComponent<MonsterButton>().monster = m;
 		go.GetComponent<MonsterButton>().AddToBar( m.isElite, this );
 
@@ -112,7 +116,7 @@ public class MonsterManager : MonoBehaviour
 		foreach ( Transform child in buttonAttach )
 		{
 			if ( child.transform.position.x > sbRect.position.x + ( 1000f * scalar ) )//off the edge
-				scrollOffset -= 175;
+				scrollOffset -= SCROLL_INCREMENT;
 		}
 		buttonAttach.DOLocalMoveX( scrollOffset, .5f ).SetEase( Ease.InOutQuad ).OnComplete( () => { scrollReady = true; } );
 	}
@@ -130,15 +134,15 @@ public class MonsterManager : MonoBehaviour
 
 	public void OnScrollLeft()
 	{
-		//leftB.interactable = GetLastButtonPos() != -517;
+        //leftB.interactable = GetLastButtonPos() != INITIAL_SCROLL_OFFSET;
 
-		if ( scrollOffset == -517 )
+        if ( scrollOffset == INITIAL_SCROLL_OFFSET)
 			return;
 
 		if ( scrollReady )
 		{
 			scrollReady = false;
-			scrollOffset += 175;
+			scrollOffset += SCROLL_INCREMENT;
 			buttonAttach.DOLocalMoveX( scrollOffset, .5f ).SetEase( Ease.InOutQuad ).OnComplete( () => { scrollReady = true; } );
 		}
 	}
@@ -153,18 +157,45 @@ public class MonsterManager : MonoBehaviour
 		if ( scrollReady )
 		{
 			scrollReady = false;
-			scrollOffset -= 175;
+			scrollOffset -= SCROLL_INCREMENT;
 			buttonAttach.DOLocalMoveX( scrollOffset, .5f ).SetEase( Ease.InOutQuad ).OnComplete( () => { scrollReady = true; } );
 		}
 	}
 
-	float GetFirstButtonPos()
+	public void ScrollToMonster(int monsterIndex, MonsterButton monsterButton)
+	{
+		int sixthOffset = INITIAL_SCROLL_OFFSET + (5 * SCROLL_INCREMENT);
+
+		//offscreen to the left; scroll it to the first position on the left
+		if (monsterButton.transform.position.x < sbRect.position.x)
+		{
+            scrollReady = false;
+			int prevOffset = scrollOffset;
+            scrollOffset = INITIAL_SCROLL_OFFSET - (monsterIndex * SCROLL_INCREMENT);
+			Debug.Log("ScrollToMonster " + monsterIndex + " (left->) monster.x " + monsterButton.transform.position.x +
+				" / sbRect.x " + sbRect.position.x + " offset " + prevOffset + "->" + scrollOffset);
+            buttonAttach.DOLocalMoveX(scrollOffset, .5f).SetEase(Ease.InOutQuad).OnComplete(() => { scrollReady = true; });
+        }
+		//offscreen to the right; scroll it to the last position on the right
+        else if (monsterButton.transform.position.x > (sbRect.position.x + (1000f * scalar)))
+        {
+			scrollReady = false;
+			int prevOffset = scrollOffset;
+            scrollOffset = INITIAL_SCROLL_OFFSET - ((monsterIndex-5) * SCROLL_INCREMENT);
+            Debug.Log("ScrollToMonster " + monsterIndex + " (<-right) monster.x " + monsterButton.transform.position.x +
+                " / sbRect.x " + sbRect.position.x + " offset " + prevOffset + "->" + scrollOffset);
+            buttonAttach.DOLocalMoveX(scrollOffset, .5f).SetEase(Ease.InOutQuad).OnComplete(() => { scrollReady = true; });
+        }
+    }
+
+
+    float GetFirstButtonPos()
 	{
 		foreach ( Transform child in buttonAttach )
 			return child.transform.position.x;
 
-		return 10000;//-517;
-	}
+		return 10000;//INITIAL_SCROLL_OFFSET;
+    }
 
 	float GetLastButtonPos()
 	{
@@ -174,9 +205,9 @@ public class MonsterManager : MonoBehaviour
 			buttons.Add( child.GetComponent<MonsterButton>() );
 
 		if ( buttons.Count == 0 )
-			return 0;//-517;
+			return 0;//INITIAL_SCROLL_OFFSET;
 
-		return buttons[buttons.Count - 1].transform.position.x;
+        return buttons[buttons.Count - 1].transform.position.x;
 	}
 
 	/// <summary>
@@ -210,7 +241,7 @@ public class MonsterManager : MonoBehaviour
 				} );
 			}
 			else
-				mb.Regroup( c++ * 175 );
+				mb.Regroup( c++ * SCROLL_INCREMENT);
 		}
 
 		if ( monsterList.Count == 0 )
@@ -218,7 +249,7 @@ public class MonsterManager : MonoBehaviour
 		else
 		{
 			scrollReady = false;
-			scrollOffset = -517;
+			scrollOffset = INITIAL_SCROLL_OFFSET;
 			buttonAttach.DOLocalMoveX( scrollOffset, .5f ).SetEase( Ease.InOutQuad ).OnComplete( () => { scrollReady = true; } );
 		}
 
@@ -270,6 +301,7 @@ public class MonsterManager : MonoBehaviour
 
 	public void SelectMonster( Monster m, bool select )
 	{
+		int monsterIndex = 0;
 		foreach ( Transform child in buttonAttach )
 		{
 			MonsterButton monsterButton = child.GetComponent<MonsterButton>();
@@ -279,8 +311,11 @@ public class MonsterManager : MonoBehaviour
 				if (monster.GUID == m.GUID)
 				{
 					monsterButton.ToggleSelect(select);
+					ScrollToMonster(monsterIndex, monsterButton);
+					return;
 				}
             }
+			monsterIndex++;
 		}
 	}
 
@@ -335,7 +370,7 @@ public class MonsterManager : MonoBehaviour
 
 			GameObject go = Instantiate( monsterButtonPrefab, buttonAttach );
 
-			go.transform.localPosition = new Vector3( ( 175 * monsterList.Count ), 25, 0 );
+			go.transform.localPosition = new Vector3( (SCROLL_INCREMENT * monsterList.Count ), 25, 0 );
 			go.GetComponent<MonsterButton>().monster = m;
 			go.GetComponent<MonsterButton>().AddToBar( m.isElite, this );
 
@@ -350,13 +385,13 @@ public class MonsterManager : MonoBehaviour
 			foreach ( Transform child in buttonAttach )
 			{
 				if ( child.transform.position.x > sbRect.position.x + ( 1000f * scalar ) )//off the edge
-					scrollOffset -= 175;
+					scrollOffset -= SCROLL_INCREMENT;
 			}
 			//buttonAttach.DOLocalMoveX( scrollOffset, .5f ).SetEase( Ease.InOutQuad ).OnComplete( () => { scrollReady = true; } );
 		}
 
-		scrollOffset = -517;
-		buttonAttach.localPosition = buttonAttach.localPosition.X( -517 );
+		scrollOffset = INITIAL_SCROLL_OFFSET;
+		buttonAttach.localPosition = buttonAttach.localPosition.X( INITIAL_SCROLL_OFFSET );
 
 		monsterPool = monsterState.monsterPool;
 
