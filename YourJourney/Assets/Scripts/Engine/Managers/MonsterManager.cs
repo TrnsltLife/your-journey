@@ -272,11 +272,15 @@ public class MonsterManager : MonoBehaviour
 	{
 		foreach ( Transform child in buttonAttach )
 		{
+			MonsterButton monsterButton = child.GetComponent<MonsterButton>();
+			Monster monster = monsterButton.monster;
 			//if ( child.name.Contains( "MonsterButton" ) )
 			{
-				if ( child.GetComponent<MonsterButton>().monster.GUID == m.GUID )
-					child.GetComponent<MonsterButton>().ToggleSelect( select );
-			}
+				if (monster.GUID == m.GUID)
+				{
+					monsterButton.ToggleSelect(select);
+				}
+            }
 		}
 	}
 
@@ -355,6 +359,12 @@ public class MonsterManager : MonoBehaviour
 		buttonAttach.localPosition = buttonAttach.localPosition.X( -517 );
 
 		monsterPool = monsterState.monsterPool;
+
+		//Enable scrolling when we're restoring from a save and there are more than 6 monsters
+		if (monsterState.monsterList.Count > 6)
+		{
+			scrollReady = true;
+		}
 	}
 
 	public void LoadBanners()
