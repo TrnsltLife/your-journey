@@ -56,7 +56,7 @@ public class ChroniclePanel : MonoBehaviour
 
 	void UpdateText()
 	{
-        SetText(string.Join("\n<align=center><font=\"Icon\"><b>L  L  L</b></font></align>\n", chronicles[currentRound]));
+        SetText("[" + (currentRound + 1) + "]\n" + string.Join("\n<align=center><font=\"Icon\">L  L  L</font></align>\n", chronicles[currentRound]));
     }
 
 	void SetText(string t)
