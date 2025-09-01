@@ -293,12 +293,22 @@ public class CamControl : MonoBehaviour
 			float d = Vector2.Distance( dragStart, Input.mousePosition );
 			float delta = GlowEngine.RemapValue( d, 0, 50, 0, rotateSpeed );
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+			//Two-finger drag for rotation on Android is the opposite of what would be expected unless you change the sign from the Desktop version of the code.
 			if ( Input.mousePosition.x < dragStart.x )
+				rotateAmount = delta;
+			else if ( Input.mousePosition.x > dragStart.x )
+				rotateAmount = -delta;
+			else
+				rotateAmount = 0;
+#else
+            if ( Input.mousePosition.x < dragStart.x )
 				rotateAmount = -delta;
 			else if ( Input.mousePosition.x > dragStart.x )
 				rotateAmount = delta;
 			else
 				rotateAmount = 0;
+#endif
 
 			transform.DORotate( new Vector3( 0, rotateAmount, 0 ), rotateDuration, RotateMode.WorldAxisAdd );
 			dragStart = Input.mousePosition;
