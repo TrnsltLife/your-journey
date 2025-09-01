@@ -128,9 +128,10 @@ public class Engine : MonoBehaviour
 		LoadDefaultMonsterActivations();
 		LoadDefaultMonsterModifiers();
 		LoadCustomMonsterModifiers();
+		FixMonsterGuids();
 
-		//Load Skins
-		var skinsManager = GetComponent<SkinsManager>();
+        //Load Skins
+        var skinsManager = GetComponent<SkinsManager>();
 		skinsManager.Awake(); //not sure why this is needed but it is. Otherwise it hasn't awoken before the next call which then fails because of a null pointer.
 		SkinsManager.LoadSkins(Bootstrap.GetSkinpack());
 		OnSkinpackUpdate(Bootstrap.GetSkinpack());
@@ -228,7 +229,18 @@ public class Engine : MonoBehaviour
 		//Debug.Log("LoadCustomMonsterModifiers() finished");
 	}
 
-	IEnumerator BeginGame()
+    private void FixMonsterGuids()
+    {
+        foreach (ThreatInteraction threat in scenario.interactionObserver.Where(it => it.interactionType == InteractionType.Threat))
+        {
+            foreach (Monster monster in threat.monsterCollection)
+            {
+				monster.FixGuid();
+            }
+        }
+    }
+
+    IEnumerator BeginGame()
 	{
 		Debug.Log("BeginGame");
 		while ( !doneLoading )
