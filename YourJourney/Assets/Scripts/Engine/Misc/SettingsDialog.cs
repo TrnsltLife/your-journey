@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -15,13 +16,15 @@ public class SettingsDialog : MonoBehaviour
 	public Text buttonText;
 	public TMP_Dropdown resolutionDropdown;
 	public TMP_Dropdown skinpackDropdown;
-	public TMP_Dropdown languageDropdown;
+    public TMP_Dropdown tileTexturePackDropdown;
+    public TMP_Dropdown languageDropdown;
 
 	RectTransform rect;
 	Vector2 ap;
 	Vector3 sp;
 	Action quitAction;
 	Action<string> skinUpdateAction;
+	Action<string> tileTextureUpdateAction;
 	Action<string> languageUpdateAction;
 	Resolution[] resolutions;
 	List<TMP_Dropdown.OptionData> resolutionList;
@@ -29,11 +32,16 @@ public class SettingsDialog : MonoBehaviour
 	List<string> skinpackList;
 	List<TMP_Dropdown.OptionData> skinpackDropdownList;
 
-	List<LanguageManager.TranslationFileEntry> languageList;
+	List<string> tileTexturePackList;
+	List<TMP_Dropdown.OptionData> tileTexturePackDropdownList;
+
+
+    List<LanguageManager.TranslationFileEntry> languageList;
 	List<TMP_Dropdown.OptionData> languageDropdownList;
 
 	public static string defaultSkinpack = "*Your Journey*";
-	public static string defaultSkinpack2 = "*Your Journey 2*";
+	public static string defaultTileTexturePack = "*Your Journey*";
+    public static string defaultSkinpack2 = "*Your Journey 2*";
 	public static string defaultLanguage = "English";
 
 
@@ -42,13 +50,14 @@ public class SettingsDialog : MonoBehaviour
 		CalculateDialogPosition();
 	}
 
-	public void Show( string bTextKey, string bDefaultText, Action<string> languageUpdateAction, Action action = null, Action<string> skinUpdateAction = null )
+	public void Show( string bTextKey, string bDefaultText, Action<string> languageUpdateAction, Action action = null, Action<string> skinUpdateAction = null, Action<string> tileTextureUpdateAction = null )
 	{
 		CalculateDialogPosition();
 
 		quitAction = action;
 		this.skinUpdateAction = skinUpdateAction;
-		this.languageUpdateAction = languageUpdateAction;
+		this.tileTextureUpdateAction = tileTextureUpdateAction;
+        this.languageUpdateAction = languageUpdateAction;
 		//buttonText.text = bText;
 		buttonText.GetComponent<TextTranslation>()?.Change(bTextKey, bDefaultText);
 		settingsCanvasGroup.alpha = 0;
@@ -60,33 +69,48 @@ public class SettingsDialog : MonoBehaviour
 
 		//populate checkboxes
 		var settings = Bootstrap.LoadSettings();
-		musicToggle.isOn = settings.Item1 == 1;
-		vignetteToggle.isOn = settings.Item2 == 1;
-		colorToggle.isOn = settings.Item3 == 1;
-		fullscreenToggle.isOn = settings.Item6 == 1;
+        musicToggle.isOn = settings.music == 1;
+        vignetteToggle.isOn = settings.vignette == 1;
+        colorToggle.isOn = settings.color == 1;
+        fullscreenToggle.isOn = settings.fullscreen == 1;
 
-		//populate resolutions dropdown
-		Resolution savedResolution = new Resolution();
-		savedResolution.width = settings.Item4;
-		savedResolution.height = settings.Item5;
-		resolutions = Screen.resolutions;
+        //populate resolutions dropdown
+        Resolution savedResolution = new Resolution();
+        savedResolution.width = settings.width;
+        savedResolution.height = settings.height;
+
 		resolutionList = new List<TMP_Dropdown.OptionData>();
-		int selectedIndex = 0;
-		foreach (var res in resolutions)
-		{
-			resolutionList.Add(new TMP_Dropdown.OptionData(res.width + "x" + res.height));
-			if(res.width == savedResolution.width && res.height == savedResolution.height)
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+		//Android doesn't return a Screen.resolutions list properly, but it can get the default resolution from Display.main
+        Resolution androidResolution = new Resolution();
+        androidResolution.width = Display.main.systemWidth;
+        androidResolution.height = Display.main.systemHeight;
+		resolutions = new Resolution[1] { androidResolution };
+        resolutionList.Add(new TMP_Dropdown.OptionData(androidResolution.width + "x" + androidResolution.height));
+#else
+		//This gets a list of resolutions on desktop OSes
+        resolutions = Screen.resolutions;
+#endif
+
+        int selectedIndex = 0;
+        foreach (var res in resolutions)
+        {
+            resolutionList.Add(new TMP_Dropdown.OptionData(res.width + "x" + res.height));
+            if (res.width == savedResolution.width && res.height == savedResolution.height)
             {
-				selectedIndex = resolutionList.Count - 1;
+                selectedIndex = resolutionList.Count - 1;
             }
-		}
-		resolutionDropdown.ClearOptions();
+        }
+
+
+        resolutionDropdown.ClearOptions();
 		resolutionDropdown.AddOptions(resolutionList);
 		resolutionDropdown.SetValueWithoutNotify(selectedIndex);
 
-		//populate skinpack dropdown
-		string savedSkinpack = settings.Item7;
-		skinpackList = SkinsManager.LoadSkinpackDirectories();
+        //populate skinpack dropdown
+        string savedSkinpack = settings.skinpack;
+        skinpackList = SkinsManager.LoadSkinpackDirectories();
 		skinpackDropdownList = new List<TMP_Dropdown.OptionData>();
 		int selectedSkinpackIndex = 0;
 
@@ -108,10 +132,31 @@ public class SettingsDialog : MonoBehaviour
 		skinpackDropdown.AddOptions(skinpackDropdownList);
 		skinpackDropdown.SetValueWithoutNotify(selectedSkinpackIndex);
 
-		//populate language dropdown
-		string savedLanguage = settings.Rest.Item1;
-		//Debug.Log("Saved language is: " + savedLanguage);
-		languageList = LanguageManager.DiscoverLanguageFiles();
+        //populate tileTexturePack dropdown
+        string savedtileTexturePack = settings.tileTexturePack;
+        tileTexturePackList = TileTextureManager.LoadTileTexturePackDirectories();
+        tileTexturePackDropdownList = new List<TMP_Dropdown.OptionData>();
+        int selectedtileTexturePackIndex = 0;
+
+        tileTexturePackDropdownList.Add(new TMP_Dropdown.OptionData(defaultTileTexturePack));
+        if (savedtileTexturePack == defaultTileTexturePack) { selectedtileTexturePackIndex = 0; }
+
+        foreach (var tileTexturePack in tileTexturePackList)
+        {
+            tileTexturePackDropdownList.Add(new TMP_Dropdown.OptionData(tileTexturePack));
+            if (tileTexturePack == savedtileTexturePack)
+            {
+                selectedtileTexturePackIndex = tileTexturePackDropdownList.Count - 1;
+            }
+        }
+        tileTexturePackDropdown.ClearOptions();
+        tileTexturePackDropdown.AddOptions(tileTexturePackDropdownList);
+        tileTexturePackDropdown.SetValueWithoutNotify(selectedtileTexturePackIndex);
+
+        //populate language dropdown
+        string savedLanguage = settings.language;
+        //Debug.Log("Saved language is: " + savedLanguage);
+        languageList = LanguageManager.DiscoverLanguageFiles();
 		languageDropdownList = new List<TMP_Dropdown.OptionData>();
 		int selectedLanguageIndex = 0;
 		//languageDropdownList.Add(new TMP_Dropdown.OptionData(defaultLanguage));
@@ -134,41 +179,48 @@ public class SettingsDialog : MonoBehaviour
 	public void OnClose()
 	{
 		//save settings
-		Bootstrap.SaveSettings( new Tuple<int, int, int, int, int, int, string, Tuple<string>>(
-			musicToggle.isOn ? 1 : 0,
-			vignetteToggle.isOn ? 1 : 0,
-			colorToggle.isOn ? 1 : 0,
-			GetSelectedResolution().width,
-			GetSelectedResolution().height,
-			fullscreenToggle.isOn ? 1 : 0,
-			GetSelectedSkinpack(),
-			new Tuple<string>(GetSelectedLanguage())));
+		Settings settings = new Settings
+		{
+            music = musicToggle.isOn ? 1 : 0,
+            vignette = vignetteToggle.isOn ? 1 : 0,
+            color = colorToggle.isOn ? 1 : 0,
+            width = GetSelectedResolution().width,
+            height = GetSelectedResolution().height,
+            fullscreen = fullscreenToggle.isOn ? 1 : 0,
+            skinpack = GetSelectedSkinpack(),
+            language = GetSelectedLanguage(), 
+			tileTexturePack = GetSelectedTileTexturePack()
+		};
+        Bootstrap.SaveSettings(settings);
 
-		settingsCanvasGroup.DOFade( 0, .25f ).OnComplete( () =>
+        settingsCanvasGroup.DOFade( 0, .25f ).OnComplete( () =>
 		{
 			settingsCanvasGroup.gameObject.SetActive( false );
 		} );
-	}
+    }
 
-	public void OnQuit()
+    public void OnQuit()
 	{
-		//Debug.Log("OnQuit");
-		//save settings
-		Bootstrap.SaveSettings( new Tuple<int, int, int, int, int, int, string, Tuple<string>>(
-			musicToggle.isOn ? 1 : 0,
-			vignetteToggle.isOn ? 1 : 0,
-			colorToggle.isOn ? 1 : 0,
-			GetSelectedResolution().width,
-			GetSelectedResolution().height,
-			fullscreenToggle.isOn ? 1 : 0,
-			GetSelectedSkinpack(),
-			new Tuple<string>(GetSelectedLanguage())
-			));
+        //Debug.Log("OnQuit");
+        //save settings
+        Settings settings = new Settings
+        {
+            music = musicToggle.isOn ? 1 : 0,
+            vignette = vignetteToggle.isOn ? 1 : 0,
+            color = colorToggle.isOn ? 1 : 0,
+            width = GetSelectedResolution().width,
+            height = GetSelectedResolution().height,
+            fullscreen = fullscreenToggle.isOn ? 1 : 0,
+            skinpack = GetSelectedSkinpack(),
+            language = GetSelectedLanguage(),
+            tileTexturePack = GetSelectedTileTexturePack()
+        };
+        Bootstrap.SaveSettings(settings);
 
-		if (quitAction != null)
+        if (quitAction != null)
 		{
-			//Debug.Log("Quit Action");
-			settingsCanvasGroup.DOFade(0, .25f).OnComplete(() =>
+            //Debug.Log("Quit Action");
+            settingsCanvasGroup.DOFade(0, .25f).OnComplete(() =>
 			{
 				settingsCanvasGroup.gameObject.SetActive(false);
 				quitAction();
@@ -176,8 +228,8 @@ public class SettingsDialog : MonoBehaviour
 		}
 		else
 		{
-			//Debug.Log("Quit App");
-			Application.Quit();
+            //Debug.Log("Quit App");
+            Application.Quit();
 		}
 	}
 
@@ -211,7 +263,17 @@ public class SettingsDialog : MonoBehaviour
 	public void OnResolution()
     {
 		Resolution res = GetSelectedResolution();
-		Screen.SetResolution(res.width, res.height, fullscreenToggle.isOn);
+		if(res.width == 0 || res.height == 0)
+        {
+            //Invalid resolution selected, not changing resolution.
+            return;
+        }
+#if UNITY_ANDROID && !UNITY_EDITOR
+		//Don't try to change the resolution on Android, it breaks things
+		Screen.fullScreen = fullscreenToggle.isOn;
+#else
+        Screen.SetResolution(res.width, res.height, fullscreenToggle.isOn);
+#endif
 		CalculateDialogPosition();
 	}
 
@@ -226,7 +288,18 @@ public class SettingsDialog : MonoBehaviour
         }
     }
 
-	public void OnLanguage()
+    public void OnTileTexturePack()
+    {
+        //Debug.Log("SettingsDialog.OnTileTexturePack()");
+        string tileTexturePack = GetSelectedTileTexturePack();
+        if (tileTextureUpdateAction != null)
+        {
+            //Debug.Log("skinUpdateAction()");
+            tileTextureUpdateAction(tileTexturePack);
+        }
+    }
+
+    public void OnLanguage()
 	{
 		//Debug.Log("SettingsDialog.OnLanguage()");
 		string language = GetSelectedLanguage();
@@ -239,12 +312,19 @@ public class SettingsDialog : MonoBehaviour
 
 	private Resolution GetSelectedResolution()
     {
-		int index = resolutionDropdown.GetComponent<TMP_Dropdown>().value;
-		string[] resString = resolutionDropdown.options[index].text.Split('x');
-		Resolution res = new Resolution();
-		res.width = Int32.Parse(resString[0]);
-		res.height = Int32.Parse (resString[1]);
-		return res;
+        int index = resolutionDropdown.GetComponent<TMP_Dropdown>().value;
+        Resolution res = new Resolution();
+		try
+		{
+			string[] resString = resolutionDropdown.options[index].text.Split('x');
+			if (resString.Length == 2)
+			{
+				res.width = Int32.Parse(resString[0]);
+				res.height = Int32.Parse(resString[1]);
+			}
+		}
+		catch (Exception e) { }
+        return res;
 	}
 
 	private string GetSelectedSkinpack()
@@ -259,7 +339,13 @@ public class SettingsDialog : MonoBehaviour
 		return languageDropdown.options[index].text;
 	}
 
-	private void CalculateDialogPosition()
+    private string GetSelectedTileTexturePack()
+    {
+        int index = tileTexturePackDropdown.GetComponent<TMP_Dropdown>().value;
+        return tileTexturePackDropdown.options[index].text;
+    }
+
+    private void CalculateDialogPosition()
     {
 		rect = settingsCanvasGroup.gameObject.GetComponent<RectTransform>();
 		ap = rect.anchoredPosition;

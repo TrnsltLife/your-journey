@@ -92,7 +92,11 @@ public class TitleManager : MonoBehaviour
 
 	private void Start()
 	{
-		var settings = Bootstrap.LoadSettings();
+		#if UNITY_ANDROID && !UNITY_EDITOR
+		AndroidUtils.requestAndroidPermissions();
+		#endif
+
+        var settings = Bootstrap.LoadSettings();
 
 		LanguageManager.LoadLanguage(LanguageManager.currentLanguage);
 		LanguageManager.CallSubscribers();
@@ -100,17 +104,30 @@ public class TitleManager : MonoBehaviour
 		Vignette v;
 		ColorGrading cg;
 		if ( volume.profile.TryGetSettings( out v ) )
-			v.active = settings.Item2 == 1;
-		if ( volume.profile.TryGetSettings( out cg ) )
-			cg.active = settings.Item3 == 1;
-		music.enabled = settings.Item1 == 1;
+            v.active = settings.vignette == 1;
+        if ( volume.profile.TryGetSettings( out cg ) )
+            cg.active = settings.color == 1;
+        music.enabled = settings.music == 1;
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+		Screen.fullScreen = (settings.fullscreen == 1);
+#else
+        if (settings.width > 0 && settings.height > 0)
+		{
+			Screen.SetResolution(settings.width, settings.height, settings.fullscreen == 1);
+		}
+		else
+		{
+			Screen.fullScreen = (settings.fullscreen == 1);
+        }
+#endif
 
 		newBcg = newButton.GetComponent<CanvasGroup>();
 		loadBcg = loadButton.GetComponent<CanvasGroup>();
 		loadingText = scenarioOverlayText.GetComponent<TextMeshProUGUI>();
 
-		//find campaign packages and unzip them into folders
-		FileManager.UnpackCampaigns();
+        //find campaign packages and unzip them into folders
+        FileManager.UnpackCampaigns();
 
 		//load scenarios and campaigns
 		selectJourney.AddScenarioPrefabs();
@@ -161,7 +178,7 @@ public class TitleManager : MonoBehaviour
 
 	public void NewGame()
 	{
-		newBcg.DOFade( 0, .25f );
+        newBcg.DOFade( 0, .25f );
 		loadBcg.DOFade( 0, .25f );
 		newBcg.blocksRaycasts = false;
 		loadBcg.blocksRaycasts = false;
@@ -177,7 +194,7 @@ public class TitleManager : MonoBehaviour
 
 	public void LoadGame()
 	{
-		newBcg.DOFade( 0, .25f );
+        newBcg.DOFade( 0, .25f );
 		loadBcg.DOFade( 0, .25f );
 		newBcg.blocksRaycasts = false;
 		loadBcg.blocksRaycasts = false;
@@ -193,13 +210,13 @@ public class TitleManager : MonoBehaviour
 
 	public void OnSettings()
 	{
-		settings.Show( "settings.QuitApp", "Quit App", OnLanguageUpdate );
+        settings.Show( "settings.QuitApp", "Quit App", OnLanguageUpdate );
 	}
 
 	public void OnLanguageUpdate(string languageName)
 	{
-		//Debug.Log("Engine.OnLanguageUpdate(" + languageName + ")");
-		LanguageManager.LoadLanguage(languageName);
+        //Debug.Log("Engine.OnLanguageUpdate(" + languageName + ")");
+        LanguageManager.LoadLanguage(languageName);
 		LanguageManager.UpdateCurrentLanguage(languageName);
 		LanguageManager.CallSubscribers();
 	}

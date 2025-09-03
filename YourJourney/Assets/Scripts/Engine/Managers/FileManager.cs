@@ -38,7 +38,8 @@ public class FileManager
 	public List<int> collections { get; set; }
 	public List<int> globalTiles { get; set; }
 	public List<string> chronicle { get; set; }
-	public Dictionary<string, bool> scenarioEndStatus { get; set; }
+    public List<List<string>> chronicles { get; set; }
+    public Dictionary<string, bool> scenarioEndStatus { get; set; }
 	public TextBookData introBookData { get; set; }
 	public ProjectType projectType { get; set; }
 	public string scenarioName { get; set; }
@@ -74,7 +75,7 @@ public class FileManager
 		chapters = source.chapterObserver.ToList();
 		collections = source.collectionObserver.ToList();
 		globalTiles = source.globalTilePool.ToList();
-		chronicle = source.chronicle;
+		chronicles = source.chronicles;
 		scenarioEndStatus = source.scenarioEndStatus;
 
 		introBookData = source.introBookData;
@@ -102,7 +103,10 @@ public class FileManager
 	public static string BasePath(bool createIfNotExists)
     {
 		string mydocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-		string basePath = Path.Combine(mydocs, "Your Journey");
+#if UNITY_ANDROID && !UNITY_EDITOR
+		mydocs = AndroidUtils.androidBasePathOr(mydocs);
+#endif
+        string basePath = Path.Combine(mydocs, "Your Journey");
 		if (createIfNotExists && !Directory.Exists(basePath))
 		{
 			Directory.CreateDirectory(basePath);
@@ -242,8 +246,10 @@ public class FileManager
 
 	public static Campaign LoadCampaign( string campaignGUID )
 	{
-		if ( campaignGUID == "Saves" || campaignGUID == "Skins" || campaignGUID == "Languages")
+		if (new string[] { "Exports", "Languages", "Saves", "Skins", "Tiles" }.Contains(campaignGUID))
+		{
 			return null;
+		}
 
 		string campaignPath = Path.Combine(BasePath(false), campaignGUID);
 		string json = "";
@@ -334,7 +340,6 @@ public class FileManager
 	/// </summary>
 	public static string GetFullPath( string filename )
 	{
-		string mydocs = Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments );
 		string filePath = Path.Combine( BasePath(false), filename );
 
 		return filePath;
@@ -342,7 +347,6 @@ public class FileManager
 
 	public static string GetFullPathWithCampaign( string filename, string campaignGUID )
 	{
-		string mydocs = Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments );
 		string filePath = Path.Combine( BasePath(false), campaignGUID, filename );
 
 		return filePath;

@@ -78,10 +78,23 @@ public class Engine : MonoBehaviour
 		Vignette v;
 		ColorGrading cg;
 		if ( volume.profile.TryGetSettings( out v ) )
-			v.active = settings.Item2 == 1;
-		if ( volume.profile.TryGetSettings( out cg ) )
-			cg.active = settings.Item3 == 1;
-		music.enabled = settings.Item1 == 1;
+            v.active = settings.vignette == 1;
+        if ( volume.profile.TryGetSettings( out cg ) )
+            cg.active = settings.color == 1;
+        music.enabled = settings.music == 1;
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            Screen.fullScreen = (settings.fullscreen == 1);
+#else
+        if (settings.width > 0 && settings.height > 0)
+        {
+            Screen.SetResolution(settings.width, settings.height, settings.fullscreen == 1);
+        }
+        else
+        {
+            Screen.fullScreen = (settings.fullscreen == 1);
+        }
+#endif
 
 		//load scenario file
 		if ( debug )
@@ -115,15 +128,23 @@ public class Engine : MonoBehaviour
 		LoadDefaultMonsterActivations();
 		LoadDefaultMonsterModifiers();
 		LoadCustomMonsterModifiers();
+		FixMonsterGuids();
 
-		//Load Skins
-		var skinsManager = GetComponent<SkinsManager>();
+        //Load Skins
+        var skinsManager = GetComponent<SkinsManager>();
 		skinsManager.Awake(); //not sure why this is needed but it is. Otherwise it hasn't awoken before the next call which then fails because of a null pointer.
 		SkinsManager.LoadSkins(Bootstrap.GetSkinpack());
 		OnSkinpackUpdate(Bootstrap.GetSkinpack());
 
-		//Load Translations
-		LanguageManager.LoadLanguage(Bootstrap.GetLanguage());
+        //Load Tile Textures
+        var tileTextureManager = GetComponent<TileTextureManager>();
+        tileTextureManager.Awake(); //not sure why this is needed but it is. Otherwise it hasn't awoken before the next call which then fails because of a null pointer.
+		TileTextureManager.LoadTileTextures(Bootstrap.GetTileTexturePack()); //This is needed to re-enable tile textures when loading the game
+		//TileTextureManager.SetTileTexturePack(Bootstrap.GetTileTexturePack()); //This line doesn't work to re-enable tile textures, because it queries tiles on-screen, and presumably they haven't been loaded/instantiated yet at this point
+        OnTileTextureUpdate(Bootstrap.GetTileTexturePack());
+
+        //Load Translations
+        LanguageManager.LoadLanguage(Bootstrap.GetLanguage());
 		OnLanguageUpdate(Bootstrap.GetLanguage());
 		LanguageManager.AssignScenarioTranslations(scenario.translationObserver.ToList());
 
@@ -208,7 +229,18 @@ public class Engine : MonoBehaviour
 		//Debug.Log("LoadCustomMonsterModifiers() finished");
 	}
 
-	IEnumerator BeginGame()
+    private void FixMonsterGuids()
+    {
+        foreach (ThreatInteraction threat in scenario.interactionObserver.Where(it => it.interactionType == InteractionType.Threat))
+        {
+            foreach (Monster monster in threat.monsterCollection)
+            {
+				monster.FixGuid();
+            }
+        }
+    }
+
+    IEnumerator BeginGame()
 	{
 		Debug.Log("BeginGame");
 		while ( !doneLoading )
@@ -481,7 +513,7 @@ public class Engine : MonoBehaviour
 
 	public void OnShowSettings()
 	{
-		settingsDialog.Show("settings.QuitToTitle", "Quit to Title", OnLanguageUpdate, OnQuit, OnSkinpackUpdate );
+		settingsDialog.Show("settings.QuitToTitle", "Quit to Title", OnLanguageUpdate, OnQuit, OnSkinpackUpdate, OnTileTextureUpdate );
 	}
 
 	public void OnQuit()
@@ -511,7 +543,14 @@ public class Engine : MonoBehaviour
 		monsterManager.UpdateSkins();
     }
 
-	public void OnLanguageUpdate(string languageName)
+	public void OnTileTextureUpdate(string tileTexturePackName)
+	{
+        Debug.Log("Engine.OnTileTextureUpdate(" + tileTexturePackName + ")");
+        //TileTextureManager.LoadTileTextures(tileTexturePackName);
+        TileTextureManager.SetTileTexturePack(tileTexturePackName);
+    }
+
+    public void OnLanguageUpdate(string languageName)
 	{
 		//Debug.Log("Engine.OnLanguageUpdate(" + languageName + ")");
 		LanguageManager.LoadLanguage(languageName);

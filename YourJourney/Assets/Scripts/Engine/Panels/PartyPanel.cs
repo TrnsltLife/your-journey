@@ -18,6 +18,7 @@ public class PartyPanel : MonoBehaviour
 	Vector3 sp;
 	Vector2 ap;
 
+
 	private void CalculatePanelPosition()
 	{
 		rect = GetComponent<RectTransform>();
@@ -116,7 +117,7 @@ public class PartyPanel : MonoBehaviour
     {
 		//Hide();
 		ToggleVisible(false);
-		chroniclePanel.Show(Engine.currentScenario.chronicle);
+		chroniclePanel.Show(Engine.currentScenario.chronicles);
     }
 
 	public void OnDifficulty()

@@ -11,11 +11,16 @@ public class ChroniclePanel : MonoBehaviour
 	public PartyPanel partyPanel;
 	public CanvasGroup canvasGroup;
 	public TextMeshProUGUI chronicleText;
+	public Button nextRoundButton;
+	public Button prevRoundButton;
 
 	//CanvasGroup group;
 	RectTransform rect;
 	Vector3 sp;
 	Vector2 ap;
+
+	int currentRound = 0;
+	List<List<string>> chronicles = new List<List<string>>();
 
 	private void CalculatePanelPosition()
 	{
@@ -28,8 +33,10 @@ public class ChroniclePanel : MonoBehaviour
 		CalculatePanelPosition();
 	}
 
-	public void Show(List<string> chronicle)
+	public void Show(List<List<string>> chronicles)
 	{
+		this.chronicles = chronicles;
+
 		CalculatePanelPosition();
 
 		FindObjectOfType<TileManager>().ToggleInput( true );
@@ -43,8 +50,14 @@ public class ChroniclePanel : MonoBehaviour
 		//rect.anchoredPosition = new Vector2( 0, ap.y - 25 );
 		canvasGroup.gameObject.transform.DOMoveY(sp.y, .75f);
 
-		SetText(string.Join("\n<align=center><font=\"Icon\"><b>L  L  L</b></font></align>\n", chronicle));
+		UpdateText();
+		UpdateButtons();
 	}
+
+	void UpdateText()
+	{
+        SetText("[" + (currentRound + 1) + "]\n" + string.Join("\n<align=center><font=\"Icon\">L  L  L</font></align>\n", chronicles[currentRound]));
+    }
 
 	void SetText(string t)
 	{
@@ -69,5 +82,46 @@ public class ChroniclePanel : MonoBehaviour
 	public void OnClose()
 	{
 		Hide();
+	}
+
+	public void OnPrev()
+	{
+		if (currentRound > 0)
+		{
+			currentRound--;
+            UpdateText();
+			UpdateButtons();
+        }
+    }
+
+	public void OnNext()
+	{
+		if(currentRound < (chronicles.Count - 1))
+		{
+			currentRound++;
+            UpdateText();
+            UpdateButtons();
+        }
+    }
+
+	public void UpdateButtons()
+	{
+		if(currentRound == 0)
+		{
+			prevRoundButton.enabled = false;
+		}
+		else
+		{
+			prevRoundButton.enabled = true;
+		}
+
+		if(currentRound == (chronicles.Count - 1))
+		{
+			nextRoundButton.enabled = false;
+		}
+		else
+		{
+			nextRoundButton.enabled = true;
+		}
 	}
 }

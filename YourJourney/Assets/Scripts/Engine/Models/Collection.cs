@@ -134,14 +134,19 @@ public class Collection
             case "Core Set":
                 return Collection.CORE_SET;
             case "Villains of Eriador":
+            case "Villains of Eriajar":
                 return Collection.VILLAINS_OF_ERIADOR;
             case "Shadowed Paths":
+            case "Shaded Paths":
                 return Collection.SHADOWED_PATHS;
             case "Dwellers in Darkness":
+            case "Denizens in Darkness":
                 return Collection.DWELLERS_IN_DARKNESS;
             case "Spreading War":
+            case "Unfurling War":
                 return Collection.SPREADING_WAR;
             case "Scourges of the Wastes":
+            case "Scorchers of the Wilds":
                 return Collection.SCOURGES_OF_THE_WASTES;
             case "Custom":
                 return Collection.CUSTOM;

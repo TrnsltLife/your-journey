@@ -28,12 +28,12 @@ public class SelectSaveSlot : MonoBehaviour
 
 	public void ActivateScreen( TitleMetaData metaData )
 	{
-		titleMetaData = metaData;
+        titleMetaData = metaData;
 		gameObject.SetActive( true );
 		warning.SetActive( false );
 		nextButton.interactable = false;
 		cancelButton.interactable = false;
-		if ( titleMetaData.slotMode == 1 )//|| titleMetaData.slotMode == 1 )
+		if ( titleMetaData.slotMode == 1 )
 			toggle.gameObject.SetActive( false );
 		else
 			toggle.gameObject.SetActive( true );
@@ -69,20 +69,20 @@ public class SelectSaveSlot : MonoBehaviour
 				saveSlotButtons[i].EnableButton();
 		}
 
-		stateItems = GameState.GetSaveItems().ToArray();
+        stateItems = GameState.GetSaveItems().ToArray();
 		for ( int i = 0; i < stateItems.Length/*Mathf.Min( saveSlotButtons.Length, stateItems.Length )*/; i++ )
 		{
 			if ( stateItems[i] != null )
 				saveSlotButtons[i].Init( stateItems[i] );
 		}
 
-		finalFader.DOFade( 0, .5f ).OnComplete( () =>
+        finalFader.DOFade( 0 , .5f ).OnComplete( () =>
 		{
 			cancelButton.interactable = true;
 		} );
-	}
+    }
 
-	public void OnToggleNoSave()
+    public void OnToggleNoSave()
 	{
 		selectedIndex = -1;
 		gameName = "";

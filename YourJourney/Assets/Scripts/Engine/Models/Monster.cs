@@ -138,7 +138,23 @@ public class Monster
 		}
 	}
 
-	public bool AddModifier(MonsterModifier mod)
+	public void FixGuid()
+	{
+        //Some scripted Monster GUIDs were coming from JIME as "00000000-0000-0000-0000-000000000000".
+        //I haven't been able to reproduce and I don't know if it's a persistent problem.
+        //It breaks the enemy activation selection because every enemy with that empty GUID gets a red circle in the game UI.
+        //So I'm trying to fix any cases where games have been created with monsters having the empty GUID and assing a new GUID here when the scenario is loaded.
+        //BTW I discovered that:
+        //new Guid() creates a default Guid with all zeroes: 00000000-0000-0000-0000-000000000000
+        //Guid.NewGuid() creates a new unique Guid value.
+        if (GUID == null || String.IsNullOrEmpty(GUID.ToString()) || GUID.ToString() == "00000000-0000-0000-0000-000000000000")
+		{
+			GUID = Guid.NewGuid();
+        }
+	}
+
+
+    public bool AddModifier(MonsterModifier mod)
     {
 		if (modifierList.Count < MAX_MODIFIERS && !modifierList.Contains(mod))
         {

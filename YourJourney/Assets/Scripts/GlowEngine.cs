@@ -310,9 +310,10 @@ public class GlowEngine : MonoBehaviour
 		float windowAspect = (float)Screen.width / (float)Screen.height;
 		//Debug.Log( "SCREEN: " + Screen.width + " x " + Screen.height );
 		float scaleHeight = windowAspect / targetAspect;
-		//Camera camera = GetComponent<Camera>();
+        //Camera camera = GetComponent<Camera>();
 
-		// if scaled height is less than current height, add letterbox
+        // if scaled height is less than current height, add letterbox
+        /*
 		if ( scaleHeight < 1.0f )
 		{
 			Rect rect = mainCamera.rect;
@@ -337,9 +338,21 @@ public class GlowEngine : MonoBehaviour
 
 			mainCamera.rect = rect;
 		}
-	}
+		*/
 
-	public static Vector3 AverageV3( Vector3[] array )
+		//Stretch to fill screen. No letterbox or pillarbox.
+        Rect rect = mainCamera.rect;
+
+        rect.width = 1.0f;
+        rect.height = 1.0f;
+        rect.x = 0;
+        rect.y = 0;
+
+        mainCamera.rect = rect;
+
+    }
+
+    public static Vector3 AverageV3( Vector3[] array )
 	{
 		Vector3 total = array.Aggregate( Vector3.zero, ( acc, next ) =>
 		{

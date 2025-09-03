@@ -67,5 +67,6 @@ public class Roles
 		new RoleData(Role.SHEPHERD) {collection=7, dataName="Shepherd", skillCount=6, indexOffset=2, skillCost= new int[]{0, 0, 3, 6, 8, 8}},
 		new RoleData(Role.TRACKER) {collection=7, dataName="Tracker", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
 		new RoleData(Role.WARRIOR) {collection=7, dataName="Warrior", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 7, 12, 12}},
-	};
+        new RoleData(Role.TREASURER) {collection=7, dataName="Treasurer", skillCount=12, skillCost= new int[]{0, 0, 0, 3, 3, 3, 7, 7, 7, 12, 12, 16}},
+    };
 }

@@ -10,8 +10,8 @@ using UnityEngine;
 /// </summary>
 public class Bootstrap
 {
-	public static readonly string AppVersion = "0.37";
-	public static readonly string FormatVersion = "1.35";
+	public static readonly string AppVersion = "0.40";
+	public static readonly string FormatVersion = "1.40";
 
 	//REQUIRED for playing ANY scenario, bootstraps the scenario
 	public static GameStarter gameStarter;
@@ -43,8 +43,8 @@ public class Bootstrap
 			scenario = FileManager.LoadScenario( FileManager.GetFullPath( gameStarter.scenarioFileName ) );
 		else
 		{
-			string mydocs = Environment.GetFolderPath( Environment.SpecialFolder.MyDocuments );
-			string basePath = Path.Combine( mydocs, "Your Journey", campaignState.campaign.campaignGUID.ToString(), gameStarter.scenarioFileName );
+			string basePath = FileManager.BasePath(false);
+            basePath = Path.Combine(basePath, campaignState.campaign.campaignGUID.ToString(), gameStarter.scenarioFileName );
 			scenario = FileManager.LoadScenario( basePath );
 		}
 		if ( scenario != null )
@@ -159,33 +159,46 @@ public class Bootstrap
     {
 		return PlayerPrefs.GetString("language", SettingsDialog.defaultLanguage);
     }
+    public static string GetTileTexturePack()
+    {
+        return PlayerPrefs.GetString("tileTexturePack", SettingsDialog.defaultTileTexturePack);
+    }
 
-	public static Tuple<int, int, int, int, int, int, string, Tuple<string>> LoadSettings()
-	{
-		int music = PlayerPrefs.GetInt( "music", 1 );
-		int vignette = PlayerPrefs.GetInt( "vignette", 1 );
-		int color = PlayerPrefs.GetInt( "color", 1 );
-		int width = PlayerPrefs.GetInt("width", Screen.currentResolution.width);
-		int height = PlayerPrefs.GetInt("height", Screen.currentResolution.height);
-		int fullscreen = PlayerPrefs.GetInt("fullscreen", 1);
-		string skinpack = PlayerPrefs.GetString("skinpack", SettingsDialog.defaultSkinpack);
-		string language = PlayerPrefs.GetString("language", SettingsDialog.defaultLanguage);
+    public static Settings LoadSettings()
+    {
+        Settings settings = new Settings
+        {
+            music = PlayerPrefs.GetInt("music", 1),
+            vignette = PlayerPrefs.GetInt("vignette", 1),
+            color = PlayerPrefs.GetInt("color", 1),
+            width = PlayerPrefs.GetInt("width", Screen.currentResolution.width),
+            height = PlayerPrefs.GetInt("height", Screen.currentResolution.height),
+            fullscreen = PlayerPrefs.GetInt("fullscreen", 1),
+            skinpack = PlayerPrefs.GetString("skinpack", SettingsDialog.defaultSkinpack),
+            language = PlayerPrefs.GetString("language", SettingsDialog.defaultLanguage),
+            tileTexturePack = PlayerPrefs.GetString("tileTexturePack", SettingsDialog.defaultTileTexturePack)
+        };
 
-		LanguageManager.DiscoverLanguageFiles();
-		LanguageManager.UpdateCurrentLanguage(language);
+        // keep your existing side effects
+        LanguageManager.DiscoverLanguageFiles();
+        LanguageManager.UpdateCurrentLanguage(settings.language);
 
-		return new Tuple<int, int, int, int, int, int, string, Tuple<string>>( music, vignette, color, width, height, fullscreen, skinpack, new Tuple<string>(language) );
-	}
+        return settings;
+    }
 
-	public static void SaveSettings( Tuple<int, int, int, int, int, int, string, Tuple<string>> prefs )
-	{
-		PlayerPrefs.SetInt( "music", prefs.Item1 );
-		PlayerPrefs.SetInt( "vignette", prefs.Item2 );
-		PlayerPrefs.SetInt( "color", prefs.Item3 );
-		PlayerPrefs.SetInt( "width", prefs.Item4 );
-		PlayerPrefs.SetInt ("height", prefs.Item5 );
-		PlayerPrefs.SetInt("fullscreen", prefs.Item6);
-		PlayerPrefs.SetString("skinpack", prefs.Item7);
-		PlayerPrefs.SetString("language", prefs.Rest.Item1);
-	}
+    public static void SaveSettings(Settings settings)
+    {
+        PlayerPrefs.SetInt("music", settings.music);
+        PlayerPrefs.SetInt("vignette", settings.vignette);
+        PlayerPrefs.SetInt("color", settings.color);
+        PlayerPrefs.SetInt("width", settings.width);
+        PlayerPrefs.SetInt("height", settings.height);
+        PlayerPrefs.SetInt("fullscreen", settings.fullscreen);
+
+        PlayerPrefs.SetString("skinpack", settings.skinpack ?? "");
+        PlayerPrefs.SetString("language", settings.language ?? "");
+        PlayerPrefs.SetString("tileTexturePack", settings.tileTexturePack ?? "");
+
+        PlayerPrefs.Save(); // ensures it’s flushed to disk
+    }
 }

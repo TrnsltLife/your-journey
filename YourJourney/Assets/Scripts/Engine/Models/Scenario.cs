@@ -49,6 +49,7 @@ public class Scenario
 	public ObservableCollection<int> collectionObserver { get; set; }
 	public ObservableCollection<int> globalTilePool { get; set; }
 	public List<string> chronicle { get; set; }
+	public List<List<string>> chronicles { get; set; }
 
 	/// <summary>
 	/// Load in data from FileManager
@@ -115,7 +116,7 @@ public class Scenario
         }
 
 		s.globalTilePool = new ObservableCollection<int>( fm.globalTiles );
-		s.chronicle = new List<string> { fm.scenarioName , fm.specialInstructions };
+		s.chronicles = new List<List<string>> { new List<string>{ fm.scenarioName, fm.specialInstructions } };
 		s.scenarioEndStatus = new Dictionary<string, bool>( fm.scenarioEndStatus );
 		//s.fileName = fm.fileName;
 		s.introBookData = fm.introBookData;
@@ -160,15 +161,24 @@ public class Scenario
 		return langsDict;
     }
 
+	public static void AddChronicleRound()
+	{
+		Engine.currentScenario.chronicles.Add(new List<string> { });
+	}
+
 	public static string Chronicle(string entry)
     {
-		Engine.currentScenario.chronicle.Add(entry);
+		int lastRoundIndex = Engine.currentScenario.chronicles.Count - 1;
+        Engine.currentScenario.chronicles[lastRoundIndex].Add(entry);
 		return entry;
     }
 
+	//ChroniclePS = Chronicle Post Script. It adds on or appends to the last entry.
 	public static string ChroniclePS(string append)
     {
-		Engine.currentScenario.chronicle[Engine.currentScenario.chronicle.Count - 1] += append;
+		int lastRoundIndex = Engine.currentScenario.chronicles.Count - 1;
+		int lastEntryIndex = Engine.currentScenario.chronicles[lastRoundIndex].Count - 1;
+        Engine.currentScenario.chronicles[lastRoundIndex][lastEntryIndex] += append;
 		return append;
     }
 }
