@@ -22,6 +22,7 @@ public enum ItemSeries
     ANCIENT_BARK = 7,
     ROBES = 8,
     HAUBERK = 9,
+    DRAGON_SCALES = 10,
 
     //Support
     BANNER = 100,
@@ -56,6 +57,9 @@ public enum ItemSeries
     MIGHTY_LIMB = 218,
     ROCK = 219,
     ROD = 220,
+    CROSSBOW = 221,
+    DRAGON_CLAWS = 222,
+    DRAGON_TAIL = 223,
 
     //Trinkets
     BOOTS = 300,
@@ -80,6 +84,8 @@ public enum ItemSeries
     HERBS_AND_POULTICES = 317,
     SEEING_STONE = 318,
     THE_ONE = 319,
+    BLACK_ARROWS = 320,
+    THRAINS_LEGACY_POUCH = 321,
 
     //Mounts
     FRIENDLY_PONY = 400,

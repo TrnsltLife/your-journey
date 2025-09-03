@@ -165,49 +165,76 @@ public class CamControl : MonoBehaviour
 		targetLookAt.x = GlowEngine.RemapValue(targetZoom.y, .2f, 6f, 50f, 55f);
 	}
 
-	void HandleZoom() //new
+	public void OnZoomInButton()
+	{
+		HandleZoom(1);
+	}
+
+	public void OnZoomOutButton()
+	{
+		HandleZoom(-1);
+	}
+
+	void HandleZoom(int direction)
+	{
+        float y = cam.transform.localPosition.y;
+
+        float zoomAmount = 2f;
+        if (y <= 14f) { zoomAmount = 1f; }
+        if (y <= 8f) { zoomAmount = 0.5f; }
+        if (y <= 5f) { zoomAmount = 0.2f; }
+
+        // scroll up
+        if (direction > 0)
+        {
+            if (y - zoomAmount >= zoomMin)
+                targetZoom = cam.transform.localPosition - new Vector3(0, zoomAmount, 0);
+            else
+                targetZoom = cam.transform.localPosition.Y(zoomMin);
+        }
+        // scroll down
+        else if (direction < 0)
+        {
+            if (y + zoomAmount <= zoomMax)
+                targetZoom = cam.transform.localPosition + new Vector3(0, zoomAmount, 0);
+            else
+                targetZoom = cam.transform.localPosition.Y(zoomMax);
+        }
+
+        //Change zSlide only when zooming
+        if (direction != 0)
+        {
+            //targetPos.z = GlowEngine.RemapValue(targetZoom.y, zoomMin, zoomMax, zSlideMax, zSlideMin); //slide camera base forward zoomed out or backward zoomed in to keep focused object closer to the center of the screen
+        }
+
+        float fdScalar = GlowEngine.RemapValue(y, zoomMin, zoomMax, focusDistMin, focusDistMax);
+        targetDOF.Set(fdScalar, fdScalar, fdScalar);
+        //Set the polar rotation - the map rotates around this axis
+        targetLookAt.y = targetLookAtY;
+
+        //0f;
+        //26.87f;
+        //30.58
+        //targetLookAt.x = GlowEngine.RemapValue( targetZoom.y, .2f, 6f, 50f, 55f );
+        targetLookAt.x = GlowEngine.RemapValue(targetZoom.y, zoomMin, zoomMax, tiltMin, tiltMax); //change tilt of camera angle
+    }
+
+    void HandleZoom() //new
 	{
 		float axis = Input.GetAxis( "Mouse ScrollWheel" );
-		float y = cam.transform.localPosition.y;
 
-		float zoomAmount = 2f;
-		if (y <= 14f) { zoomAmount = 1f; }
-		if (y <= 8f) { zoomAmount = 0.5f; }
-		if (y <= 5f) { zoomAmount = 0.2f; }
-
-		// scroll up
-		if ( axis > 0f )
+		if(axis > 0f)
 		{
-			if (y - zoomAmount >= zoomMin)
-				targetZoom = cam.transform.localPosition - new Vector3(0, zoomAmount, 0);
-			else
-				targetZoom = cam.transform.localPosition.Y(zoomMin);
+			HandleZoom(1);
 		}
-		// scroll down
-		else if ( axis < 0f )
+		else if(axis < 0f)
 		{
-			if (y + zoomAmount <= zoomMax)
-				targetZoom = cam.transform.localPosition + new Vector3(0, zoomAmount, 0);
-			else
-				targetZoom = cam.transform.localPosition.Y(zoomMax);
+			HandleZoom(-1);
 		}
-
-		//Change zSlide only when zooming
-		if(axis != 0)
-        {
-			//targetPos.z = GlowEngine.RemapValue(targetZoom.y, zoomMin, zoomMax, zSlideMax, zSlideMin); //slide camera base forward zoomed out or backward zoomed in to keep focused object closer to the center of the screen
+		else
+		{
+			HandleZoom(0); //needed to set the default camera zoom and angle, especially on first load
 		}
-
-		float fdScalar = GlowEngine.RemapValue( y, zoomMin, zoomMax, focusDistMin, focusDistMax );
-		targetDOF.Set( fdScalar, fdScalar, fdScalar );
-		//Set the polar rotation - the map rotates around this axis
-		targetLookAt.y = targetLookAtY;
-
-		//0f;
-		//26.87f;
-		//30.58
-		//targetLookAt.x = GlowEngine.RemapValue( targetZoom.y, .2f, 6f, 50f, 55f );
-		targetLookAt.x = GlowEngine.RemapValue(targetZoom.y, zoomMin, zoomMax, tiltMin, tiltMax); //change tilt of camera angle
 	}
 
 	public void MoveTo( Vector3 pos, bool evenBattleMap = false, float speed = .35f )

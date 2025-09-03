@@ -458,8 +458,27 @@ public class CampfireScreen : MonoBehaviour
 			}
 		}
 
-		//Let the four Rohirrim custom characters pick any of the standard horse mounts
-        if(slot == Slot.MOUNT && new int[] { 18, 19, 20, 21 }.Contains(characterSheets[selectedHero].portraitIndex))
+        //Special treatment for Dragon custom character
+        if (characterSheets[selectedHero].portraitIndex == 72)
+        {
+            if (slot == Slot.ARMOR)
+            {
+                itemList.Add(Items.FromSeriesID(ItemSeries.DRAGON_SCALES)[0]);
+            }
+            else if (slot == Slot.HAND)
+            {
+                itemList.Add(Items.FromSeriesID(ItemSeries.DRAGON_CLAWS)[0]);
+                itemList.Add(Items.FromSeriesID(ItemSeries.DRAGON_TAIL)[0]);
+            }
+            else if (slot == Slot.MOUNT)
+            {
+                itemList.Clear();
+                itemList.Add(Items.list[0]); //None
+            }
+        }
+
+        //Let the four Rohirrim custom characters pick any of the standard horse mounts
+        if (slot == Slot.MOUNT && new int[] { 18, 19, 20, 21 }.Contains(characterSheets[selectedHero].portraitIndex))
         {
 			List<Item> availableItems = new Item[]{Items.FromSeriesID(ItemSeries.FRIENDLY_PONY)[0],
 				Items.FromSeriesID(ItemSeries.SWIFT_STEED)[0],
@@ -472,10 +491,11 @@ public class CampfireScreen : MonoBehaviour
 			itemList.AddRange(availableItems);
 		}
 
-		//Trinket: Hammer and Tongs (Smith) is equipped after setup. Custom trinkets: The One (Ringbearer), Seeing Stone (Seer) are also equipped after setup.
-	}
+        //Trinket: Hammer and Tongs (Smith) is equipped after setup. Custom trinkets: The One (Ringbearer), Seeing Stone (Seer), Thrain's Legacy Pouch (Treasurer) are also equipped after setup.
+        //Black Arrows is presumably equipped after setup.
+    }
 
-	public void PopulateItemSetupDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int hand, int tier)
+    public void PopulateItemSetupDropdown(TMP_Dropdown dropdown, List<Item> itemList, Slot slot, int hand, int tier)
     {
 		//populate dropdown
 		List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();

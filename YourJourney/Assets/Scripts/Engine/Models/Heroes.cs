@@ -96,6 +96,6 @@ internal class Heroes
         new Hero(69){name="Friend of beasts", sex = Sex.MALE, race=Race.MAN, role=Role.BEAST_FRIEND},
         new Hero(70){name="Hound master", sex = Sex.MALE, race=Race.ELF, role=Role.BEAST_FRIEND },
         new Hero(71){name="Wizard", sex = Sex.MALE, race=Race.WIZARD, role=Role.MEDDLER, armor=ItemSeries.CLOAK, hand1=ItemSeries.WALKING_STICK, hand2=ItemSeries.SWORD},
-
+        new Hero(72){name="Dragon", sex = Sex.MALE, race=Race.DRAGON, maxHanded=3, role=Role.TREASURER, armor=ItemSeries.DRAGON_SCALES, hand1=ItemSeries.DRAGON_CLAWS, hand2=ItemSeries.DRAGON_TAIL},
     };
 }

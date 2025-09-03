@@ -55,6 +55,7 @@ SpriteAtlas:
     - bce898617948c7d4d9794ca071030647: 21300000
     - 649829614294f3546a23438918632866: 21300000
     - 89c9019136d29ed47aa983b7d57eefc3: 21300000
+    - bdefa1b14895c30479f995ed7d2921fb: 21300000
     - 404168b12fe803e4c8f0b2379c5d02e3: 21300000
     - aa7296c1c0817344c8e6bd6870f0e204: 21300000
     - e09d08c14e45dff46bd860933d88a220: 21300000
@@ -71,6 +72,7 @@ SpriteAtlas:
     - f3af4ff24197266479a7901bf11fdb36: 21300000
     - 2c7ac213f4103bf409a519d87ced92d2: 21300000
     - fc5f9543098b1f446820116dae391d5c: 21300000
+    - 1994fc43d352e124eb83fc67b2dfeb01: 21300000
     - ed4aa1638a4b82945af26a82acd379e2: 21300000
     - 4c6a0893d30108f4abc5c7b02e58dc14: 21300000
     - f3bb01a3ca7a4b34bb90493f1948bb91: 21300000
@@ -209,6 +211,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: bce898617948c7d4d9794ca071030647, type: 3}
   - {fileID: 21300000, guid: 649829614294f3546a23438918632866, type: 3}
   - {fileID: 21300000, guid: 89c9019136d29ed47aa983b7d57eefc3, type: 3}
+  - {fileID: 21300000, guid: bdefa1b14895c30479f995ed7d2921fb, type: 3}
   - {fileID: 21300000, guid: 404168b12fe803e4c8f0b2379c5d02e3, type: 3}
   - {fileID: 21300000, guid: aa7296c1c0817344c8e6bd6870f0e204, type: 3}
   - {fileID: 21300000, guid: e09d08c14e45dff46bd860933d88a220, type: 3}
@@ -225,6 +228,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: f3af4ff24197266479a7901bf11fdb36, type: 3}
   - {fileID: 21300000, guid: 2c7ac213f4103bf409a519d87ced92d2, type: 3}
   - {fileID: 21300000, guid: fc5f9543098b1f446820116dae391d5c, type: 3}
+  - {fileID: 21300000, guid: 1994fc43d352e124eb83fc67b2dfeb01, type: 3}
   - {fileID: 21300000, guid: ed4aa1638a4b82945af26a82acd379e2, type: 3}
   - {fileID: 21300000, guid: 4c6a0893d30108f4abc5c7b02e58dc14, type: 3}
   - {fileID: 21300000, guid: f3bb01a3ca7a4b34bb90493f1948bb91, type: 3}
@@ -362,6 +366,7 @@ SpriteAtlas:
   - b2
   - agility
   - marker-start
+  - zoom-in
   - frame_21_delay-0.11s
   - action icon
   - monster scroll arrow
@@ -378,6 +383,7 @@ SpriteAtlas:
   - PortraitBoxLeft
   - m-endris
   - party button
+  - zoom-out
   - b1
   - frame_02_delay-0.1s
   - corruption counter

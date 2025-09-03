@@ -8,7 +8,7 @@ using UnityEngine;
 using static LanguageManager;
 
 public enum Sex { NONE, MALE, FEMALE };
-public enum Race { NONE, ELF, MAN, DWARF, HALFLING, WIZARD, WEREBEAR, ENT };
+public enum Race { NONE, ELF, MAN, DWARF, HALFLING, WIZARD, WEREBEAR, ENT, DRAGON };
 public class Hero
 {
     public int id;
